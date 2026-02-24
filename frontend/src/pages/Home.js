@@ -120,6 +120,29 @@ function Home() {
     setIsNavOpen(false);
   };
 
+  const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+  const currentDay = today.getDate();
+  const monthLabel = today.toLocaleString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+  const leadingEmptyDays = (firstDayIndex + 6) % 7;
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+  const calendarDays = [
+    ...Array.from({ length: leadingEmptyDays }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+  ];
+
+  while (calendarDays.length % 7 !== 0) {
+    calendarDays.push(null);
+  }
+
   return (
     <>
       <header className="topbar" id="top">
@@ -156,7 +179,7 @@ function Home() {
               Health
             </a>
             <a href="/events" onClick={goToEventsDashboard}>
-              Event
+              Events
             </a>
             <a href="#career" onClick={(e) => scrollToSection(e, "career")}>
               Career
@@ -577,6 +600,84 @@ function Home() {
           </div>
         </section>
       </main>
+
+      <footer className="footer">
+        <div className="container footer__panel">
+          <div className="footer__support">
+            <p className="footer__kicker">Do you need any</p>
+            <h3 className="footer__heading">Support?</h3>
+            <a className="footer__contact footer__contact--accent" href="https://support.sliit.lk">
+              🌐 support.sliit.lk
+            </a>
+            <a className="footer__contact" href="tel:+94117544801">
+              📞 +94 11 754 4801
+            </a>
+            <a className="footer__feedback" href="https://support.sliit.lk">
+              Provide Feedback to SLIIT
+            </a>
+          </div>
+
+          <div className="footer__calendar" aria-label="Calendar preview">
+            <h3 className="footer__calendarTitle">Calendar</h3>
+            <div className="footer__calendarHead">
+              <strong>{monthLabel}</strong>
+            </div>
+            <div className="footer__weekdays">
+              {weekdayLabels.map((weekday) => (
+                <span key={weekday}>{weekday}</span>
+              ))}
+            </div>
+            <div className="footer__days">
+              {calendarDays.map((day, index) => {
+                if (!day) {
+                  return <span className="is-muted" key={`empty-${index}`}></span>;
+                }
+
+                const isToday = day === currentDay;
+                return (
+                  <span className={isToday ? "is-active" : ""} key={`day-${day}`}>
+                    {day}
+                  </span>
+                );
+              })}
+            </div>
+            <a className="footer__fullCalendar" href="/events" onClick={goToEventsDashboard}>
+              Full calendar
+            </a>
+          </div>
+        </div>
+
+        <div className="footer__bottom">
+          <div className="container footer__inner">
+            <div className="footer__brand">
+              <img className="brand__logo--img" src={campusLogo} alt="CampusZone Logo" />
+              <div>
+                <div className="footer__name">CampusZone</div>
+                <div className="footer__small">Student Productivity Platform</div>
+              </div>
+            </div>
+
+            <div className="footer__socials" aria-label="Social links">
+              <a href="#top" onClick={scrollToTop} aria-label="Facebook">
+                f
+              </a>
+              <a href="#top" onClick={scrollToTop} aria-label="Instagram">
+                ig
+              </a>
+              <a href="#top" onClick={scrollToTop} aria-label="LinkedIn">
+                in
+              </a>
+              <a href="#top" onClick={scrollToTop} aria-label="YouTube">
+                ▶
+              </a>
+            </div>
+
+            <a className="toTop" href="#top" onClick={scrollToTop} aria-label="Back to top">
+              ↑
+            </a>
+          </div>
+        </div>
+      </footer>
 
       <div
         className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
