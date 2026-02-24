@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import campusLogo from "../images/campus_logo.png";
 
@@ -9,6 +10,7 @@ const stats = [
 ];
 
 function Home() {
+  const navigate = useNavigate();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
@@ -112,6 +114,12 @@ function Home() {
     setIsNavOpen(false);
   };
 
+  const goToEventsDashboard = (event) => {
+    event.preventDefault();
+    navigate("/events");
+    setIsNavOpen(false);
+  };
+
   return (
     <>
       <header className="topbar" id="top">
@@ -147,7 +155,7 @@ function Home() {
             <a href="#health" onClick={(e) => scrollToSection(e, "health")}>
               Health
             </a>
-            <a href="#event" onClick={(e) => scrollToSection(e, "event")}>
+            <a href="/events" onClick={goToEventsDashboard}>
               Event
             </a>
             <a href="#career" onClick={(e) => scrollToSection(e, "career")}>
@@ -357,11 +365,8 @@ function Home() {
                   </p>
                   <a
                     className="post__link"
-                    href="/"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      showToast("Events page coming soon");
-                    }}
+                    href="/events"
+                    onClick={goToEventsDashboard}
                   >
                     Read more →
                   </a>
@@ -384,11 +389,8 @@ function Home() {
                   </p>
                   <a
                     className="post__link"
-                    href="/"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      showToast("Competitions list coming soon");
-                    }}
+                    href="/events"
+                    onClick={goToEventsDashboard}
                   >
                     Read more →
                   </a>
@@ -411,11 +413,8 @@ function Home() {
                   </p>
                   <a
                     className="post__link"
-                    href="/"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      showToast("Volunteer section coming soon");
-                    }}
+                    href="/events"
+                    onClick={goToEventsDashboard}
                   >
                     Read more →
                   </a>
