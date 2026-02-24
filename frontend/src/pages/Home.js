@@ -2,6 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "./Home.css";
 import campusLogo from "../images/campus_logo.png";
+import facebookIcon from "../images/facebook.png";
+import instagramIcon from "../images/instagram.png";
+import linkedinIcon from "../images/linkedin.png";
+import youtubeIcon from "../images/youtube.png";
 
 const stats = [
   { label: "Hour access", value: 24 },
@@ -659,16 +663,16 @@ function Home() {
 
             <div className="footer__socials" aria-label="Social links">
               <a href="#top" onClick={scrollToTop} aria-label="Facebook">
-                f
+                <img className="footer__socialIcon" src={facebookIcon} alt="Facebook" />
               </a>
               <a href="#top" onClick={scrollToTop} aria-label="Instagram">
-                ig
+                <img className="footer__socialIcon" src={instagramIcon} alt="Instagram" />
               </a>
               <a href="#top" onClick={scrollToTop} aria-label="LinkedIn">
-                in
+                <img className="footer__socialIcon" src={linkedinIcon} alt="LinkedIn" />
               </a>
               <a href="#top" onClick={scrollToTop} aria-label="YouTube">
-                ▶
+                <img className="footer__socialIcon" src={youtubeIcon} alt="YouTube" />
               </a>
             </div>
 

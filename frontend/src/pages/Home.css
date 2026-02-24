@@ -786,6 +786,13 @@ img{ max-width:100%; display:block; }
 }
 .footer__socials a:hover{ background: rgba(37, 182, 255, .32); }
 
+.footer__socialIcon{
+	width: 24px;
+	height: 24px;
+	object-fit: contain;
+	display:block;
+}
+
 .toTop{
 	width: 44px;
 	height: 44px;
