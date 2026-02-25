@@ -209,13 +209,13 @@ function EventDashboard() {
             <p className="footer__kicker">Do you need any</p>
             <h3 className="footer__heading">Support?</h3>
             <a className="footer__contact footer__contact--accent" href="https://support.sliit.lk">
-              🌐 support.sliit.lk
+              🌐 support.campuszone.lk
             </a>
             <a className="footer__contact" href="tel:+94117544801">
-              📞 +94 11 754 4801
+              📞 +94 11 754 0000
             </a>
             <a className="footer__feedback" href="https://support.sliit.lk">
-              Provide Feedback to SLIIT
+              Provide Feedback to CampusZone
             </a>
           </div>
 
