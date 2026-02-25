@@ -112,45 +112,173 @@
 }
 
 .eventCard {
-  background: rgba(255, 255, 255, 0.88);
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid rgba(7, 35, 56, 0.08);
-  border-radius: 22px;
-  padding: 22px;
+  border-radius: 20px;
+  overflow: hidden;
   box-shadow: 0 14px 36px rgba(2, 30, 55, 0.1);
 }
 
-.eventCard__icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  display: grid;
-  place-items: center;
-  font-size: 24px;
-  background: linear-gradient(135deg, var(--event-sky-100), var(--event-sky-300));
+.eventCard__media {
+  position: relative;
+  height: 235px;
+}
+
+.eventCard__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.eventCard__tag {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(130, 130, 130, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.eventCard__content {
+  padding: 18px 20px 16px;
 }
 
 .eventCard__title {
-  margin: 14px 0 8px;
-  font-size: 22px;
+  margin: 0 0 8px;
+  font-size: 34px;
+  line-height: 1.12;
+  letter-spacing: -0.4px;
   color: var(--event-ink);
 }
 
 .eventCard__text {
   margin: 0;
   color: var(--event-muted);
-  line-height: 1.7;
-  min-height: 84px;
+  line-height: 1.45;
+  min-height: 64px;
+  font-size: 17px;
+}
+
+.eventCard__actions {
+  margin-top: 18px;
+  display: flex;
+  justify-content: center;
+}
+
+.eventCard__btn {
+  padding: 8px 22px;
+  font-size: 16px;
+  border-radius: 16px;
 }
 
 .eventCard__cta {
   margin-top: 14px;
   border: 0;
-  border-radius: 12px;
-  padding: 10px 14px;
-  background: rgba(44, 184, 255, 0.14);
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
   color: var(--event-ink);
   font-weight: 700;
+  font-size: 32px;
+  line-height: 1;
   cursor: pointer;
+}
+
+.header__profileDropdown {
+  position: relative;
+}
+
+.header__profileBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 6px;
+  border: 1px solid rgba(44, 184, 255, 0.25);
+  border-radius: 12px;
+  background: rgba(191, 238, 255, 0.25);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--event-ink);
+}
+
+.header__profileBtn:hover {
+  background: rgba(191, 238, 255, 0.45);
+  border-color: rgba(44, 184, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(44, 184, 255, 0.15);
+}
+
+.header__profileText {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header__profileArrow {
+  font-size: 10px;
+  opacity: 0.6;
+  transition: transform 0.3s ease;
+}
+
+.header__profileBtn[aria-expanded="true"] .header__profileArrow {
+  transform: rotate(180deg);
+}
+
+.header__profileCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(44, 184, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.header__profileMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(44, 184, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 12px 40px rgba(44, 184, 255, 0.2);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 100;
+  backdrop-filter: blur(10px);
+}
+
+.header__profileMenuItem {
+  display: block;
+  padding: 12px 16px;
+  color: var(--event-ink);
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 1px solid rgba(2, 30, 55, 0.08);
+  transition: all 0.2s ease;
+}
+
+.header__profileMenuItem:last-child {
+  border-bottom: none;
+}
+
+.header__profileMenuItem:hover:not(.header__profileMenuItem--danger) {
+  background: rgba(44, 184, 255, 0.1);
+  padding-left: 20px;
+}
+
+.header__profileMenuItem--danger {
+  color: #ef4444;
+}
+
+.header__profileMenuItem--danger:hover {
+  background: rgba(239, 68, 68, 0.1);
+  padding-left: 20px;
 }
 
 @media (max-width: 960px) {
@@ -160,5 +288,26 @@
 
   .eventCard__text {
     min-height: auto;
+  }
+
+  .eventCard__title {
+    font-size: 30px;
+  }
+
+  .eventCard__cta {
+    font-size: 28px;
+  }
+
+  .header__profileBtn {
+    padding: 4px 8px 4px 4px;
+  }
+
+  .header__profileText {
+    display: none;
+  }
+
+  .header__profileCircle {
+    width: 28px;
+    height: 28px;
   }
 }

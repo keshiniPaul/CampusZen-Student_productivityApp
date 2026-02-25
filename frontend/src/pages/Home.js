@@ -6,6 +6,7 @@ import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
+import learningImage from "../images/learning.png";
 
 const stats = [
   { label: "Hour access", value: 24 },
@@ -215,11 +216,6 @@ function Home() {
 
           <div className="container hero__content">
             <div className="hero__text">
-              <div className="pill">
-                <span className="pill__dot" aria-hidden="true"></span>
-                CampusZone platform
-              </div>
-
               <h1 className="hero__title">
                 Campus services made <span className="accent">simple</span> for students.
               </h1>
@@ -249,7 +245,7 @@ function Home() {
                   href="#health"
                   onClick={(e) => scrollToSection(e, "health")}
                 >
-                  Explore Modules
+                  Explore Features
                 </a>
               </div>
 
@@ -542,7 +538,7 @@ function Home() {
             <div className="gallery">
               <figure className="gallery__item">
                 <img
-                  src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?auto=format&fit=crop&w=1200&q=80"
+                  src={learningImage}
                   alt="Study planning"
                   loading="lazy"
                 />
@@ -611,13 +607,13 @@ function Home() {
             <p className="footer__kicker">Do you need any</p>
             <h3 className="footer__heading">Support?</h3>
             <a className="footer__contact footer__contact--accent" href="https://support.sliit.lk">
-              🌐 support.sliit.lk
+              🌐 support.campuszone.lk
             </a>
             <a className="footer__contact" href="tel:+94117544801">
-              📞 +94 11 754 4801
+              📞 +94 11 754 0000
             </a>
             <a className="footer__feedback" href="https://support.sliit.lk">
-              Provide Feedback to SLIIT
+              Provide Feedback to CampusZone
             </a>
           </div>
 
@@ -654,7 +650,6 @@ function Home() {
         <div className="footer__bottom">
           <div className="container footer__inner">
             <div className="footer__brand">
-              <img className="brand__logo--img" src={campusLogo} alt="CampusZone Logo" />
               <div>
                 <div className="footer__name">CampusZone</div>
                 <div className="footer__small">Student Productivity Platform</div>
