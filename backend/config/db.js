@@ -7,11 +7,16 @@ const connectDB = async () => {
   }
 
   try {
-    const connection = await mongoose.connect(process.env.DATABASE_URL);
+    console.log("Connecting to MongoDB...");
+    const connection = await mongoose.connect(process.env.DATABASE_URL, {
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 45000,
+    });
     console.log(`MongoDB connected: ${connection.connection.host}`);
   } catch (error) {
     console.error("MongoDB connection error:", error.message);
-    process.exit(1);
+    console.log("Starting server without MongoDB connection...");
+    // Don't exit, allow server to start anyway
   }
 };
 
