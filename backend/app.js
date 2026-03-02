@@ -16,6 +16,10 @@ app.get("/", (req, res) => {
 	});
 });
 
+// Event routes
+const eventRoutes = require("./routes/eventroutes");
+app.use("/api/events", eventRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
 

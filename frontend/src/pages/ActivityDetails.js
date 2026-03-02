@@ -11,50 +11,158 @@ import profileImg from "../images/profile.png";
 
 // Sample activity data - replace with API calls later
 const activitiesData = {
-  event: {
+  "event": {
     id: "event-1",
     title: "Web Development Workshop",
     category: "Event",
+    shortDescription: "Learn modern web development with React and Node.js in this hands-on workshop.",
     date: "2026-03-15",
     time: "10:00 AM - 1:00 PM",
     venue: "Main Auditorium, Building A",
     description:
-      "Learn modern web development with React and Node.js. This workshop covers the fundamentals of full-stack web development and includes hands-on coding exercises. Perfect for beginners and intermediate developers.",
+      "Learn modern web development with React and Node.js. This workshop covers the fundamentals of full-stack web development and includes hands-on coding exercises. Perfect for beginners and intermediate developers. You'll learn about component-based architecture, state management, API integration, and deployment strategies. Bring your laptop and be ready to code!",
     registrationOpen: "2026-03-01",
     registrationClose: "2026-03-10",
     capacity: 100,
     registered: 45,
     image: require("../images/event1.png"),
+    isNew: true,
   },
-  sports: {
+  "sports": {
     id: "sports-1",
     title: "Cricket Tournament Registration",
     category: "Sports",
+    shortDescription: "Join the annual inter-batch cricket tournament and compete for trophies.",
     date: "2026-04-05",
     time: "2:00 PM",
     venue: "Sports Field, Campus Ground",
     description:
-      "Join the annual inter-batch cricket tournament. Teams of 11 players per batch. Register your team before the deadline. Winners will receive trophies and certificates.",
+      "Join the annual inter-batch cricket tournament. Teams of 11 players per batch. Register your team before the deadline. Winners will receive trophies and certificates. This is a great opportunity to showcase your cricketing skills and represent your batch. The tournament will be held over multiple days with knockout rounds leading to the grand finale.",
     registrationOpen: "2026-03-08",
     registrationClose: "2026-03-25",
     capacity: 200,
     registered: 180,
     image: require("../images/sport.png"),
+    isNew: false,
   },
-  community: {
+  "club-&-society": {
     id: "community-1",
     title: "IEEE Student Chapter Meetup",
     category: "Club & Society",
+    shortDescription: "Network with IEEE members and explore engineering career opportunities.",
     date: "2026-03-20",
     time: "3:30 PM - 5:00 PM",
     venue: "Digital Lab, Building B",
     description:
-      "Meet with IEEE student chapter members. Discuss upcoming projects, network with industry professionals, and explore career opportunities in engineering and technology.",
+      "Meet with IEEE student chapter members. Discuss upcoming projects, network with industry professionals, and explore career opportunities in engineering and technology. This meetup features guest speakers from leading tech companies, interactive sessions on emerging technologies, and networking opportunities with alumni working in the industry.",
     registrationOpen: "2026-03-05",
     registrationClose: "2026-03-18",
     capacity: 80,
     registered: 62,
     image: require("../images/club.png"),
+    isNew: false,
+  },
+  "viramaya": {
+    id: "viramaya",
+    title: "Viramaya Music Festival",
+    category: "Event",
+    shortDescription: "Annual music festival featuring live performances and cultural shows.",
+    date: "2026-03-22",
+    time: "6:00 PM - 11:00 PM",
+    venue: "SLIIT, Main Auditorium",
+    description:
+      "Experience the magic of Viramaya, SLIIT's premier music festival! This annual celebration brings together talented student performers, live bands, and cultural dance troupes for an unforgettable night of entertainment. Enjoy diverse musical genres from classical to contemporary, witness spectacular stage performances, and immerse yourself in the vibrant campus culture. This year's lineup includes special guest performances and surprise acts that you won't want to miss!",
+    registrationOpen: "2026-03-01",
+    registrationClose: "2026-03-20",
+    capacity: 500,
+    registered: 487,
+    image: require("../images/event1.png"),
+    isNew: true,
+  },
+  "lantharuma": {
+    id: "lantharuma",
+    title: "Lantharuma Drama Festival",
+    category: "Event",
+    shortDescription: "Showcase of theatrical performances by student drama societies.",
+    date: "2026-04-10",
+    time: "5:00 PM - 9:00 PM",
+    venue: "SLIIT, Drama Theatre",
+    description:
+      "Lantharuma is SLIIT's celebrated drama festival showcasing the finest theatrical talents from our student community. Watch as drama societies present compelling narratives, powerful performances, and creative storytelling through various theatrical forms. From contemporary plays to classic adaptations, this festival celebrates the art of drama and provides a platform for budding actors, directors, and playwrights to showcase their creativity. Experience thought-provoking performances that will leave you moved and inspired.",
+    registrationOpen: "2026-03-15",
+    registrationClose: "2026-04-08",
+    capacity: 350,
+    registered: 325,
+    image: require("../images/event1.png"),
+    isNew: false,
+  },
+  "get": {
+    id: "get",
+    title: "GET Tech Conference",
+    category: "Event",
+    shortDescription: "Technology conference with industry experts and innovation workshops.",
+    date: "2026-03-28",
+    time: "9:00 AM - 5:00 PM",
+    venue: "SLIIT, Convention Center",
+    description:
+      "The Global Engineering & Technology (GET) Conference is SLIIT's flagship tech event bringing together industry leaders, innovators, and students. Participate in cutting-edge workshops on AI, Machine Learning, Blockchain, Cybersecurity, and IoT. Attend keynote speeches from tech giants, engage in hands-on coding sessions, and network with professionals from leading tech companies. This full-day conference offers invaluable insights into emerging technologies and career pathways in the tech industry. Don't miss this opportunity to learn from the best and expand your tech horizons!",
+    registrationOpen: "2026-03-01",
+    registrationClose: "2026-03-26",
+    capacity: 600,
+    registered: 542,
+    image: require("../images/event1.png"),
+    isNew: true,
+  },
+  "career-day": {
+    id: "career-day",
+    title: "Career Day",
+    category: "Event",
+    shortDescription: "Meet recruiters from top companies and explore career opportunities.",
+    date: "2026-04-05",
+    time: "10:00 AM - 4:00 PM",
+    venue: "SLIIT, Main Building",
+    description:
+      "Career Day at SLIIT is your gateway to professional success! Meet with recruiters from top multinational companies and local industry leaders. Explore internship and full-time job opportunities across various sectors including IT, Engineering, Finance, Marketing, and more. Participate in mock interviews, CV review sessions, and career counseling workshops. Learn about company cultures, growth opportunities, and what employers are looking for in candidates. Dress professionally and bring multiple copies of your CV. This is your chance to make a lasting impression and kickstart your career!",
+    registrationOpen: "2026-03-10",
+    registrationClose: "2026-04-03",
+    capacity: 450,
+    registered: 396,
+    image: require("../images/event1.png"),
+    isNew: false,
+  },
+  "open-day": {
+    id: "open-day",
+    title: "Open Day",
+    category: "Event",
+    shortDescription: "Campus open day for prospective students and parents to visit.",
+    date: "2026-04-15",
+    time: "8:00 AM - 3:00 PM",
+    venue: "SLIIT, Campus Grounds",
+    description:
+      "Join us for SLIIT Open Day, where prospective students and their families can explore our world-class campus facilities! Tour our state-of-the-art laboratories, libraries, and innovation centers. Meet with faculty members and current students to learn about our diverse degree programs. Attend information sessions about admissions, scholarships, student life, and career prospects. Experience campus culture through live demonstrations, club exhibitions, and interactive sessions. Whether you're considering undergraduate or postgraduate studies, Open Day provides everything you need to make an informed decision about your educational future. Free campus tours run throughout the day!",
+    registrationOpen: "2026-03-20",
+    registrationClose: "2026-04-13",
+    capacity: 800,
+    registered: 678,
+    image: require("../images/event1.png"),
+    isNew: false,
+  },
+  "ganthera": {
+    id: "ganthera",
+    title: "Ganthera Cultural Show",
+    category: "Event",
+    shortDescription: "Celebration of diverse cultures through music, dance, and art.",
+    date: "2026-04-20",
+    time: "6:30 PM - 10:00 PM",
+    venue: "SLIIT, Amphitheatre",
+    description:
+      "Ganthera is SLIIT's vibrant celebration of cultural diversity and artistic expression! Experience the rich tapestry of Sri Lankan culture alongside international performances. Watch mesmerizing traditional dance performances, listen to soulful music from around the world, and admire artistic displays from talented student artists. The event features cultural food stalls, traditional craft exhibitions, and interactive cultural workshops. Ganthera brings together students from all backgrounds to celebrate unity in diversity. Whether you're a performer or an audience member, this cultural extravaganza promises an evening of beauty, tradition, and community spirit. Traditional attire is encouraged but not required!",
+    registrationOpen: "2026-03-25",
+    registrationClose: "2026-04-18",
+    capacity: 500,
+    registered: 425,
+    image: require("../images/event1.png"),
+    isNew: false,
   },
 };
 
@@ -64,6 +172,8 @@ function ActivityDetails() {
   const [activity, setActivity] = useState(null);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [showClosedMessage, setShowClosedMessage] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showNewActivityBanner, setShowNewActivityBanner] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navLinksRef = useRef(null);
@@ -72,7 +182,7 @@ function ActivityDetails() {
 
   useEffect(() => {
     const data =
-      activitiesData[activityType] || activitiesData.event;
+      activitiesData[activityType] || activitiesData["event"];
     setActivity(data);
 
     // Check if registration is open
@@ -80,6 +190,11 @@ function ActivityDetails() {
     const regOpen = new Date(data.registrationOpen);
     const regClose = new Date(data.registrationClose);
     setIsRegistrationOpen(today >= regOpen && today <= regClose);
+
+    // Show new activity banner if activity is new
+    if (data.isNew) {
+      setShowNewActivityBanner(true);
+    }
   }, [activityType]);
 
   useEffect(() => {
@@ -127,7 +242,10 @@ function ActivityDetails() {
       setTimeout(() => setShowClosedMessage(false), 3000);
       return;
     }
-    navigate(`/register/${activity.id}`);
+    // Simulate successful registration
+    setShowSuccessMessage(true);
+    setTimeout(() => setShowSuccessMessage(false), 4000);
+    // navigate(`/register/${activity.id}`);
   };
 
   if (!activity) {
@@ -179,6 +297,15 @@ function ActivityDetails() {
             </a>
           </div>
 
+          <button className="header__notificationBtn" aria-label="Notifications">
+            <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
+              <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
+            </svg>
+            <span className="header__notificationBadge">3</span>
+          </button>
+
           <div className="header__profileDropdown" ref={profileRef}>
             <button
               className="header__profileBtn"
@@ -201,100 +328,145 @@ function ActivityDetails() {
       </header>
 
       <main className="activityDetails">
-        <div className="activityDetails__hero container">
-          <Link to="/events" className="activityDetails__backBtn">
-            ← Back to Dashboard
-          </Link>
-          <h1 className="activityDetails__title">{activity.title}</h1>
-          <span className="activityDetails__category">{activity.category}</span>
-        </div>
-
-        <section className="activityDetails__container container">
-          <div className="activityDetails__main">
-            <img 
-              src={activity.image} 
-              alt={activity.title}
-              className="activityDetails__image"
-            />
-
-            <div className="activityDetails__info">
-              <div className="activityDetails__detail">
-                <h3>📅 Date</h3>
-                <p>{new Date(activity.date).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  year: "numeric",
-                  month: "long",
-                  day: "numeric",
-                })}</p>
+        {showNewActivityBanner && (
+          <div className="activityDetails__alertBanner">
+            <div className="container">
+              <div className="activityDetails__notification activityDetails__notification--info">
+                <span className="activityDetails__notificationIcon">🎉</span>
+                <span><strong>New Activity Alert!</strong> This is a recently added activity. Register now to secure your spot!</span>
+                <button 
+                  className="activityDetails__closeBtn" 
+                  onClick={() => setShowNewActivityBanner(false)}
+                  aria-label="Close notification"
+                >
+                  ×
+                </button>
               </div>
+            </div>
+          </div>
+        )}
 
-              <div className="activityDetails__detail">
-                <h3>⏰ Time</h3>
-                <p>{activity.time}</p>
-              </div>
-
-              <div className="activityDetails__detail">
-                <h3>📍 Venue</h3>
-                <p>{activity.venue}</p>
-              </div>
-
-              <div className="activityDetails__detail">
-                <h3>👥 Capacity</h3>
-                <p>{activity.registered} / {activity.capacity} registered</p>
-                <div className="activityDetails__progressBar">
-                  <div 
-                    className="activityDetails__progress"
-                    style={{ width: `${(activity.registered / activity.capacity) * 100}%` }}
-                  ></div>
+        <div className="activityDetails__layout">
+          <div className="activityDetails__contentWrapper container">
+            <div className="activityDetails__mainContent">
+              <div className="activityDetails__imageSection">
+                <img 
+                  src={activity.image} 
+                  alt={activity.title}
+                  className="activityDetails__heroImage"
+                />
+                <div className="activityDetails__imageOverlay">
+                  <div className="activityDetails__titleSection">
+                    <h1 className="activityDetails__mainTitle">{activity.title}</h1>
+                    <p className="activityDetails__shortDesc">{activity.shortDescription}</p>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="activityDetails__description">
-              <h2>About This Activity</h2>
-              <p>{activity.description}</p>
-            </div>
+              <div className="activityDetails__infoGrid">
+                <div className="activityDetails__infoCard">
+                  <div className="activityDetails__iconWrapper activityDetails__iconWrapper--date">
+                    <svg className="activityDetails__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div className="activityDetails__infoContent">
+                    <span className="activityDetails__label">DATE</span>
+                    <p className="activityDetails__value">{new Date(activity.date).toLocaleDateString("en-US", {
+                      weekday: "long",
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                    })}</p>
+                  </div>
+                </div>
 
-            <div className="activityDetails__registrationInfo">
-              <h3>Registration Period</h3>
-              <p>
-                Opens: {new Date(activity.registrationOpen).toLocaleDateString()}
-              </p>
-              <p>
-                Closes: {new Date(activity.registrationClose).toLocaleDateString()}
-              </p>
-              {isRegistrationOpen ? (
-                <p className="activityDetails__register--open">✓ Registration is Open</p>
-              ) : (
-                <p className="activityDetails__register--closed">✗ Registration is Closed</p>
+                <div className="activityDetails__infoCard">
+                  <div className="activityDetails__iconWrapper activityDetails__iconWrapper--time">
+                    <svg className="activityDetails__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M22 12C22 17.52 17.52 22 12 22C6.48 22 2 17.52 2 12C2 6.48 6.48 2 12 2C17.52 2 22 6.48 22 12Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M15.71 15.18L12.61 13.33C12.07 13.01 11.63 12.24 11.63 11.61V7.51001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div className="activityDetails__infoContent">
+                    <span className="activityDetails__label">TIME</span>
+                    <p className="activityDetails__value">{activity.time}</p>
+                  </div>
+                </div>
+
+                <div className="activityDetails__infoCard">
+                  <div className="activityDetails__iconWrapper activityDetails__iconWrapper--venue">
+                    <svg className="activityDetails__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 13.43C13.7231 13.43 15.12 12.0331 15.12 10.31C15.12 8.58687 13.7231 7.19 12 7.19C10.2769 7.19 8.88 8.58687 8.88 10.31C8.88 12.0331 10.2769 13.43 12 13.43Z" stroke="currentColor" strokeWidth="1.5"/>
+                      <path d="M3.62 8.49C5.59 -0.169998 18.42 -0.159998 20.38 8.5C21.53 13.58 18.37 17.88 15.6 20.54C13.59 22.48 10.41 22.48 8.39 20.54C5.63 17.88 2.47 13.57 3.62 8.49Z" stroke="currentColor" strokeWidth="1.5"/>
+                    </svg>
+                  </div>
+                  <div className="activityDetails__infoContent">
+                    <span className="activityDetails__label">VENUE</span>
+                    <p className="activityDetails__value">{activity.venue}</p>
+                  </div>
+                </div>
+
+                <div className="activityDetails__infoCard">
+                  <div className="activityDetails__iconWrapper activityDetails__iconWrapper--capacity">
+                    <svg className="activityDetails__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M18 7.16C17.94 7.15 17.87 7.15 17.81 7.16C16.43 7.11 15.33 5.98 15.33 4.58C15.33 3.15 16.48 2 17.91 2C19.34 2 20.49 3.16 20.49 4.58C20.48 5.98 19.38 7.11 18 7.16Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M16.97 14.44C18.34 14.67 19.85 14.43 20.91 13.72C22.32 12.78 22.32 11.24 20.91 10.3C19.84 9.59 18.31 9.35 16.94 9.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M5.97 7.16C6.03 7.15 6.1 7.15 6.16 7.16C7.54 7.11 8.64 5.98 8.64 4.58C8.64 3.15 7.49 2 6.06 2C4.63 2 3.48 3.16 3.48 4.58C3.49 5.98 4.59 7.11 5.97 7.16Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M7 14.44C5.63 14.67 4.12 14.43 3.06 13.72C1.65 12.78 1.65 11.24 3.06 10.3C4.13 9.59 5.66 9.35 7.03 9.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M12 14.63C11.94 14.62 11.87 14.62 11.81 14.63C10.43 14.58 9.33 13.45 9.33 12.05C9.33 10.62 10.48 9.47 11.91 9.47C13.34 9.47 14.49 10.63 14.49 12.05C14.48 13.45 13.38 14.59 12 14.63Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      <path d="M9.09 17.78C7.68 18.72 7.68 20.26 9.09 21.2C10.69 22.27 13.31 22.27 14.91 21.2C16.32 20.26 16.32 18.72 14.91 17.78C13.32 16.72 10.69 16.72 9.09 17.78Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                  </div>
+                  <div className="activityDetails__infoContent">
+                    <span className="activityDetails__label">CAPACITY</span>
+                    <p className="activityDetails__value">{activity.registered} / {activity.capacity} attendees</p>
+                    <div className="activityDetails__progressBar">
+                      <div 
+                        className="activityDetails__progress"
+                        style={{ width: `${(activity.registered / activity.capacity) * 100}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="activityDetails__descriptionSection">
+                <h2 className="activityDetails__sectionTitle">About This Activity</h2>
+                <p className="activityDetails__description">{activity.description}</p>
+              </div>
+
+              {(showClosedMessage || showSuccessMessage) && (
+                <div className="activityDetails__messages">
+                  {showClosedMessage && (
+                    <div className="activityDetails__notification activityDetails__notification--error">
+                      <span className="activityDetails__notificationIcon">⚠️</span>
+                      <span>Registration period is closed. Please check back during the registration window.</span>
+                    </div>
+                  )}
+
+                  {showSuccessMessage && (
+                    <div className="activityDetails__notification activityDetails__notification--success">
+                      <span className="activityDetails__notificationIcon">✓</span>
+                      <span><strong>Registration Successful!</strong> You have been registered for this activity. Check your email for confirmation details.</span>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
 
-            {showClosedMessage && (
-              <div className="activityDetails__notification activityDetails__notification--error">
-                Registration period is closed. Please check back during the registration window.
+            <aside className="activityDetails__sidebar">
+              <div className="activityDetails__registerCard">
+                <div className="activityDetails__sidebarInfo">
+                  <h3 className="activityDetails__sidebarTitle">Event Information</h3>
+                  <p className="activityDetails__helperText">
+                    For more details about this activity, please check the information on the left or contact the organizers.
+                  </p>
+                </div>
               </div>
-            )}
+            </aside>
           </div>
-
-          <aside className="activityDetails__sidebar">
-            <button
-              className={`activityDetails__registerBtn ${
-                isRegistrationOpen ? "is-enabled" : "is-disabled"
-              }`.trim()}
-              onClick={handleRegistrationClick}
-            >
-              {isRegistrationOpen ? "Register Now" : "Registration Closed"}
-            </button>
-            <div className="activityDetails__sidebarInfo">
-              <p className="activityDetails__small">
-                {isRegistrationOpen
-                  ? "Click the button above to join this activity"
-                  : "Registration period has ended"}
-              </p>
-            </div>
-          </aside>
-        </section>
+        </div>
       </main>
 
       <footer className="footer">
