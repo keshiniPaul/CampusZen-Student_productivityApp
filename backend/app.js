@@ -20,6 +20,10 @@ app.get("/", (req, res) => {
 const eventRoutes = require("./routes/eventroutes");
 app.use("/api/events", eventRoutes);
 
+// Sport routes
+const sportRoutes = require("./routes/sportroutes");
+app.use("/api/sports", sportRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
 
