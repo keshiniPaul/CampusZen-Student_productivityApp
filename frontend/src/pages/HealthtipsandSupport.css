@@ -1,0 +1,61 @@
+.healthtips-hero {
+  padding: 80px 0 40px;
+  text-align: center;
+}
+
+.healthtips-hero h1 {
+  font-size: 38px;
+  margin-bottom: 15px;
+}
+
+.healthtips-hero p {
+  max-width: 700px;
+  margin: auto;
+  color: var(--muted);
+}
+
+.healthtips-search {
+  margin: 40px auto;
+  display: flex;
+  justify-content: center;
+}
+
+.healthtips-search input {
+  width: 100%;
+  max-width: 500px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(2, 30, 55, 0.1);
+  font-size: 14px;
+}
+
+.healthtips-content {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+  padding-bottom: 60px;
+}
+
+.health-card {
+  background: var(--card-strong);
+  border-radius: var(--radius-lg);
+  padding: 25px;
+  box-shadow: var(--shadow);
+  border: 1px solid rgba(2, 30, 55, 0.07);
+  transition: 0.2s ease;
+}
+
+.health-card:hover {
+  transform: translateY(-4px);
+}
+
+.health-card__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.health-card__icon {
+  font-size: 24px;
+}

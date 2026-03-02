@@ -180,7 +180,12 @@ function Home() {
             <a href="#top" onClick={scrollToTop}>
               Home
             </a>
-            <a href="#health" onClick={(e) => scrollToSection(e, "health")}>
+            <a href="#health" onClick={(e) => {
+                      e.preventDefault();
+                  navigate("/health");
+                   setIsNavOpen(false);
+              }}
+               >
               Health
             </a>
             <a href="/events" onClick={goToEventsDashboard}>
@@ -317,7 +322,8 @@ function Home() {
                   href="/"
                   onClick={(e) => {
                     e.preventDefault();
-                    showToast("Wellbeing module coming soon");
+                    navigate("/daily-health");
+                    setIsNavOpen(false);
                   }}
                 >
                   Learn more →
@@ -335,7 +341,8 @@ function Home() {
                   href="/"
                   onClick={(e) => {
                     e.preventDefault();
-                    showToast("Counselling module coming soon");
+                    navigate("/health-resources");
+                    setIsNavOpen(false);
                   }}
                 >
                   Learn more →
@@ -353,7 +360,8 @@ function Home() {
                   href="/"
                   onClick={(e) => {
                     e.preventDefault();
-                    showToast("Healthy habits coming soon");
+                    navigate("/healthy-habits");
+                    setIsNavOpen(false);
                   }}
                 >
                   Learn more →
