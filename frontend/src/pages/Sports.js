@@ -9,6 +9,14 @@ import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
 import profileImg from "../images/profile.png";
+import cricketImg from "../images/cricket.png";
+import swimmingImg from "../images/swimming.png";
+import chessImg from "../images/chess.png";
+import badmintonImg from "../images/badminton.png";
+import carromImg from "../images/carrom.png";
+import footballImg from "../images/football.png";
+import volleyballImg from "../images/volleyball.png";
+import netballImg from "../images/netball.png";
 
 // Sports data with registration periods
 const initialSportsData = [
@@ -28,6 +36,7 @@ const initialSportsData = [
     requiresMedical: true,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
     registrationLink: "https://forms.gle/cricket-registration",
+    image: cricketImg,
   },
   {
     id: "volleyball",
@@ -45,6 +54,7 @@ const initialSportsData = [
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
     registrationLink: "https://forms.gle/volleyball-registration",
+    image: volleyballImg,
   },
   {
     id: "netball",
@@ -62,6 +72,7 @@ const initialSportsData = [
     requiresMedical: true,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
     registrationLink: "https://forms.gle/netball-registration",
+    image: netballImg,
   },
   {
     id: "badminton",
@@ -79,6 +90,7 @@ const initialSportsData = [
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
     registrationLink: "https://forms.gle/badminton-registration",
+    image: badmintonImg,
   },
   {
     id: "chess",
@@ -96,6 +108,7 @@ const initialSportsData = [
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
     registrationLink: "https://forms.gle/chess-registration",
+    image: chessImg,
   },
   {
     id: "carrom",
@@ -113,15 +126,16 @@ const initialSportsData = [
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
     registrationLink: "https://forms.gle/carrom-registration",
+    image: carromImg,
   },
   {
-    id: "tabletennis",
-    name: "Table Tennis Trials",
+    id: "football",
+    name: "Football Team Selection",
     category: "Team Selection",
-    description: "Selection for university table tennis team.",
+    description: "Selection for university football team.",
     registrationOpen: "2026-02-28",
     registrationClose: "2026-03-28",
-    venue: "Table Tennis Arena",
+    venue: "Football Field",
     coach: "Coach Dilshan Wickramasinghe",
     maxCapacity: 70,
     registered: 54,
@@ -129,7 +143,8 @@ const initialSportsData = [
     selectionCriteria: "Singles matches and reaction time",
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/tabletennis-registration",
+    registrationLink: "https://forms.gle/football-registration",
+    image: footballImg,
   },
   {
     id: "swimming",
@@ -147,6 +162,7 @@ const initialSportsData = [
     requiresMedical: true,
     skillLevels: ["Intermediate", "Advanced"],
     registrationLink: "https://forms.gle/swimming-registration",
+    image: swimmingImg,
   },
 ];
 
@@ -507,26 +523,17 @@ function Sports() {
 
             return (
               <article key={sport.id} className="sports__card">
-                <div className="sports__cardHeader">
-                  <div className="sports__iconWrapper">
-                    <div className="sports__icon">
-                      {sport.id === "cricket" && "🏏"}
-                      {sport.id === "volleyball" && "🏐"}
-                      {sport.id === "netball" && "🥅"}
-                      {sport.id === "badminton" && "🏸"}
-                      {sport.id === "chess" && "♟️"}
-                      {sport.id === "carrom" && "🎯"}
-                      {sport.id === "tabletennis" && "🏓"}
-                      {sport.id === "swimming" && "🏊"}
-                    </div>
+                <div className="sports__cardImage">
+                  <img src={sport.image} alt={sport.name} className="sports__image" />
+                  <div className="sports__cardBadges">
+                    <span className="sports__categoryBadge">{sport.category}</span>
+                    <span className={`sports__status ${statusInfo.class}`}>
+                      {statusInfo.status}
+                    </span>
                   </div>
-                  <span className={`sports__status ${statusInfo.class}`}>
-                    {statusInfo.status}
-                  </span>
                 </div>
 
                 <div className="sports__content">
-                  <span className="sports__category">{sport.category}</span>
                   <h2 className="sports__name">{sport.name}</h2>
                   <p className="sports__description">{sport.description}</p>
 
@@ -615,17 +622,10 @@ function Sports() {
         <div className="modal__overlay" onClick={() => setShowDetailsModal(false)}>
           <div className="modal__content modal__content--large" onClick={(e) => e.stopPropagation()}>
             <div className="modal__header">
+              <div className="modal__headerImage">
+                <img src={selectedSport.image} alt={selectedSport.name} className="modal__sportImage" />
+              </div>
               <div className="modal__headerContent">
-                <div className="modal__sportIcon">
-                  {selectedSport.id === "cricket" && "🏏"}
-                  {selectedSport.id === "volleyball" && "🏐"}
-                  {selectedSport.id === "netball" && "🥅"}
-                  {selectedSport.id === "badminton" && "🏸"}
-                  {selectedSport.id === "chess" && "♟️"}
-                  {selectedSport.id === "carrom" && "🎯"}
-                  {selectedSport.id === "tabletennis" && "🏓"}
-                  {selectedSport.id === "swimming" && "🏊"}
-                </div>
                 <div>
                   <h2 className="modal__title">{selectedSport.name}</h2>
                   <span className="modal__category">{selectedSport.category}</span>
