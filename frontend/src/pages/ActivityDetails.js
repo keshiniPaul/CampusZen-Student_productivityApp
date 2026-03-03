@@ -44,6 +44,8 @@ const activitiesData = {
       "Join the annual inter-batch cricket tournament. Teams of 11 players per batch. Register your team before the deadline. Winners will receive trophies and certificates. This is a great opportunity to showcase your cricketing skills and represent your batch. The tournament will be held over multiple days with knockout rounds leading to the grand finale.",
     registrationOpen: "2026-03-08",
     registrationClose: "2026-03-25",
+    capacity: 200,
+    registered: 180,
     image: require("../images/sport.png"),
     isNew: false,
   },
@@ -223,18 +225,6 @@ function ActivityDetails() {
     setIsNavOpen(false);
   };
 
-  const handleRegistrationClick = (e) => {
-    e.preventDefault();
-    if (!isRegistrationOpen) {
-      setShowClosedMessage(true);
-      setTimeout(() => setShowClosedMessage(false), 3000);
-      return;
-    }
-    // Simulate successful registration
-    setShowSuccessMessage(true);
-    setTimeout(() => setShowSuccessMessage(false), 4000);
-    // navigate(`/register/${activity.id}`);
-  };
 
   if (!activity) {
     return <div>Loading...</div>;

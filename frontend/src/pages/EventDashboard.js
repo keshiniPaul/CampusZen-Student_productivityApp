@@ -207,6 +207,7 @@ function EventDashboard() {
                   to={
                     category.title === "Event" ? "/events/list" : 
                     category.title === "Sports" ? "/sports" :
+                    category.title === "Club & Society" ? "/clubs" :
                     `/activity/${category.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`
                   }
                 >

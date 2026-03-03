@@ -24,6 +24,10 @@ app.use("/api/events", eventRoutes);
 const sportRoutes = require("./routes/sportroutes");
 app.use("/api/sports", sportRoutes);
 
+// Club routes
+const clubRoutes = require("./routes/clubroutes");
+app.use("/api/clubs", clubRoutes);
+
 app.use(notFound);
 app.use(errorHandler);
 

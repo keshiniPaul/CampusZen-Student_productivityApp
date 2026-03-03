@@ -171,7 +171,6 @@ function Sports() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [sports, setSports] = useState(initialSportsData);
-  const [isAdmin, setIsAdmin] = useState(false); // Set to true for admin
   const [selectedSport, setSelectedSport] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [notifications, setNotifications] = useState([]);

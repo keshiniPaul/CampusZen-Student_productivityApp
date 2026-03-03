@@ -248,4 +248,185 @@ export const eventAPI = {
   },
 };
 
-export default { sportsAPI, eventAPI };
+// Club API endpoints
+export const clubsAPI = {
+  // Get all clubs
+  getAllClubs: async (params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${API_BASE_URL}/clubs${queryString ? `?${queryString}` : ''}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch clubs');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching clubs:', error);
+      throw error;
+    }
+  },
+
+  // Get single club by ID
+  getClubById: async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/clubs/${id}`);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch club');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching club:', error);
+      throw error;
+    }
+  },
+
+  // Create new club (Admin only)
+  createClub: async (clubData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/clubs`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(clubData),
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create club');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error creating club:', error);
+      throw error;
+    }
+  },
+
+  // Update club (Admin/President only)
+  updateClub: async (id, clubData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/clubs/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(clubData),
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update club');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error updating club:', error);
+      throw error;
+    }
+  },
+
+  // Delete club (Admin only)
+  deleteClub: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/clubs/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete club');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error deleting club:', error);
+      throw error;
+    }
+  },
+
+  // Join club (Student only)
+  joinClub: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/clubs/${id}/join`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to join club');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error joining club:', error);
+      throw error;
+    }
+  },
+
+  // Manage member (Approve/Reject) (Admin/President only)
+  manageMember: async (clubId, memberId, action, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/clubs/${clubId}/members/${memberId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify({ action }),
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to manage member');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error managing member:', error);
+      throw error;
+    }
+  },
+
+  // Post announcement (Admin/President only)
+  postAnnouncement: async (id, announcementData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/clubs/${id}/announcements`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(announcementData),
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to post announcement');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error posting announcement:', error);
+      throw error;
+    }
+  },
+};
+
+const api = { sportsAPI, eventAPI, clubsAPI };
+
+export default api;
