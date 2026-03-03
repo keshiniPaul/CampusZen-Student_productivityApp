@@ -78,7 +78,7 @@ function Event() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [events, setEvents] = useState(initialEventsData);
-  const [isAdmin, setIsAdmin] = useState(true); // Set to true for admin, false for student
+  const [isAdmin] = useState(true); // Set to true for admin, false for student
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);

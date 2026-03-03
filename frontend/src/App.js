@@ -3,6 +3,8 @@ import Home from "./pages/Home";
 import EventDashboard from "./pages/EventDashboard";
 import Event from "./pages/Event";
 import ActivityDetails from "./pages/ActivityDetails";
+import Sports from "./pages/Sports";
+import Clubs from "./pages/Clubs";
 
 function App() {
   return (
@@ -11,6 +13,8 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/events" element={<EventDashboard />} />
         <Route path="/events/list" element={<Event />} />
+        <Route path="/sports" element={<Sports />} />
+        <Route path="/clubs" element={<Clubs />} />
         <Route path="/activity/:activityType" element={<ActivityDetails />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>

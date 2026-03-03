@@ -204,7 +204,12 @@ function EventDashboard() {
               <div className="eventDashboard__actions eventCard__actions">
                 <Link 
                   className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
-                  to={category.title === "Event" ? "/events/list" : `/activity/${category.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}
+                  to={
+                    category.title === "Event" ? "/events/list" : 
+                    category.title === "Sports" ? "/sports" :
+                    category.title === "Club & Society" ? "/clubs" :
+                    `/activity/${category.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`
+                  }
                 >
                   View Details
                 </Link>
