@@ -11,6 +11,8 @@ function Login() {
     email: "",
     password: "",
   });
+  
+  const [toast, setToast] = useState({ visible: false, message: "" });
 
   const handleChange = (e) => {
     setFormData({
@@ -19,22 +21,43 @@ function Login() {
     });
   };
 
+  const showToast = (message) => {
+    setToast({ visible: true, message });
+    
+    // Auto hide after 1.5 seconds and navigate
+    setTimeout(() => {
+      setToast({ visible: false, message: "" });
+      navigate("/dashboard");
+    }, 1500);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🔵 Later connect to backend
-    console.log(formData);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    /*
-    await fetch("http://localhost:5000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    */
+      const data = await response.json();
 
-    // Example redirect after login
-    navigate("/dashboard");
+      if (response.ok) {
+        // Store token and user info
+        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data.user));
+
+        // Show toast and auto-navigate
+        showToast("Login Successful 🎉");
+      } else {
+        alert(data.message);
+      }
+
+    } catch (error) {
+      console.error(error);
+      alert("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -107,6 +130,11 @@ function Login() {
           </div>
         </div>
       </footer>
+
+      {/* Toast Notification */}
+      <div className={`toast ${toast.visible ? "is-visible" : ""}`}>
+        {toast.message}
+      </div>
     </>
   );
 }

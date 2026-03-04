@@ -15,6 +15,9 @@ import Health from "./pages/Health";
 import Event from "./pages/Event";
 import ActivityDetails from "./pages/ActivityDetails";
 
+// new pages for login
+import LoginDashboard from "./pages/LoginDashboard";
+
 function App() {
   return (
     <BrowserRouter>
@@ -35,6 +38,7 @@ function App() {
         <Route path="/health-resources" element={<HealthtipsandSupport />} />
         <Route path="/healthy-habits" element={<HealthyHabits />} />
         <Route path="/health" element={<Health />} />
+        <Route path="/dashboard" element={<LoginDashboard />} />
 
         {/* Default */}
         <Route path="*" element={<Navigate to="/" replace />} />

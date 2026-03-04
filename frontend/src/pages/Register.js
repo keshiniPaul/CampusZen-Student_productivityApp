@@ -20,6 +20,10 @@ function Register() {
     });
   };
 
+  /* ===============================
+  UPDATED HANDLE SUBMIT ONLY
+  ================================= */
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -28,19 +32,29 @@ function Register() {
       return;
     }
 
-    // 🔵 Later connect this to backend
-    console.log(formData);
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: formData.fullName,
+          email: formData.email,
+          password: formData.password
+        }),
+      });
 
-    // Example backend call (you can uncomment later)
-    /*
-    await fetch("http://localhost:5000/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
-    */
+      const data = await response.json();
 
-    navigate("/login");
+      if (response.ok) {
+        alert("Registration Successful!");
+        navigate("/login");
+      } else {
+        alert(data.message);
+      }
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (

@@ -19,11 +19,33 @@ function Home() {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  
+  const profileDropdownRef = useRef(null);
 
   const toastTimerRef = useRef(null);
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const counterRefs = useRef([]);
+
+  // Check login status on component mount
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
+        setIsProfileDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -125,6 +147,25 @@ function Home() {
     setIsNavOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsLoggedIn(false);
+    setIsProfileDropdownOpen(false);
+    navigate("/");
+  };
+
+  const goToDashboard = () => {
+    navigate("/dashboard");
+    setIsProfileDropdownOpen(false);
+    setIsNavOpen(false);
+  };
+
+  const goToProfile = () => {
+    navigate("/profile");
+    setIsProfileDropdownOpen(false);
+    setIsNavOpen(false);
+  };
+
   const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -207,12 +248,45 @@ function Home() {
                 </svg>
                 <span className="header__notificationBadge">3</span>
               </button>
-              <a className="btn btn--ghost" href="/login" onClick={() => setIsNavOpen(false)}>
-                Login
-              </a>
-              <a className="btn btn--primary" href="/register" onClick={() => setIsNavOpen(false)}>
-                Register
-              </a>
+              
+              {isLoggedIn ? (
+                <div className="profile-dropdown" ref={profileDropdownRef}>
+                  <button 
+                    className="profile-icon-btn"
+                    onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
+                    aria-label="Profile menu"
+                  >
+                    👤
+                  </button>
+                  
+                  {isProfileDropdownOpen && (
+                    <div className="profile-dropdown-menu">
+                      <button onClick={goToProfile} className="dropdown-item">
+                        <span className="dropdown-icon">👤</span>
+                        My Profile
+                      </button>
+                      <button onClick={goToDashboard} className="dropdown-item">
+                        <span className="dropdown-icon">📊</span>
+                        Dashboard
+                      </button>
+                      <div className="dropdown-divider"></div>
+                      <button onClick={handleLogout} className="dropdown-item logout">
+                        <span className="dropdown-icon">🚪</span>
+                        Log out
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <>
+                  <a className="btn btn--ghost" href="/login" onClick={() => setIsNavOpen(false)}>
+                    Login
+                  </a>
+                  <a className="btn btn--primary" href="/register" onClick={() => setIsNavOpen(false)}>
+                    Register
+                  </a>
+                </>
+              )}
             </div>
           </div>
         </nav>
