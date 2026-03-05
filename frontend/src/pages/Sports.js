@@ -9,6 +9,7 @@ import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
 import profileImg from "../images/profile.png";
+import sportIcon from "../images/sport.png";
 import cricketImg from "../images/cricket.png";
 import swimmingImg from "../images/swimming.png";
 import chessImg from "../images/chess.png";
@@ -181,48 +182,64 @@ function Sports() {
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
 
+  // Debug: Log when Sports page loads
+  useEffect(() => {
+    console.log('Sports page loaded successfully!');
+    console.log('Initial sports data:', initialSportsData.length, 'items');
+    document.title = 'Sports - CampusZone';
+  }, []);
+
   // Fetch sports data from API
   useEffect(() => {
     const fetchSports = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        console.log('Fetching sports from API...');
         const response = await sportsAPI.getAllSports();
         
-        if (response.success && response.data) {
+        if (response.success && response.data && response.data.length > 0) {
           // Map backend data to match frontend format
-          const mappedSports = response.data.map((sport) => ({
-            id: sport._id,
-            name: sport.name,
-            category: sport.category,
-            description: sport.description,
-            registrationOpen: sport.registrationOpen,
-            registrationClose: sport.registrationClose,
-            venue: sport.venue,
-            coach: sport.coach,
-            maxCapacity: sport.maxCapacity,
-            registered: sport.registered,
-            eligibility: sport.eligibility,
-            selectionCriteria: sport.selectionCriteria,
-            requiresMedical: sport.requiresMedical,
-            skillLevels: sport.skillLevels,
-            registrationLink: sport.registrationLink,
-          }));
+          const mappedSports = response.data.map((sport) => {
+            // Find matching initial data for image fallback
+            const initialSport = initialSportsData.find(s => s.id === sport._id || s.name === sport.name);
+            return {
+              id: sport._id,
+              name: sport.name,
+              category: sport.category,
+              description: sport.description,
+              registrationOpen: sport.registrationOpen,
+              registrationClose: sport.registrationClose,
+              venue: sport.venue,
+              coach: sport.coach,
+              maxCapacity: sport.maxCapacity,
+              registered: sport.registered,
+              eligibility: sport.eligibility,
+              selectionCriteria: sport.selectionCriteria,
+              requiresMedical: sport.requiresMedical,
+              skillLevels: sport.skillLevels,
+              registrationLink: sport.registrationLink,
+              image: sport.image || (initialSport ? initialSport.image : sportIcon),
+            };
+          });
+          console.log('API sports loaded:', mappedSports.length);
           setSports(mappedSports);
         } else {
-          // Use fallback data if API fails
-          setSports(initialSportsData);
+          // API returned no data, keep initial data
+          console.log('API returned no data, keeping initial sports data');
+          setError('Using sample sports data.');
         }
       } catch (err) {
         console.error('Error fetching sports:', err);
         setError('Failed to load sports. Showing sample data.');
-        // Use fallback data on error
-        setSports(initialSportsData);
+        console.log('Using initial sports data due to error');
+        // Don't call setSports, keep the initial data
       } finally {
         setLoading(false);
       }
     };
 
+    // Set initial loading state
+    setLoading(true);
+    setError(null);
     fetchSports();
   }, []);
 
