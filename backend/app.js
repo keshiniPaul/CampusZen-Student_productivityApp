@@ -26,6 +26,14 @@ app.use("/api/auth", userRoutes);
 const eventRoutes = require("./routes/eventroutes");
 app.use("/api/events", eventRoutes);
 
+// Sport routes
+const sportRoutes = require("./routes/sportroutes");
+app.use("/api/sports", sportRoutes);
+
+// Club routes
+const clubRoutes = require("./routes/clubroutes");
+app.use("/api/clubs", clubRoutes);
+
 // Error handling middleware (must be last)
 app.use(notFound);
 app.use(errorHandler);

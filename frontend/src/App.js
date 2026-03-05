@@ -14,6 +14,8 @@ import Health from "./pages/Health";
 // Group member added pages
 import Event from "./pages/Event";
 import ActivityDetails from "./pages/ActivityDetails";
+import Sports from "./pages/Sports";
+import Clubs from "./pages/Clubs";
 
 // new pages for login
 import LoginDashboard from "./pages/LoginDashboard";
@@ -27,6 +29,8 @@ function App() {
         {/* Events */}
         <Route path="/events" element={<EventDashboard />} />
         <Route path="/events/list" element={<Event />} />
+        <Route path="/sports" element={<Sports />} />
+        <Route path="/clubs" element={<Clubs />} />
         <Route path="/activity/:activityType" element={<ActivityDetails />} />
 
         {/* Authentication */}

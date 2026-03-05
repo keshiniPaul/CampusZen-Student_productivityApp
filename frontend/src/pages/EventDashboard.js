@@ -202,12 +202,31 @@ function EventDashboard() {
               <h2 className="eventCard__title">{category.title}</h2>
               <p className="eventCard__text">{category.description}</p>
               <div className="eventDashboard__actions eventCard__actions">
-                <Link 
-                  className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
-                  to={category.title === "Event" ? "/events/list" : `/activity/${category.title.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-')}`}
-                >
-                  View Details
-                </Link>
+                {category.title === "Event" && (
+                  <Link 
+                    className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
+                    to="/events/list"
+                  >
+                    View Details
+                  </Link>
+                )}
+                {category.title === "Sports" && (
+                  <Link 
+                    className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
+                    to="/sports"
+                    onClick={() => console.log('Navigating to /sports')}
+                  >
+                    View Details
+                  </Link>
+                )}
+                {category.title === "Club & Society" && (
+                  <Link 
+                    className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
+                    to="/clubs"
+                  >
+                    View Details
+                  </Link>
+                )}
               </div>
             </div>
           </article>
