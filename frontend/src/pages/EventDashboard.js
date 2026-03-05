@@ -214,6 +214,7 @@ function EventDashboard() {
                   <Link 
                     className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
                     to="/sports"
+                    onClick={() => console.log('Navigating to /sports')}
                   >
                     View Details
                   </Link>

@@ -101,7 +101,7 @@
 .clubs__card:hover {
   box-shadow: 0 12px 32px rgba(245, 158, 11, 0.15);
   transform: translateY(-4px);
-  border-color: #f59e0b;
+  border-color: #92cbee;
 }
 
 .clubs__cardImage {
@@ -109,7 +109,7 @@
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: linear-gradient(135deg, #fef3c7 0%, #8adcfd 100%);
 }
 
 .clubs__image {
@@ -173,7 +173,7 @@
 }
 
 .status--comingSoon {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #0bb7f5, #0661d9);
   color: white;
 }
 
@@ -220,7 +220,7 @@
   padding: 16px;
   background: #fffbeb;
   border-radius: 12px;
-  border: 1px solid #fde68a;
+  border: 1px solid #8ad7fd;
 }
 
 .clubs__metaItem {
@@ -330,14 +330,14 @@
 }
 
 .clubs__btn--primary {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #59baf7, #204fdd);
   color: white;
   border: none;
 }
 
 .clubs__btn--primary:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  background: linear-gradient(135deg, #59baf7, #204fdd);
+  box-shadow: 0 4px 12px rgba(92, 120, 246, 0.4);
   transform: translateY(-2px);
 }
 
@@ -796,7 +796,7 @@
 .clubDetails__joinBtn {
   width: 100%;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #1cb8f5, #057fb0);
   color: white;
   border: none;
   border-radius: 10px;
@@ -807,7 +807,7 @@
 }
 
 .clubDetails__joinBtn:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
+  background: linear-gradient(135deg, #0fa8ea, #096ab4);
   box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
   transform: translateY(-2px);
 }

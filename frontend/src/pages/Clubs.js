@@ -170,46 +170,63 @@ function Clubs() {
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
 
+  // Debug: Log when Clubs page loads
+  useEffect(() => {
+    console.log('Clubs page loaded successfully!');
+    console.log('Initial clubs data:', initialClubsData.length, 'items');
+    document.title = 'Clubs - CampusZone';
+  }, []);
+
   // Fetch clubs data from API
   useEffect(() => {
     const fetchClubs = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        console.log('Fetching clubs from API...');
         const response = await clubsAPI.getAllClubs();
         
-        if (response.success && response.data) {
-          const mappedClubs = response.data.map((club) => ({
-            id: club._id,
-            name: club.name,
-            category: club.category,
-            description: club.description,
-            registrationOpen: club.registrationOpen,
-            registrationClose: club.registrationClose,
-            president: club.president,
-            advisor: club.advisor,
-            maxMembers: club.maxMembers,
-            currentMembers: club.currentMembers,
-            vision: club.vision,
-            mission: club.mission,
-            upcomingEvents: club.upcomingEvents,
-            socialMedia: club.socialMedia,
-            registrationLink: club.registrationLink,
-            image: club.image || clubImg,
-          }));
+        if (response.success && response.data && response.data.length > 0) {
+          const mappedClubs = response.data.map((club) => {
+            // Find matching initial data for image fallback
+            const initialClub = initialClubsData.find(c => c.id === club._id || c.name === club.name);
+            return {
+              id: club._id,
+              name: club.name,
+              category: club.category,
+              description: club.description,
+              registrationOpen: club.registrationOpen,
+              registrationClose: club.registrationClose,
+              president: club.president,
+              advisor: club.advisor,
+              maxMembers: club.maxMembers,
+              currentMembers: club.currentMembers,
+              vision: club.vision,
+              mission: club.mission,
+              upcomingEvents: club.upcomingEvents,
+              socialMedia: club.socialMedia,
+              registrationLink: club.registrationLink,
+              image: club.image || (initialClub ? initialClub.image : clubImg),
+            };
+          });
+          console.log('API clubs loaded:', mappedClubs.length);
           setClubs(mappedClubs);
         } else {
-          setClubs(initialClubsData);
+          // API returned no data, keep initial data
+          console.log('API returned no data, keeping initial clubs data');
+          setError('Using sample clubs data.');
         }
       } catch (err) {
         console.error('Error fetching clubs:', err);
         setError('Failed to load clubs. Showing sample data.');
-        setClubs(initialClubsData);
+        console.log('Using initial clubs data due to error');
+        // Don't call setClubs, keep the initial data
       } finally {
         setLoading(false);
       }
     };
 
+    // Set initial loading state
+    setLoading(true);
+    setError(null);
     fetchClubs();
   }, []);
 
