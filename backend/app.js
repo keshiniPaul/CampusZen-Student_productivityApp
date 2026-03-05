@@ -5,16 +5,22 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 
 const app = express();
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
 
+// Home route
 app.get("/", (req, res) => {
-	res.status(200).json({
-		message: "Backend connected successfully!"
-	});
+  res.status(200).json({
+    message: "Backend connected successfully!"
+  });
 });
+
+// User authentication routes
+const userRoutes = require("./routes/userroutes");
+app.use("/api/auth", userRoutes);
 
 // Event routes
 const eventRoutes = require("./routes/eventroutes");
@@ -28,6 +34,7 @@ app.use("/api/sports", sportRoutes);
 const clubRoutes = require("./routes/clubroutes");
 app.use("/api/clubs", clubRoutes);
 
+// Error handling middleware (must be last)
 app.use(notFound);
 app.use(errorHandler);
 
