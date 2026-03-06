@@ -1,3 +1,4 @@
+// healthController.js
 const mongoose = require('mongoose');
 const HealthEntry = require('../models/HealthEntryModel');
 
@@ -13,19 +14,22 @@ exports.createHealthEntry = async (req, res) => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    // Check duplicate
+    // Check if there's an existing entry for today
     const existingEntry = await HealthEntry.findOne({
       user: userId,
       date: today,
     });
 
+    // If there's an existing entry, return error
+    // The user should use the edit functionality instead
     if (existingEntry) {
       return res.status(400).json({
         success: false,
-        message: "You already added today's entry.",
+        message: "You already have an entry for today. Please edit the existing entry instead.",
       });
     }
 
+    // Create new entry
     const entry = await HealthEntry.create({
       user: userId,
       date: today,
