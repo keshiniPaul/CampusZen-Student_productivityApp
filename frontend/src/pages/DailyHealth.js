@@ -14,20 +14,37 @@ function DailyHealth() {
   const [toastVisible, setToastVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  
+  // Form state
   const [formData, setFormData] = useState({
     sleepHours: "",
     exerciseMinutes: "",
     mood: "",
     stress: "",
+    notes: ""
   });
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
+  const [editingEntry, setEditingEntry] = useState(null);
+  const [entries, setEntries] = useState([]);
+  const [userStats, setUserStats] = useState({
+    weeklyCompletion: 0,
+    streak: 0,
+    rank: 'New'
+  });
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [entryToDelete, setEntryToDelete] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  
   const totalSteps = 4;
   
   const profileDropdownRef = useRef(null);
   const toastTimerRef = useRef(null);
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
+
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
 
   const today = new Date().toLocaleDateString("en-US", {
     weekday: 'long',
@@ -36,10 +53,31 @@ function DailyHealth() {
     day: 'numeric'
   });
 
+  // ⭐ Step 1 — Add This Mapping (Very Important)
+  const sleepNumberMap = {
+    "less-than-5": 4,
+    "5-6": 5.5,
+    "6-7": 6.5,
+    "7-8": 7.5,
+    "more-than-8": 9
+  };
+
+  const exerciseNumberMap = {
+    "none": 0,
+    "1-30": 20,
+    "31-60": 45,
+    "61-90": 75,
+    "more-than-90": 120
+  };
+
   // Check login status on component mount
   useEffect(() => {
     const token = localStorage.getItem("token");
     setIsLoggedIn(!!token);
+    if (token) {
+      fetchEntries();
+      fetchUserStats();
+    }
   }, []);
 
   // Close dropdown when clicking outside
@@ -96,6 +134,137 @@ function DailyHealth() {
     }, 3000);
   };
 
+  // API Functions
+  const fetchEntries = async () => {
+    setIsLoading(true);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/health/entries`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setEntries(data.data);
+      } else {
+        showToast(data.message || 'Failed to fetch entries', 'error');
+      }
+    } catch (error) {
+      console.error('Error fetching entries:', error);
+      showToast('Error connecting to server', 'error');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchUserStats = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/health/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setUserStats(data.data);
+      }
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
+  const createEntry = async (entryData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/health/entries`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entryData)
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        showToast('Health entry saved successfully! 🎉');
+        fetchEntries();
+        fetchUserStats();
+        resetForm();
+      } else {
+        showToast(data.message || 'Failed to save entry', 'error');
+      }
+    } catch (error) {
+      console.error('Error creating entry:', error);
+      showToast('Error connecting to server', 'error');
+    }
+  };
+
+  const updateEntry = async (id, entryData) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/health/entries/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(entryData)
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        showToast('Health entry updated successfully! ✏️');
+        fetchEntries();
+        fetchUserStats();
+        resetForm();
+      } else {
+        showToast(data.message || 'Failed to update entry', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating entry:', error);
+      showToast('Error connecting to server', 'error');
+    }
+  };
+
+  // Fixed deleteEntry function
+  const deleteEntry = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/health/entries/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.message || 'Failed to delete entry');
+      }
+
+      showToast('Entry deleted successfully');
+      fetchEntries();
+      fetchUserStats();
+      setShowDeleteModal(false);
+      setEntryToDelete(null);
+    } catch (error) {
+      console.error('Error deleting entry:', error);
+      showToast(error.message || 'Error connecting to server', 'error');
+    }
+  };
+
   const scrollToTop = (e) => {
     e.preventDefault();
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -140,34 +309,85 @@ function DailyHealth() {
     });
   };
 
+  const handleEdit = (entry) => {
+    setEditingEntry(entry);
+    setFormData({
+      sleepHours: entry.sleepHours,
+      exerciseMinutes: entry.exerciseMinutes,
+      mood: entry.mood,
+      stress: entry.stress,
+      notes: entry.notes || ""
+    });
+    setCurrentStep(1);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    showToast("Editing entry from " + new Date(entry.date).toLocaleDateString(), "info");
+  };
+
+  // Fixed handleDeleteClick function
+  const handleDeleteClick = (entry) => {
+    setEntryToDelete(entry);
+    setShowDeleteModal(true);
+  };
+
+  // Fixed confirmDelete function
+  const confirmDelete = () => {
+    if (entryToDelete) {
+      // Use the correct ID field - check both _id and id
+      const entryId = entryToDelete._id || entryToDelete.id;
+      deleteEntry(entryId);
+    }
+  };
+
+  const resetForm = () => {
+    setFormData({
+      sleepHours: "",
+      exerciseMinutes: "",
+      mood: "",
+      stress: "",
+      notes: ""
+    });
+    setEditingEntry(null);
+    setCurrentStep(1);
+  };
+
+  // ⭐ Step 2 — Replace handleSubmit Function
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    // Validate all fields are filled
-    const isComplete = Object.values(formData).every(value => value !== "");
-    
-    if (!isComplete) {
-      showToast("Please complete all sections before saving", "error");
-      setIsSubmitting(false);
-      return;
+    const requiredFields = ["sleepHours", "exerciseMinutes", "mood", "stress"];
+
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        showToast("Please complete all sections before saving", "error");
+        setIsSubmitting(false);
+        return;
+      }
     }
 
-    const payload = {
-      ...formData,
+    const entryData = {
+      mood: formData.mood,
+      stress: formData.stress,
+      notes: formData.notes || "",
       date: new Date().toISOString(),
-      timestamp: Date.now(),
+
+      // ⭐ Convert MCQ string → number
+      sleepHours: sleepNumberMap[formData.sleepHours] || 0,
+      exerciseMinutes: exerciseNumberMap[formData.exerciseMinutes] || 0
     };
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      if (editingEntry) {
+        await updateEntry(editingEntry._id || editingEntry.id, entryData);
+      } else {
+        await createEntry(entryData);
+      }
+    } catch (error) {
+      console.error(error);
+      showToast("Submission failed", "error");
+    }
 
-    console.log("Health entry saved:", payload);
-    showToast("Health entry saved successfully! 🎉");
-    
-    setTimeout(() => {
-      navigate("/health");
-    }, 1500);
+    setIsSubmitting(false);
   };
 
   const nextStep = () => {
@@ -180,6 +400,67 @@ function DailyHealth() {
     if (currentStep > 1) {
       setCurrentStep(currentStep - 1);
     }
+  };
+
+  const cancelEdit = () => {
+    resetForm();
+    showToast("Edit cancelled", "info");
+  };
+
+  const formatDate = (dateString) => {
+    const options = { 
+      weekday: 'long', 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
+  const getMoodEmoji = (mood) => {
+    const moodMap = {
+      'very-low': '😞',
+      'low': '🙂',
+      'neutral': '😐',
+      'good': '😃',
+      'very-happy': '🤩'
+    };
+    return moodMap[mood] || '😐';
+  };
+
+  const getStressEmoji = (stress) => {
+    const stressMap = {
+      'very-low': '😌',
+      'low': '🙂',
+      'moderate': '😐',
+      'high': '😰',
+      'very-high': '😫'
+    };
+    return stressMap[stress] || '😐';
+  };
+
+  const getSleepLabel = (sleepValue) => {
+    const sleepMap = {
+      'less-than-5': '😴 <5h',
+      '5-6': '🌤️ 5-6h',
+      '6-7': '🌥️ 6-7h',
+      '7-8': '😊 7-8h',
+      'more-than-8': '🌟 >8h'
+    };
+    return sleepMap[sleepValue] || sleepValue;
+  };
+
+  const getExerciseLabel = (exerciseValue) => {
+    const exerciseMap = {
+      'none': '🚫 None',
+      '1-30': '🚶 1-30m',
+      '31-60': '🏃 31-60m',
+      '61-90': '🔥 61-90m',
+      'more-than-90': '⚡ >90m'
+    };
+    return exerciseMap[exerciseValue] || exerciseValue;
   };
 
   /* ================= MCQ DATA ================= */
@@ -379,16 +660,16 @@ function DailyHealth() {
             <p className="daily-health-hero__date">{today}</p>
             <div className="daily-health-hero__stats">
               <div className="daily-health-hero__stat">
-                <span className="daily-health-hero__stat-value">92%</span>
+                <span className="daily-health-hero__stat-value">{userStats.weeklyCompletion}%</span>
                 <span className="daily-health-hero__stat-label">Weekly Completion</span>
               </div>
               <div className="daily-health-hero__stat">
-                <span className="daily-health-hero__stat-value">5</span>
+                <span className="daily-health-hero__stat-value">{userStats.streak}</span>
                 <span className="daily-health-hero__stat-label">Day Streak</span>
               </div>
               <div className="daily-health-hero__stat">
                 <span className="daily-health-hero__stat-value">🏆</span>
-                <span className="daily-health-hero__stat-label">Top 10%</span>
+                <span className="daily-health-hero__stat-label">{userStats.rank}</span>
               </div>
             </div>
           </div>
@@ -440,40 +721,33 @@ function DailyHealth() {
               <div className="daily-health-sidebar__card">
                 <h4 className="daily-health-sidebar__subtitle">Recent Activity</h4>
                 <div className="daily-health-sidebar__activity">
-                  <div className="daily-health-sidebar__activity-item">
-                    <span className="daily-health-sidebar__activity-day">Mon</span>
-                    <span className="daily-health-sidebar__activity-status completed"></span>
-                  </div>
-                  <div className="daily-health-sidebar__activity-item">
-                    <span className="daily-health-sidebar__activity-day">Tue</span>
-                    <span className="daily-health-sidebar__activity-status completed"></span>
-                  </div>
-                  <div className="daily-health-sidebar__activity-item">
-                    <span className="daily-health-sidebar__activity-day">Wed</span>
-                    <span className="daily-health-sidebar__activity-status completed"></span>
-                  </div>
-                  <div className="daily-health-sidebar__activity-item">
-                    <span className="daily-health-sidebar__activity-day">Thu</span>
-                    <span className="daily-health-sidebar__activity-status completed"></span>
-                  </div>
-                  <div className="daily-health-sidebar__activity-item">
-                    <span className="daily-health-sidebar__activity-day">Fri</span>
-                    <span className="daily-health-sidebar__activity-status completed"></span>
-                  </div>
-                  <div className="daily-health-sidebar__activity-item">
-                    <span className="daily-health-sidebar__activity-day">Sat</span>
-                    <span className="daily-health-sidebar__activity-status"></span>
-                  </div>
-                  <div className="daily-health-sidebar__activity-item">
-                    <span className="daily-health-sidebar__activity-day">Sun</span>
-                    <span className="daily-health-sidebar__activity-status"></span>
-                  </div>
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day, index) => {
+                    const hasEntryToday = entries.some(entry => {
+                      const entryDate = new Date(entry.date).toLocaleDateString('en-US', { weekday: 'short' });
+                      return entryDate === day;
+                    });
+                    
+                    return (
+                      <div key={day} className="daily-health-sidebar__activity-item">
+                        <span className="daily-health-sidebar__activity-day">{day}</span>
+                        <span className={`daily-health-sidebar__activity-status ${hasEntryToday ? 'completed' : ''}`}></span>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </aside>
 
             {/* Right Side - Form */}
             <div className="daily-health-form-container">
+              {/* Edit Mode Indicator */}
+              {editingEntry && (
+                <div className="edit-mode-indicator">
+                  <span>✏️ Editing entry from {new Date(editingEntry.date).toLocaleDateString()}</span>
+                  <button onClick={cancelEdit} className="edit-mode-cancel">Cancel</button>
+                </div>
+              )}
+
               {/* Progress Bar */}
               <div className="daily-health-progress">
                 <div className="daily-health-progress__bar">
@@ -522,6 +796,22 @@ function DailyHealth() {
                     {renderMCQ("stress", stressOptions, formData.stress)}
                   </div>
 
+                  {/* Notes Field (Optional) */}
+                  {currentStep === 4 && (
+                    <div className="notes-field">
+                      <label htmlFor="notes" className="notes-label">Additional Notes (Optional)</label>
+                      <textarea
+                        id="notes"
+                        name="notes"
+                        value={formData.notes}
+                        onChange={handleChange}
+                        placeholder="Any additional thoughts about your day?"
+                        rows="3"
+                        className="notes-textarea"
+                      />
+                    </div>
+                  )}
+
                   {/* Form Navigation */}
                   <div className="form-navigation">
                     {currentStep > 1 && (
@@ -553,7 +843,7 @@ function DailyHealth() {
                         className="btn btn--primary btn--lg"
                         disabled={isSubmitting}
                       >
-                        {isSubmitting ? 'Saving...' : 'Complete Check-in ✓'}
+                        {isSubmitting ? 'Saving...' : (editingEntry ? 'Update Entry ✏️' : 'Complete Check-in ✓')}
                       </button>
                     )}
                   </div>
@@ -563,7 +853,9 @@ function DailyHealth() {
               {/* Summary Card (visible when all steps completed) */}
               {Object.values(formData).every(value => value !== "") && (
                 <div className="daily-health-summary">
-                  <h3 className="daily-health-summary__title">Today's Summary</h3>
+                  <h3 className="daily-health-summary__title">
+                    {editingEntry ? 'Editing Summary' : "Today's Summary"}
+                  </h3>
                   <div className="daily-health-summary__grid">
                     <div className="daily-health-summary__item">
                       <span className="daily-health-summary__item-label">Sleep</span>
@@ -592,10 +884,104 @@ function DailyHealth() {
                   </div>
                 </div>
               )}
+
+              {/* Past Entries List */}
+              <div className="entries-list">
+                <h3 className="entries-list__title">Your Past Entries</h3>
+                
+                {isLoading ? (
+                  <div className="entries-list__loading">Loading entries...</div>
+                ) : entries.length === 0 ? (
+                  <div className="entries-list__empty">
+                    <p>No entries yet. Complete your first check-in!</p>
+                  </div>
+                ) : (
+                  <div className="entries-list__grid">
+                    {entries.map(entry => (
+                      <div key={entry._id || entry.id} className="entry-card">
+                        <div className="entry-card__header">
+                          <span className="entry-card__date">{formatDate(entry.date)}</span>
+                          <div className="entry-card__actions">
+                            <button 
+                              className="entry-card__btn entry-card__btn--edit"
+                              onClick={() => handleEdit(entry)}
+                              title="Edit entry"
+                            >
+                              ✏️
+                            </button>
+                            <button 
+                              className="entry-card__btn entry-card__btn--delete"
+                              onClick={() => handleDeleteClick(entry)}
+                              title="Delete entry"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                        
+                        <div className="entry-card__content">
+                          <div className="entry-card__item">
+                            <span className="entry-card__item-label">😴 Sleep</span>
+                            <span className="entry-card__item-value">{getSleepLabel(entry.sleepHours)}</span>
+                          </div>
+                          
+                          <div className="entry-card__item">
+                            <span className="entry-card__item-label">🏃 Exercise</span>
+                            <span className="entry-card__item-value">{getExerciseLabel(entry.exerciseMinutes)}</span>
+                          </div>
+                          
+                          <div className="entry-card__item">
+                            <span className="entry-card__item-label">{getMoodEmoji(entry.mood)} Mood</span>
+                            <span className="entry-card__item-value">{entry.mood?.replace('-', ' ')}</span>
+                          </div>
+                          
+                          <div className="entry-card__item">
+                            <span className="entry-card__item-label">{getStressEmoji(entry.stress)} Stress</span>
+                            <span className="entry-card__item-value">{entry.stress?.replace('-', ' ')}</span>
+                          </div>
+
+                          {entry.notes && (
+                            <div className="entry-card__notes">
+                              <span className="entry-card__notes-label">📝 Notes:</span>
+                              <p className="entry-card__notes-text">{entry.notes}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
       </main>
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3 className="modal__title">Delete Entry</h3>
+            <p className="modal__message">
+              Are you sure you want to delete this entry from {entryToDelete && formatDate(entryToDelete.date)}?
+            </p>
+            <div className="modal__actions">
+              <button 
+                className="modal__btn modal__btn--cancel"
+                onClick={() => setShowDeleteModal(false)}
+              >
+                Cancel
+              </button>
+              <button 
+                className="modal__btn modal__btn--delete"
+                onClick={confirmDelete}
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* ================= FOOTER ================= */}
       <footer className="footer">
@@ -663,8 +1049,311 @@ function DailyHealth() {
       >
         {toastText}
       </div>
+
+      {/* Add CSS for new elements */}
+      <style jsx>{`
+        .edit-mode-indicator {
+          background: #e0f2fe;
+          border: 1px solid #7dd3fc;
+          border-radius: 8px;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          animation: slideDown 0.3s ease;
+        }
+
+        .edit-mode-indicator span {
+          color: #0369a1;
+          font-weight: 500;
+        }
+
+        .edit-mode-cancel {
+          background: none;
+          border: none;
+          color: #0369a1;
+          font-weight: 600;
+          cursor: pointer;
+          padding: 0.25rem 0.75rem;
+          border-radius: 4px;
+          transition: all 0.2s ease;
+        }
+
+        .edit-mode-cancel:hover {
+          background: #bae6fd;
+        }
+
+        .notes-field {
+          margin-top: 2rem;
+          padding-top: 1rem;
+          border-top: 1px solid #e2e8f0;
+        }
+
+        .notes-label {
+          display: block;
+          font-weight: 500;
+          color: #4a5568;
+          margin-bottom: 0.5rem;
+        }
+
+        .notes-textarea {
+          width: 100%;
+          padding: 0.75rem;
+          border: 1px solid #cbd5e0;
+          border-radius: 8px;
+          font-family: inherit;
+          font-size: 0.95rem;
+          resize: vertical;
+        }
+
+        .notes-textarea:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .entries-list {
+          margin-top: 2rem;
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .entries-list__title {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #1e293b;
+          margin-bottom: 1.5rem;
+          padding-bottom: 1rem;
+          border-bottom: 2px solid #e2e8f0;
+        }
+
+        .entries-list__empty,
+        .entries-list__loading {
+          text-align: center;
+          padding: 3rem;
+          background: #f8fafc;
+          border-radius: 12px;
+          color: #64748b;
+          font-size: 1.1rem;
+        }
+
+        .entries-list__grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: 1.5rem;
+        }
+
+        .entry-card {
+          background: #f8fafc;
+          border-radius: 12px;
+          padding: 1.5rem;
+          transition: all 0.3s ease;
+          border: 1px solid #e2e8f0;
+        }
+
+        .entry-card:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+          border-color: #cbd5e1;
+        }
+
+        .entry-card__header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1rem;
+          padding-bottom: 0.75rem;
+          border-bottom: 1px solid #e2e8f0;
+        }
+
+        .entry-card__date {
+          font-size: 0.9rem;
+          color: #64748b;
+          font-weight: 500;
+        }
+
+        .entry-card__actions {
+          display: flex;
+          gap: 0.5rem;
+        }
+
+        .entry-card__btn {
+          background: none;
+          border: none;
+          font-size: 1.2rem;
+          cursor: pointer;
+          padding: 0.25rem;
+          border-radius: 6px;
+          transition: all 0.2s ease;
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+
+        .entry-card__btn--edit:hover {
+          background: #e0f2fe;
+          transform: scale(1.1);
+        }
+
+        .entry-card__btn--delete:hover {
+          background: #fee2e2;
+          transform: scale(1.1);
+        }
+
+        .entry-card__content {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+        }
+
+        .entry-card__item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 0;
+        }
+
+        .entry-card__item-label {
+          color: #475569;
+          font-size: 0.95rem;
+          display: flex;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .entry-card__item-value {
+          font-weight: 600;
+          color: #1e293b;
+          background: white;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.9rem;
+        }
+
+        .entry-card__notes {
+          margin-top: 0.75rem;
+          padding-top: 0.75rem;
+          border-top: 1px dashed #cbd5e0;
+        }
+
+        .entry-card__notes-label {
+          font-size: 0.85rem;
+          color: #64748b;
+          display: block;
+          margin-bottom: 0.25rem;
+        }
+
+        .entry-card__notes-text {
+          font-size: 0.9rem;
+          color: #334155;
+          margin: 0;
+          font-style: italic;
+        }
+
+        .modal-overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: rgba(0, 0, 0, 0.5);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          backdrop-filter: blur(4px);
+        }
+
+        .modal {
+          background: white;
+          border-radius: 16px;
+          padding: 2rem;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal__title {
+          font-size: 1.5rem;
+          font-weight: 600;
+          color: #1e293b;
+          margin-bottom: 1rem;
+        }
+
+        .modal__message {
+          color: #475569;
+          margin-bottom: 2rem;
+          line-height: 1.5;
+        }
+
+        .modal__actions {
+          display: flex;
+          gap: 1rem;
+          justify-content: flex-end;
+        }
+
+        .modal__btn {
+          padding: 0.75rem 1.5rem;
+          border-radius: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          border: none;
+          font-size: 1rem;
+        }
+
+        .modal__btn--cancel {
+          background: #e2e8f0;
+          color: #475569;
+        }
+
+        .modal__btn--cancel:hover {
+          background: #cbd5e1;
+        }
+
+        .modal__btn--delete {
+          background: #ef4444;
+          color: white;
+        }
+
+        .modal__btn--delete:hover {
+          background: #dc2626;
+        }
+
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (max-width: 768px) {
+          .entries-list {
+            padding: 1.5rem;
+          }
+
+          .entries-list__grid {
+            grid-template-columns: 1fr;
+          }
+
+          .modal {
+            padding: 1.5rem;
+          }
+        }
+      `}</style>
     </>
   );
 }
 
 export default DailyHealth;
+
+

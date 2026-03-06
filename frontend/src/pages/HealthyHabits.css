@@ -269,6 +269,32 @@
   box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
 }
 
+.goal-unit {
+  color: #718096;
+  font-size: 0.9rem;
+  min-width: 60px;
+}
+
+.goal-unit-select {
+  padding: 0.5rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #4a5568;
+  background: white;
+  cursor: pointer;
+}
+
+.goal-unit-select:focus {
+  outline: none;
+  border-color: #4a9eff;
+}
+
+.goal-input-wrapper--with-select {
+  display: flex;
+  gap: 0.5rem;
+}
+
 .goals-submit {
   width: 100%;
   max-width: 300px;
@@ -288,6 +314,51 @@
   box-shadow: 0 10px 20px -5px rgba(74, 158, 255, 0.4);
 }
 
+.goals-form__actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn--lg {
+  padding: 1rem 2.5rem;
+  font-size: 1.1rem;
+}
+
+.btn--secondary {
+  background: #e2e8f0;
+  color: #4a5568;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn--secondary:hover {
+  background: #cbd5e0;
+  transform: translateY(-2px);
+}
+
+.btn--danger {
+  background: #fed7d7;
+  color: #c53030;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn--danger:hover {
+  background: #fc8181;
+  color: #9b2c2c;
+  transform: translateY(-2px);
+}
+
 .success-message {
   display: flex;
   align-items: center;
@@ -304,6 +375,63 @@
 
 .success-icon {
   font-size: 1.2rem;
+}
+
+/* Goals Summary */
+.goals-summary {
+  margin-top: 2rem;
+}
+
+.goals-summary__title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.goals-summary__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.goal-summary-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f7fafc;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+}
+
+.goal-summary-icon {
+  font-size: 2rem;
+}
+
+.goal-summary-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.goal-summary-label {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.goal-summary-value {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.goals-summary__actions {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
 /* Progress Grid */
@@ -620,6 +748,216 @@
   box-shadow: 0 5px 15px rgba(74, 158, 255, 0.3);
 }
 
+/* ===============================
+   NEW WORKOUT & MINDFULNESS STYLES
+================================ */
+
+.workout-goals-section,
+.mindfulness-goals-section {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 2px solid #e2e8f0;
+}
+
+.workout-goals__title,
+.mindfulness-goals__title {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #2d3748;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.workout-goals__icon,
+.mindfulness-goals__icon {
+  font-size: 2.2rem;
+}
+
+.workout-goals__subtitle,
+.mindfulness-goals__subtitle {
+  font-size: 1.1rem;
+  color: #718096;
+  margin-bottom: 1.5rem;
+}
+
+.workout-selector,
+.mindfulness-selector {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  max-width: 600px;
+}
+
+.workout-select,
+.mindfulness-select {
+  flex: 1;
+  padding: 0.9rem 1rem;
+  border: 2px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 1.1rem;
+  color: #2d3748;
+  background-color: white;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.workout-select:focus,
+.mindfulness-select:focus {
+  outline: none;
+  border-color: #4a9eff;
+  box-shadow: 0 0 0 3px rgba(74, 158, 255, 0.1);
+}
+
+.workout-add-btn,
+.mindfulness-add-btn {
+  padding: 0.9rem 2rem;
+  white-space: nowrap;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #4a9eff, #3a7bc8);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.workout-add-btn:hover:not(:disabled),
+.mindfulness-add-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 20px -5px rgba(74, 158, 255, 0.4);
+}
+
+.workout-add-btn:disabled,
+.mindfulness-add-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #cbd5e0;
+}
+
+/* Added Items Grid */
+.added-workouts-grid,
+.added-mindfulness-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.workout-card,
+.mindfulness-card {
+  background: linear-gradient(135deg, #f7fafc 0%, #edf2f7 100%);
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  padding: 1.2rem;
+}
+
+.workout-card:hover,
+.mindfulness-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+  border-color: #4a9eff;
+}
+
+.workout-card__emoji,
+.mindfulness-card__emoji {
+  font-size: 3.5rem;
+  margin-right: 1.2rem;
+  min-width: 70px;
+  text-align: center;
+}
+
+.workout-card__content,
+.mindfulness-card__content {
+  flex: 1;
+  position: relative;
+}
+
+.workout-card__title,
+.mindfulness-card__title {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin-bottom: 0.4rem;
+}
+
+.workout-card__description,
+.mindfulness-card__description {
+  font-size: 0.95rem;
+  color: #718096;
+  line-height: 1.4;
+  margin-bottom: 0.8rem;
+}
+
+.workout-card__remove-btn,
+.mindfulness-card__remove-btn {
+  background-color: #fed7d7;
+  color: #c53030;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+}
+
+.workout-card__remove-btn:hover,
+.mindfulness-card__remove-btn:hover {
+  background-color: #fc8181;
+  color: #9b2c2c;
+  transform: scale(1.05);
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem;
+  background: #f7fafc;
+  border-radius: 12px;
+  margin-top: 1.5rem;
+  border: 2px dashed #e2e8f0;
+}
+
+.empty-state__text {
+  font-size: 1.1rem;
+  color: #718096;
+  font-style: italic;
+}
+
+/* Toast notification */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: #2d3748;
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transform: translateY(100px);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.toast.is-visible {
+  transform: translateY(0);
+  opacity: 1;
+}
+
 /* Footer Quick Links */
 .footer__quick-links {
   display: flex;
@@ -696,6 +1034,11 @@
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+.workout-card,
+.mindfulness-card {
+  animation: slideIn 0.3s ease-out;
 }
 
 /* Responsive Design */
@@ -779,6 +1122,53 @@
     align-items: center;
     text-align: center;
   }
+
+  /* New responsive styles */
+  .workout-selector,
+  .mindfulness-selector {
+    flex-direction: column;
+  }
+  
+  .workout-add-btn,
+  .mindfulness-add-btn {
+    width: 100%;
+  }
+  
+  .added-workouts-grid,
+  .added-mindfulness-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .workout-card,
+  .mindfulness-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  
+  .workout-card__emoji,
+  .mindfulness-card__emoji {
+    margin-right: 0;
+    margin-bottom: 1rem;
+    font-size: 4rem;
+  }
+  
+  .workout-goals__title,
+  .mindfulness-goals__title {
+    font-size: 1.6rem;
+  }
+  
+  .goals-summary__grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .goals-summary__actions {
+    flex-direction: column;
+  }
+  
+  .goals-form__actions {
+    flex-direction: column;
+  }
 }
 
 @media (max-width: 480px) {
@@ -811,5 +1201,11 @@
     width: 100%;
     text-align: left;
     margin-top: 0.25rem;
+  }
+  
+  .toast {
+    left: 20px;
+    right: 20px;
+    text-align: center;
   }
 }

@@ -15,6 +15,14 @@ function HealthyHabits() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("goals");
+  const [showGoalSummary, setShowGoalSummary] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  
+  // New state for workouts and mindfulness
+  const [selectedWorkout, setSelectedWorkout] = useState("");
+  const [addedWorkouts, setAddedWorkouts] = useState([]);
+  const [selectedMindfulness, setSelectedMindfulness] = useState("");
+  const [addedMindfulness, setAddedMindfulness] = useState([]);
   
   const profileDropdownRef = useRef(null);
   const toastTimerRef = useRef(null);
@@ -24,9 +32,11 @@ function HealthyHabits() {
   const [goals, setGoals] = useState({
     sleepGoal: 8,
     exerciseGoal: 30,
+    exerciseUnit: 'minutes',
     stressGoal: 4,
     waterGoal: 8,
     meditationGoal: 10,
+    meditationUnit: 'minutes'
   });
 
   const [progress, setProgress] = useState({
@@ -38,6 +48,22 @@ function HealthyHabits() {
   });
 
   const [message, setMessage] = useState("");
+
+  // Workout options with emojis
+  const workoutOptions = [
+    { id: "yoga", name: "Yoga", emoji: "🧘‍♀️", description: "Improve flexibility and reduce stress" },
+    { id: "pilates", name: "Pilates", emoji: "🤸‍♀️", description: "Core strength and body conditioning" },
+    { id: "gym", name: "Gym Workout", emoji: "🏋️‍♂️", description: "Build strength and muscle" },
+    { id: "cardio", name: "Cardio Run", emoji: "🏃‍♂️", description: "Boost heart health and endurance" }
+  ];
+
+  // Mindfulness options with emojis
+  const mindfulnessOptions = [
+    { id: "meditation", name: "Meditation", emoji: "🧘", description: "Calm your mind and focus" },
+    { id: "breathing", name: "Breathing Exercise", emoji: "🌬️", description: "Reduce stress and anxiety" },
+    { id: "journal", name: "Journalling", emoji: "📝", description: "Express thoughts and feelings" },
+    { id: "gratitude", name: "Practice Gratitude", emoji: "🙏", description: "Cultivate positive mindset" }
+  ];
 
   // Sample data for charts
   const weeklyData = {
@@ -146,21 +172,178 @@ function HealthyHabits() {
   };
 
   const handleChange = (e) => {
-    setGoals({
-      ...goals,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    
+    if (name === 'exerciseUnit' || name === 'meditationUnit') {
+      setGoals({
+        ...goals,
+        [name]: value,
+      });
+    } else {
+      setGoals({
+        ...goals,
+        [name]: value === "" ? "" : Number(value),
+      });
+    }
   };
 
-  const handleSave = async (e) => {
+  // Handle workout selection
+  const handleWorkoutSelect = (e) => {
+    setSelectedWorkout(e.target.value);
+  };
+
+  // Add workout to the list
+  const handleAddWorkout = () => {
+    if (selectedWorkout) {
+      const workout = workoutOptions.find(w => w.id === selectedWorkout);
+      if (workout && !addedWorkouts.some(w => w.id === workout.id)) {
+        setAddedWorkouts([...addedWorkouts, workout]);
+        showToast(`✅ ${workout.name} added to your workout routine!`);
+        setSelectedWorkout("");
+      } else if (addedWorkouts.some(w => w.id === workout?.id)) {
+        showToast("⚠️ This workout is already added!");
+      }
+    }
+  };
+
+  // Remove workout from list
+  const handleRemoveWorkout = (workoutId) => {
+    setAddedWorkouts(addedWorkouts.filter(w => w.id !== workoutId));
+    showToast("🗑️ Workout removed from your routine");
+  };
+
+  // Handle mindfulness selection
+  const handleMindfulnessSelect = (e) => {
+    setSelectedMindfulness(e.target.value);
+  };
+
+  // Add mindfulness to the list
+  const handleAddMindfulness = () => {
+    if (selectedMindfulness) {
+      const mindfulness = mindfulnessOptions.find(m => m.id === selectedMindfulness);
+      if (mindfulness && !addedMindfulness.some(m => m.id === mindfulness.id)) {
+        setAddedMindfulness([...addedMindfulness, mindfulness]);
+        showToast(`✅ ${mindfulness.name} added to your mindfulness practice!`);
+        setSelectedMindfulness("");
+      } else if (addedMindfulness.some(m => m.id === mindfulness?.id)) {
+        showToast("⚠️ This mindfulness exercise is already added!");
+      }
+    }
+  };
+
+  // Remove mindfulness from list
+  const handleRemoveMindfulness = (mindfulnessId) => {
+    setAddedMindfulness(addedMindfulness.filter(m => m.id !== mindfulnessId));
+    showToast("🗑️ Mindfulness exercise removed from your practice");
+  };
+
+  // Convert exercise value to minutes for display in progress
+  const getExerciseInMinutes = () => {
+    if (goals.exerciseUnit === 'hours') {
+      return goals.exerciseGoal * 60;
+    }
+    return goals.exerciseGoal;
+  };
+
+  // Convert meditation value to minutes for display in progress
+  const getMeditationInMinutes = () => {
+    if (goals.meditationUnit === 'hours') {
+      return goals.meditationGoal * 60;
+    }
+    return goals.meditationGoal;
+  };
+
+  // Format exercise display based on unit
+  const getExerciseDisplay = () => {
+    if (goals.exerciseUnit === 'hours') {
+      return `${goals.exerciseGoal}h`;
+    }
+    return `${goals.exerciseGoal}m`;
+  };
+
+  // Format meditation display based on unit
+  const getMeditationDisplay = () => {
+    if (goals.meditationUnit === 'hours') {
+      return `${goals.meditationGoal}h`;
+    }
+    return `${goals.meditationGoal}m`;
+  };
+
+  const handleSave = (e) => {
     e.preventDefault();
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    // Validate inputs
+    const updatedGoals = { ...goals };
+    let hasChanges = false;
 
-    console.log("Saved Goals:", goals);
-    setMessage("Goals saved successfully! 🎯");
-    showToast("Your wellness goals have been updated");
+    // Convert empty strings to default values or validate
+    Object.keys(updatedGoals).forEach(key => {
+      if (key !== 'exerciseUnit' && key !== 'meditationUnit' && (updatedGoals[key] === "" || isNaN(updatedGoals[key]))) {
+        // Set default values based on goal type
+        switch(key) {
+          case 'sleepGoal':
+            updatedGoals[key] = 8;
+            break;
+          case 'exerciseGoal':
+            updatedGoals[key] = 30;
+            break;
+          case 'stressGoal':
+            updatedGoals[key] = 4;
+            break;
+          case 'waterGoal':
+            updatedGoals[key] = 8;
+            break;
+          case 'meditationGoal':
+            updatedGoals[key] = 10;
+            break;
+          default:
+            updatedGoals[key] = 0;
+        }
+        hasChanges = true;
+      }
+    });
+
+    if (hasChanges) {
+      setGoals(updatedGoals);
+    }
+
+    // Simulate API call
+    setTimeout(() => {
+      console.log("Saved Goals:", updatedGoals);
+      setMessage("Goals saved successfully! 🎯");
+      showToast("Your wellness goals have been updated");
+      setShowGoalSummary(true);
+      setIsEditing(false);
+    }, 500);
+  };
+
+  const handleEdit = () => {
+    setIsEditing(true);
+    setShowGoalSummary(false);
+  };
+
+  const handleDelete = () => {
+    if (window.confirm("Are you sure you want to reset all your goals to defaults?")) {
+      const defaultGoals = {
+        sleepGoal: 8,
+        exerciseGoal: 30,
+        exerciseUnit: 'minutes',
+        stressGoal: 4,
+        waterGoal: 8,
+        meditationGoal: 10,
+        meditationUnit: 'minutes'
+      };
+      
+      setGoals(defaultGoals);
+      setShowGoalSummary(false);
+      setIsEditing(true);
+      showToast("Goals have been reset to defaults");
+    }
+  };
+
+  const handleSetNewGoal = () => {
+    setIsEditing(true);
+    setShowGoalSummary(false);
   };
 
   const getProgressPercentage = (current, goal) => {
@@ -185,6 +368,8 @@ function HealthyHabits() {
   // Dynamic insights based on data
   const getInsights = () => {
     const insights = [];
+    const exerciseInMinutes = getExerciseInMinutes();
+    const meditationInMinutes = getMeditationInMinutes();
     
     if (progress.sleepAvg < goals.sleepGoal) {
       insights.push({
@@ -200,11 +385,11 @@ function HealthyHabits() {
       });
     }
 
-    if (progress.exerciseAvg < goals.exerciseGoal) {
+    if (progress.exerciseAvg < exerciseInMinutes) {
       insights.push({
         type: "warning",
         icon: "🏃",
-        message: `You're averaging ${progress.exerciseAvg} minutes of exercise daily. Add short walks between study sessions to reach your ${goals.exerciseGoal}-minute goal.`
+        message: `You're averaging ${progress.exerciseAvg} minutes of exercise daily. Add short walks between study sessions to reach your ${getExerciseDisplay()} goal.`
       });
     }
 
@@ -221,6 +406,14 @@ function HealthyHabits() {
         type: "warning",
         icon: "💧",
         message: `You're drinking ${progress.waterAvg} glasses of water daily. Aim for ${goals.waterGoal} glasses to stay hydrated and focused.`
+      });
+    }
+
+    if (progress.meditationAvg < meditationInMinutes) {
+      insights.push({
+        type: "warning",
+        icon: "🧘",
+        message: `You're averaging ${progress.meditationAvg} minutes of meditation daily. Try to reach your ${getMeditationDisplay()} goal for better mindfulness.`
       });
     }
 
@@ -342,11 +535,11 @@ function HealthyHabits() {
                 <span className="habits-hero__stat-label">Sleep Goal</span>
               </div>
               <div className="habits-hero__stat">
-                <span className="habits-hero__stat-value">{goals.exerciseGoal}m</span>
+                <span className="habits-hero__stat-value">{getExerciseDisplay()}</span>
                 <span className="habits-hero__stat-label">Exercise Goal</span>
               </div>
               <div className="habits-hero__stat">
-                <span className="habits-hero__stat-value">{goals.waterGoal}🍷</span>
+                <span className="habits-hero__stat-value">{goals.waterGoal} 🥤</span>
                 <span className="habits-hero__stat-label">Water Goal</span>
               </div>
             </div>
@@ -396,165 +589,324 @@ function HealthyHabits() {
                 </p>
               </div>
 
-              <form onSubmit={handleSave} className="goals-form">
-                <div className="goals-grid">
-                  <div className="goal-item">
-                    <label className="goal-label">
-                      <span className="goal-icon">🛌</span>
-                      <span className="goal-text">Sleep (hours/day)</span>
-                    </label>
-                    <div className="goal-input-wrapper">
-                      <input
-                        type="range"
-                        name="sleepGoal"
-                        min="4"
-                        max="12"
-                        step="0.5"
-                        value={goals.sleepGoal}
-                        onChange={handleChange}
-                        className="goal-slider"
-                      />
-                      <input
-                        type="number"
-                        name="sleepGoal"
-                        value={goals.sleepGoal}
-                        onChange={handleChange}
-                        min="4"
-                        max="12"
-                        step="0.5"
-                        className="goal-number"
-                      />
+              {showGoalSummary && !isEditing ? (
+                <div className="goals-summary">
+                  <h3 className="goals-summary__title">Your Current Goals</h3>
+                  <div className="goals-summary__grid">
+                    <div className="goal-summary-item">
+                      <span className="goal-summary-icon">🛌</span>
+                      <div className="goal-summary-content">
+                        <span className="goal-summary-label">Sleep</span>
+                        <span className="goal-summary-value">{goals.sleepGoal} hours</span>
+                      </div>
+                    </div>
+                    <div className="goal-summary-item">
+                      <span className="goal-summary-icon">🏃</span>
+                      <div className="goal-summary-content">
+                        <span className="goal-summary-label">Exercise</span>
+                        <span className="goal-summary-value">{getExerciseDisplay()}</span>
+                      </div>
+                    </div>
+                    <div className="goal-summary-item">
+                      <span className="goal-summary-icon">😌</span>
+                      <div className="goal-summary-content">
+                        <span className="goal-summary-label">Target Stress</span>
+                        <span className="goal-summary-value">{goals.stressGoal}/10</span>
+                      </div>
+                    </div>
+                    <div className="goal-summary-item">
+                      <span className="goal-summary-icon">💧</span>
+                      <div className="goal-summary-content">
+                        <span className="goal-summary-label">Water</span>
+                        <span className="goal-summary-value">{goals.waterGoal} glasses</span>
+                      </div>
+                    </div>
+                    <div className="goal-summary-item">
+                      <span className="goal-summary-icon">🧘</span>
+                      <div className="goal-summary-content">
+                        <span className="goal-summary-label">Meditation</span>
+                        <span className="goal-summary-value">{getMeditationDisplay()}</span>
+                      </div>
                     </div>
                   </div>
-
-                  <div className="goal-item">
-                    <label className="goal-label">
-                      <span className="goal-icon">🏃</span>
-                      <span className="goal-text">Exercise (minutes/day)</span>
-                    </label>
-                    <div className="goal-input-wrapper">
-                      <input
-                        type="range"
-                        name="exerciseGoal"
-                        min="0"
-                        max="120"
-                        step="5"
-                        value={goals.exerciseGoal}
-                        onChange={handleChange}
-                        className="goal-slider"
-                      />
-                      <input
-                        type="number"
-                        name="exerciseGoal"
-                        value={goals.exerciseGoal}
-                        onChange={handleChange}
-                        min="0"
-                        max="120"
-                        step="5"
-                        className="goal-number"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="goal-item">
-                    <label className="goal-label">
-                      <span className="goal-icon">😌</span>
-                      <span className="goal-text">Target Stress (1-10)</span>
-                    </label>
-                    <div className="goal-input-wrapper">
-                      <input
-                        type="range"
-                        name="stressGoal"
-                        min="1"
-                        max="10"
-                        step="1"
-                        value={goals.stressGoal}
-                        onChange={handleChange}
-                        className="goal-slider"
-                      />
-                      <input
-                        type="number"
-                        name="stressGoal"
-                        value={goals.stressGoal}
-                        onChange={handleChange}
-                        min="1"
-                        max="10"
-                        step="1"
-                        className="goal-number"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="goal-item">
-                    <label className="goal-label">
-                      <span className="goal-icon">💧</span>
-                      <span className="goal-text">Water (glasses/day)</span>
-                    </label>
-                    <div className="goal-input-wrapper">
-                      <input
-                        type="range"
-                        name="waterGoal"
-                        min="4"
-                        max="12"
-                        step="1"
-                        value={goals.waterGoal}
-                        onChange={handleChange}
-                        className="goal-slider"
-                      />
-                      <input
-                        type="number"
-                        name="waterGoal"
-                        value={goals.waterGoal}
-                        onChange={handleChange}
-                        min="4"
-                        max="12"
-                        step="1"
-                        className="goal-number"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="goal-item goal-item--full">
-                    <label className="goal-label">
-                      <span className="goal-icon">🧘</span>
-                      <span className="goal-text">Meditation (minutes/day)</span>
-                    </label>
-                    <div className="goal-input-wrapper">
-                      <input
-                        type="range"
-                        name="meditationGoal"
-                        min="0"
-                        max="30"
-                        step="5"
-                        value={goals.meditationGoal}
-                        onChange={handleChange}
-                        className="goal-slider"
-                      />
-                      <input
-                        type="number"
-                        name="meditationGoal"
-                        value={goals.meditationGoal}
-                        onChange={handleChange}
-                        min="0"
-                        max="30"
-                        step="5"
-                        className="goal-number"
-                      />
-                    </div>
+                  <div className="goals-summary__actions">
+                    <button onClick={handleEdit} className="btn btn--secondary">
+                      ✏️ Edit Goals
+                    </button>
+                    <button onClick={handleDelete} className="btn btn--danger">
+                      🗑️ Reset Goals
+                    </button>
+                    <button onClick={handleSetNewGoal} className="btn btn--primary">
+                      ➕ Set New Goal
+                    </button>
                   </div>
                 </div>
+              ) : (
+                <form onSubmit={handleSave} className="goals-form">
+                  <div className="goals-grid">
+                    <div className="goal-item">
+                      <label className="goal-label">
+                        <span className="goal-icon">🛌</span>
+                        <span className="goal-text">Sleep (hours/day)</span>
+                      </label>
+                      <div className="goal-input-wrapper">
+                        <input
+                          type="number"
+                          name="sleepGoal"
+                          value={goals.sleepGoal}
+                          onChange={handleChange}
+                          min="4"
+                          max="12"
+                          step="0.5"
+                          className="goal-number"
+                          placeholder="8"
+                        />
+                        <span className="goal-unit">hours</span>
+                      </div>
+                    </div>
 
-                <button type="submit" className="btn btn--primary btn--lg goals-submit">
-                  Save All Goals
-                </button>
+                    <div className="goal-item">
+                      <label className="goal-label">
+                        <span className="goal-icon">🏃</span>
+                        <span className="goal-text">Exercise</span>
+                      </label>
+                      <div className="goal-input-wrapper goal-input-wrapper--with-select">
+                        <input
+                          type="number"
+                          name="exerciseGoal"
+                          value={goals.exerciseGoal}
+                          onChange={handleChange}
+                          min="0"
+                          max={goals.exerciseUnit === 'hours' ? "24" : "1440"}
+                          step={goals.exerciseUnit === 'hours' ? "0.5" : "5"}
+                          className="goal-number"
+                          placeholder={goals.exerciseUnit === 'hours' ? "1" : "30"}
+                        />
+                        <select 
+                          name="exerciseUnit" 
+                          value={goals.exerciseUnit} 
+                          onChange={handleChange}
+                          className="goal-unit-select"
+                        >
+                          <option value="minutes">minutes</option>
+                          <option value="hours">hours</option>
+                        </select>
+                      </div>
+                    </div>
 
-                {message && (
-                  <div className="success-message">
-                    <span className="success-icon">✅</span>
-                    {message}
+                    <div className="goal-item">
+                      <label className="goal-label">
+                        <span className="goal-icon">😌</span>
+                        <span className="goal-text">Target Stress (1-10)</span>
+                      </label>
+                      <div className="goal-input-wrapper">
+                        <input
+                          type="number"
+                          name="stressGoal"
+                          value={goals.stressGoal}
+                          onChange={handleChange}
+                          min="1"
+                          max="10"
+                          step="1"
+                          className="goal-number"
+                          placeholder="4"
+                        />
+                        <span className="goal-unit">/10</span>
+                      </div>
+                    </div>
+
+                    <div className="goal-item">
+                      <label className="goal-label">
+                        <span className="goal-icon">💧</span>
+                        <span className="goal-text">Water (glasses/day)</span>
+                      </label>
+                      <div className="goal-input-wrapper">
+                        <input
+                          type="number"
+                          name="waterGoal"
+                          value={goals.waterGoal}
+                          onChange={handleChange}
+                          min="4"
+                          max="12"
+                          step="1"
+                          className="goal-number"
+                          placeholder="8"
+                        />
+                        <span className="goal-unit">glasses</span>
+                      </div>
+                    </div>
+
+                    <div className="goal-item goal-item--full">
+                      <label className="goal-label">
+                        <span className="goal-icon">🧘</span>
+                        <span className="goal-text">Meditation</span>
+                      </label>
+                      <div className="goal-input-wrapper goal-input-wrapper--with-select">
+                        <input
+                          type="number"
+                          name="meditationGoal"
+                          value={goals.meditationGoal}
+                          onChange={handleChange}
+                          min="0"
+                          max={goals.meditationUnit === 'hours' ? "24" : "1440"}
+                          step={goals.meditationUnit === 'hours' ? "0.5" : "5"}
+                          className="goal-number"
+                          placeholder={goals.meditationUnit === 'hours' ? "0.5" : "10"}
+                        />
+                        <select 
+                          name="meditationUnit" 
+                          value={goals.meditationUnit} 
+                          onChange={handleChange}
+                          className="goal-unit-select"
+                        >
+                          <option value="minutes">minutes</option>
+                          <option value="hours">hours</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="goals-form__actions">
+                    <button type="submit" className="btn btn--primary btn--lg">
+                      Save All Goals
+                    </button>
+                    {showGoalSummary && (
+                      <button type="button" onClick={() => {setIsEditing(false); setShowGoalSummary(true);}} className="btn btn--secondary">
+                        Cancel
+                      </button>
+                    )}
+                  </div>
+
+                  {message && (
+                    <div className="success-message">
+                      <span className="success-icon">✅</span>
+                      {message}
+                    </div>
+                  )}
+                </form>
+              )}
+
+              {/* ================= NEW WORKOUT GOALS SECTION ================= */}
+              <div className="workout-goals-section">
+                <h3 className="workout-goals__title">
+                  <span className="workout-goals__icon">💪</span>
+                  My Workout Goals
+                </h3>
+                <p className="workout-goals__subtitle">
+                  Add your favourite workout routines. Practice them daily. All the best! ✨
+                </p>
+
+                <div className="workout-selector">
+                  <select 
+                    value={selectedWorkout} 
+                    onChange={handleWorkoutSelect}
+                    className="workout-select"
+                  >
+                    <option value="">Select a workout ⬇️</option>
+                    {workoutOptions.map(workout => (
+                      <option key={workout.id} value={workout.id}>
+                        {workout.emoji} {workout.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button 
+                    onClick={handleAddWorkout}
+                    className="btn btn--primary workout-add-btn"
+                    disabled={!selectedWorkout}
+                  >
+                    ➕ Add Workout
+                  </button>
+                </div>
+
+                {/* Display added workouts */}
+                {addedWorkouts.length > 0 && (
+                  <div className="added-workouts-grid">
+                    {addedWorkouts.map(workout => (
+                      <div key={workout.id} className="workout-card">
+                        <div className="workout-card__emoji">{workout.emoji}</div>
+                        <div className="workout-card__content">
+                          <h4 className="workout-card__title">{workout.name}</h4>
+                          <p className="workout-card__description">{workout.description}</p>
+                          <button 
+                            onClick={() => handleRemoveWorkout(workout.id)}
+                            className="workout-card__remove-btn"
+                            aria-label={`Remove ${workout.name}`}
+                          >
+                            🗑️ Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 )}
-              </form>
+
+                {addedWorkouts.length === 0 && (
+                  <div className="empty-state">
+                    <p className="empty-state__text">✨ No workouts added yet. Select a workout above to get started!</p>
+                  </div>
+                )}
+              </div>
+
+              {/* ================= NEW MINDFULNESS GOALS SECTION ================= */}
+              <div className="mindfulness-goals-section">
+                <h3 className="mindfulness-goals__title">
+                  <span className="mindfulness-goals__icon">🧠</span>
+                  My Mindfulness: Mental Health Goals
+                </h3>
+                <p className="mindfulness-goals__subtitle">
+                  Select a mindfulness exercise to practice daily. 🌿
+                </p>
+
+                <div className="mindfulness-selector">
+                  <select 
+                    value={selectedMindfulness} 
+                    onChange={handleMindfulnessSelect}
+                    className="mindfulness-select"
+                  >
+                    <option value="">Select a mindfulness exercise ⬇️</option>
+                    {mindfulnessOptions.map(option => (
+                      <option key={option.id} value={option.id}>
+                        {option.emoji} {option.name}
+                      </option>
+                    ))}
+                  </select>
+                  <button 
+                    onClick={handleAddMindfulness}
+                    className="btn btn--primary mindfulness-add-btn"
+                    disabled={!selectedMindfulness}
+                  >
+                    ➕ Add Practice
+                  </button>
+                </div>
+
+                {/* Display added mindfulness exercises */}
+                {addedMindfulness.length > 0 && (
+                  <div className="added-mindfulness-grid">
+                    {addedMindfulness.map(option => (
+                      <div key={option.id} className="mindfulness-card">
+                        <div className="mindfulness-card__emoji">{option.emoji}</div>
+                        <div className="mindfulness-card__content">
+                          <h4 className="mindfulness-card__title">{option.name}</h4>
+                          <p className="mindfulness-card__description">{option.description}</p>
+                          <button 
+                            onClick={() => handleRemoveMindfulness(option.id)}
+                            className="mindfulness-card__remove-btn"
+                            aria-label={`Remove ${option.name}`}
+                          >
+                            🗑️ Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {addedMindfulness.length === 0 && (
+                  <div className="empty-state">
+                    <p className="empty-state__text">🧘 No mindfulness exercises added yet. Select one above to begin your journey!</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </section>
@@ -592,11 +944,11 @@ function HealthyHabits() {
                   <div className="progress-card__header">
                     <span className="progress-card__icon">🏃</span>
                     <h3 className="progress-card__title">Exercise</h3>
-                    <span className="progress-card__value">{progress.exerciseAvg}m / {goals.exerciseGoal}m</span>
+                    <span className="progress-card__value">{progress.exerciseAvg}m / {getExerciseDisplay()}</span>
                   </div>
-                  {generateBarChart(progress.exerciseAvg, goals.exerciseGoal, '#48bb78')}
+                  {generateBarChart(progress.exerciseAvg, getExerciseInMinutes(), '#48bb78')}
                   <div className="progress-card__footer">
-                    <span className="progress-percentage">{getProgressPercentage(progress.exerciseAvg, goals.exerciseGoal)}% of goal</span>
+                    <span className="progress-percentage">{getProgressPercentage(progress.exerciseAvg, getExerciseInMinutes())}% of goal</span>
                   </div>
                 </div>
 
@@ -628,11 +980,11 @@ function HealthyHabits() {
                   <div className="progress-card__header">
                     <span className="progress-card__icon">🧘</span>
                     <h3 className="progress-card__title">Meditation</h3>
-                    <span className="progress-card__value">{progress.meditationAvg}m / {goals.meditationGoal}m</span>
+                    <span className="progress-card__value">{progress.meditationAvg}m / {getMeditationDisplay()}</span>
                   </div>
-                  {generateBarChart(progress.meditationAvg, goals.meditationGoal, '#9f7aea')}
+                  {generateBarChart(progress.meditationAvg, getMeditationInMinutes(), '#9f7aea')}
                   <div className="progress-card__footer">
-                    <span className="progress-percentage">{getProgressPercentage(progress.meditationAvg, goals.meditationGoal)}% of goal</span>
+                    <span className="progress-percentage">{getProgressPercentage(progress.meditationAvg, getMeditationInMinutes())}% of goal</span>
                   </div>
                 </div>
               </div>
@@ -665,9 +1017,9 @@ function HealthyHabits() {
                   ))}
                 </div>
                 <div className="chart-legend">
-                  <span className="legend-item"><span className="legend-color sleep"></span> Sleep</span>
-                  <span className="legend-item"><span className="legend-color exercise"></span> Exercise</span>
-                  <span className="legend-item"><span className="legend-color stress"></span> Stress</span>
+                  <span className="legend-item"><span className="legend-color sleep"></span> Sleep 😴</span>
+                  <span className="legend-item"><span className="legend-color exercise"></span> Exercise 🏃</span>
+                  <span className="legend-item"><span className="legend-color stress"></span> Stress 😓</span>
                 </div>
               </div>
             </div>
@@ -686,7 +1038,7 @@ function HealthyHabits() {
                   Personalized Insights
                 </h2>
                 <p className="habits-card__subtitle">
-                  AI-powered recommendations based on your progress patterns
+                  Health tips for you to achieve your goals!
                 </p>
               </div>
 
@@ -705,39 +1057,8 @@ function HealthyHabits() {
                   <div className="insight-card__content">
                     <p className="insight-card__message">
                       <strong>Weekly Challenge:</strong> Try to increase your water intake by 1 glass each day this week. 
-                      Proper hydration can improve focus by up to 20%!
+                      Proper hydration can improve focus by up to 20%! 💧
                     </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Recommendations */}
-              <div className="recommendations">
-                <h3 className="recommendations__title">Recommended Actions</h3>
-                <div className="recommendations-grid">
-                  <div className="recommendation-card">
-                    <span className="recommendation-icon">🌙</span>
-                    <h4 className="recommendation-title">Improve Sleep</h4>
-                    <p className="recommendation-text">Try going to bed 15 minutes earlier each night this week</p>
-                    <button className="recommendation-btn" onClick={() => showToast("Sleep reminder set!")}>
-                      Set Reminder
-                    </button>
-                  </div>
-                  <div className="recommendation-card">
-                    <span className="recommendation-icon">🚶</span>
-                    <h4 className="recommendation-title">Movement Break</h4>
-                    <p className="recommendation-text">Take a 5-minute walk break every 2 hours of study</p>
-                    <button className="recommendation-btn" onClick={() => showToast("Movement reminder set!")}>
-                      Set Reminder
-                    </button>
-                  </div>
-                  <div className="recommendation-card">
-                    <span className="recommendation-icon">🧘</span>
-                    <h4 className="recommendation-title">Mindfulness</h4>
-                    <p className="recommendation-text">Try a 5-minute guided meditation before bed</p>
-                    <button className="recommendation-btn" onClick={() => showToast("Meditation reminder set!")}>
-                      Start Now
-                    </button>
                   </div>
                 </div>
               </div>

@@ -2,7 +2,7 @@
 
 /* Hero Section */
 .hero--health {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
   padding: 4rem 0;
   color: white;
   margin-bottom: 2rem;
@@ -58,8 +58,8 @@
 /* Section Header */
 .section__tag {
   display: inline-block;
-  background: rgba(102, 126, 234, 0.1);
-  color: #667eea;
+  background: rgba(33, 147, 176, 0.1);
+  color: #2193b0;
   padding: 0.5rem 1rem;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -115,7 +115,7 @@
   border-radius: 20px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #667eea;
+  color: #2193b0;
   box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
@@ -154,14 +154,14 @@
 .post__link {
   display: inline-flex;
   align-items: center;
-  color: #667eea;
+  color: #2193b0;
   font-weight: 600;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .post__link:hover {
-  color: #764ba2;
+  color: #6dd5ed;
 }
 
 .post__link-arrow {
@@ -205,8 +205,7 @@
   flex-wrap: wrap;
 }
 
-.health-emergency__phone,
-.health-emergency__chat {
+.health-emergency__phone {
   background: rgba(255,255,255,0.2);
   color: white;
   padding: 1rem 2rem;
@@ -214,16 +213,16 @@
   text-decoration: none;
   font-weight: 600;
   transition: background 0.3s ease;
+  display: inline-block;
 }
 
-.health-emergency__phone:hover,
-.health-emergency__chat:hover {
+.health-emergency__phone:hover {
   background: rgba(255,255,255,0.3);
 }
 
 /* Active Navigation Link */
 .nav__link--active {
-  color: #667eea;
+  color: #2193b0;
   font-weight: 600;
   position: relative;
 }
@@ -235,7 +234,7 @@
   left: 0;
   right: 0;
   height: 2px;
-  background: #667eea;
+  background: #2193b0;
   border-radius: 2px;
 }
 
@@ -259,8 +258,7 @@
     gap: 1rem;
   }
   
-  .health-emergency__phone,
-  .health-emergency__chat {
+  .health-emergency__phone {
     text-align: center;
   }
 }

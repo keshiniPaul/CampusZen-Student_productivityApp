@@ -6,6 +6,9 @@ import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
+import wellbeingImg from "../images/wellbeingimg.jpg";
+import guidedHealthTipsImg from "../images/guidedhealthtips.jpg";
+import healthyHabitsImg from "../images/healthyhabitsimg.jpg";
 
 function Health() {
   const navigate = useNavigate();
@@ -301,7 +304,7 @@ function Health() {
             <article className="post post--featured">
               <div className="post__media">
                 <img
-                  src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                  src={wellbeingImg}
                   alt="Wellbeing checkin"
                 />
                 <div className="post__category">Daily Wellness</div>
@@ -330,24 +333,24 @@ function Health() {
               </div>
             </article>
 
-            {/* Counselling */}
+            {/* Guided Health Tips */}
             <article className="post post--featured">
               <div className="post__media">
                 <img
-                  src="https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
-                  alt="Counselling support"
+                  src={guidedHealthTipsImg}
+                  alt="Guided health tips"
                 />
                 <div className="post__category">Mental Health</div>
               </div>
               <div className="post__body">
-                <h3 className="post__title">Counselling & Support</h3>
+                <h3 className="post__title">Guided Health Tips</h3>
                 <p className="post__text">
-                  Connect with professional counsellors and access confidential mental health support services.
+                  Access expert-guided wellness tips, meditation guides, and mental health resources.
                 </p>
                 <div className="post__features">
-                  <span className="post__feature">✓ One-on-one sessions</span>
-                  <span className="post__feature">✓ Group therapy</span>
-                  <span className="post__feature">✓ Crisis support</span>
+                  <span className="post__feature">✓ Meditation guides</span>
+                  <span className="post__feature">✓ Wellness articles</span>
+                  <span className="post__feature">✓ Expert advice</span>
                 </div>
                 <a
                   className="post__link"
@@ -358,7 +361,7 @@ function Health() {
                     setIsNavOpen(false);
                   }}
                 >
-                  Find Support <span className="post__link-arrow">→</span>
+                  Explore Tips <span className="post__link-arrow">→</span>
                 </a>
               </div>
             </article>
@@ -367,7 +370,7 @@ function Health() {
             <article className="post post--featured">
               <div className="post__media">
                 <img
-                  src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                  src={healthyHabitsImg}
                   alt="Healthy habits"
                 />
                 <div className="post__category">Lifestyle</div>
@@ -407,12 +410,6 @@ function Health() {
               <div className="health-emergency__contacts">
                 <a href="tel:+94117544801" className="health-emergency__phone">
                   📞 Crisis Hotline: +94 11 754 0000
-                </a>
-                <a href="#" className="health-emergency__chat" onClick={(e) => {
-                  e.preventDefault();
-                  showToast("Live chat support coming soon");
-                }}>
-                  💬 Live Chat Support
                 </a>
               </div>
             </div>
