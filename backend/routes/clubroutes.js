@@ -10,22 +10,20 @@ const {
   manageMember,
   postAnnouncement,
 } = require("../controllers/clubcontrollers");
-
-// Import auth middleware (when implemented)
-// const { protect, adminOnly, studentOnly, presidentOnly } = require("../middleware/authMiddleware");
+const { protect, adminOnly, studentOnly } = require("../middleware/authMiddleware");
 
 // Public routes
 router.get("/", getClubs);
 router.get("/:id", getClubById);
 
-// Student routes (add protect middleware when auth is ready)
-router.post("/:id/join", joinClub); // Add: protect, studentOnly
+// Student routes
+router.post("/:id/join", protect, studentOnly, joinClub);
 
-// Admin/President routes (add protect and adminOnly/presidentOnly middleware when auth is ready)
-router.post("/", createClub); // Add: protect, adminOnly
-router.put("/:id", updateClub); // Add: protect, adminOnly or presidentOnly
-router.delete("/:id", deleteClub); // Add: protect, adminOnly
-router.put("/:id/members/:memberId", manageMember); // Add: protect, adminOnly or presidentOnly
-router.post("/:id/announcements", postAnnouncement); // Add: protect, adminOnly or presidentOnly
+// Admin routes
+router.post("/", protect, adminOnly, createClub);
+router.put("/:id", protect, adminOnly, updateClub);
+router.delete("/:id", protect, adminOnly, deleteClub);
+router.put("/:id/members/:memberId", protect, adminOnly, manageMember);
+router.post("/:id/announcements", protect, adminOnly, postAnnouncement);
 
 module.exports = router;

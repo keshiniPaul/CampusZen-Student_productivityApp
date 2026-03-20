@@ -36,6 +36,10 @@ function App() {
         {/* Authentication */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/admin/register" element={<Register />} />
+        <Route path="/admin/login" element={<Login />} />
+        <Route path="/student/register" element={<Register />} />
+        <Route path="/student/login" element={<Login />} />
 
         {/* Health Module */}
         <Route path="/daily-health" element={<DailyHealth />} />

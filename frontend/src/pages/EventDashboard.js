@@ -7,7 +7,6 @@ import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
-import profileImg from "../images/profile.png";
 import eventIcon from "../images/event.png";
 import sportIcon from "../images/sport.png";
 import clubIcon from "../images/club.png";
@@ -35,6 +34,8 @@ const categories = [
 
 function EventDashboard() {
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const displayName = currentUser?.fullName || currentUser?.email || "User";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navLinksRef = useRef(null);
@@ -161,9 +162,8 @@ function EventDashboard() {
               onClick={() => setIsProfileOpen((prev) => !prev)}
               aria-expanded={isProfileOpen}
             >
-              <span className="header__profileText"> UTHPALA </span>
+              <span className="header__profileText">{displayName}</span>
               <span className="header__profileArrow" aria-hidden="true">▼</span>
-              <img className="header__profileCircle" src={profileImg} alt="Uthpala" />
             </button>
             {isProfileOpen && (
               <div className="header__profileMenu">

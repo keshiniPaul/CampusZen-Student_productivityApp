@@ -7,7 +7,6 @@ import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
-import profileImg from "../images/profile.png";
 import wiramaya1Image from "../images/wiramaya1.png";
 import ganthersImage from "../images/ganthera.png";
 import lantharumaImage from "../images/lantharuma.png";
@@ -159,6 +158,8 @@ const activitiesData = {
 function ActivityDetails() {
   const { activityType } = useParams();
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const displayName = currentUser?.fullName || currentUser?.email || "User";
   const [activity, setActivity] = useState(null);
   const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
   const [showClosedMessage, setShowClosedMessage] = useState(false);
@@ -290,9 +291,8 @@ function ActivityDetails() {
               onClick={() => setIsProfileOpen((prev) => !prev)}
               aria-expanded={isProfileOpen}
             >
-              <span className="header__profileText"> UTHPALA </span>
+              <span className="header__profileText">{displayName}</span>
               <span className="header__profileArrow" aria-hidden="true">▼</span>
-              <img className="header__profileCircle" src={profileImg} alt="Uthpala" />
             </button>
             {isProfileOpen && (
               <div className="header__profileMenu">

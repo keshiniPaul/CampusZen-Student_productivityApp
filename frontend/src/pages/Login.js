@@ -1,16 +1,21 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import "./Login.css";
 import campusLogo from "../images/campus_logo.png";
 
 function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const roleFromPath = location.pathname.includes("/admin") ? "admin" : "student";
 
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+  const [role, setRole] = useState(roleFromPath);
   
   const [toast, setToast] = useState({ visible: false, message: "" });
 
@@ -35,7 +40,8 @@ function Login() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const endpoint = role === "admin" ? "login/admin" : "login/student";
+      const response = await fetch(`http://localhost:5000/api/auth/${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -48,8 +54,7 @@ function Login() {
         localStorage.setItem("token", data.token);
         localStorage.setItem("user", JSON.stringify(data.user));
 
-        // Show toast and auto-navigate
-        showToast("Login Successful 🎉");
+        showToast(role === "admin" ? "Admin Login Successful" : "Student Login Successful");
       } else {
         alert(data.message);
       }
@@ -87,8 +92,25 @@ function Login() {
           <div className="login__card">
             <h2>Welcome Back</h2>
             <p className="login__subtitle">
-              Login to continue to CampusZone.
+              Login as {role === "admin" ? "Admin" : "Student"} to continue to CampusZone.
             </p>
+
+            <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => setRole("student")}
+              >
+                Student Login
+              </button>
+              <button
+                type="button"
+                className="btn btn--ghost"
+                onClick={() => setRole("admin")}
+              >
+                Admin Login
+              </button>
+            </div>
 
             <form onSubmit={handleSubmit} className="login__form">
               <input
@@ -113,7 +135,8 @@ function Login() {
             </form>
 
             <p className="login__register">
-              Don’t have an account? <Link to="/register">Register</Link>
+              Do not have an account?{" "}
+              <Link to={role === "admin" ? "/admin/register" : "/student/register"}>Register</Link>
             </p>
           </div>
         </div>
