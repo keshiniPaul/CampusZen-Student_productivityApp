@@ -30,6 +30,30 @@ function HealthyHabits() {
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
 
+  // Calendar variables
+  const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonth = currentDate.getMonth();
+  const currentDay = currentDate.getDate();
+  const monthLabel = currentDate.toLocaleString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+
+  const firstDayIndex = new Date(currentYear, currentMonth, 1).getDay();
+  const leadingEmptyDays = (firstDayIndex + 6) % 7;
+  const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+  const calendarDays = [
+    ...Array.from({ length: leadingEmptyDays }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, index) => index + 1),
+  ];
+
+  while (calendarDays.length % 7 !== 0) {
+    calendarDays.push(null);
+  }
+
   const [goals, setGoals] = useState({
     sleepGoal: 8,
     exerciseGoal: 30,
@@ -1148,26 +1172,46 @@ function HealthyHabits() {
       <footer className="footer">
         <div className="container footer__panel">
           <div className="footer__support">
-            <p className="footer__kicker">Stay Healthy</p>
-            <h3 className="footer__heading">Wellness Tracking</h3>
-            <a className="footer__contact footer__contact--accent" href="#">
-              🌐 wellness.campuszone.lk
+            <p className="footer__kicker">Do you need any</p>
+            <h3 className="footer__heading">Support?</h3>
+            <a className="footer__contact footer__contact--accent" href="https://support.sliit.lk">
+              🌐 support.campuszone.lk
             </a>
             <a className="footer__contact" href="tel:+94117544801">
               📞 +94 11 754 0000
             </a>
+            <a className="footer__feedback" href="https://support.sliit.lk">
+              Provide Feedback to CampusZone
+            </a>
           </div>
 
-          <div className="footer__calendar">
-            <h3 className="footer__calendarTitle">Quick Links</h3>
-            <div className="footer__quick-links">
-              <Link to="/health" className="footer__quick-link">Health Dashboard</Link>
-              <Link to="/daily-health" className="footer__quick-link">Daily Check-in</Link>
-              <Link to="/health/tips" className="footer__quick-link">Tips & Support</Link>
-              <button className="footer__quick-link footer__quick-link--btn" onClick={() => showToast("Resources coming soon")}>
-                Wellness Resources
-              </button>
+          <div className="footer__calendar" aria-label="Calendar preview">
+            <h3 className="footer__calendarTitle">Calendar</h3>
+            <div className="footer__calendarHead">
+              <strong>{monthLabel}</strong>
             </div>
+            <div className="footer__weekdays">
+              {weekdayLabels.map((weekday) => (
+                <span key={weekday}>{weekday}</span>
+              ))}
+            </div>
+            <div className="footer__days">
+              {calendarDays.map((day, index) => {
+                if (!day) {
+                  return <span className="is-muted" key={`empty-${index}`}></span>;
+                }
+
+                const isToday = day === currentDay;
+                return (
+                  <span className={isToday ? "is-active" : ""} key={`day-${day}`}>
+                    {day}
+                  </span>
+                );
+              })}
+            </div>
+            <a className="footer__fullCalendar" href="/events" onClick={goToEventsDashboard}>
+              Full calendar
+            </a>
           </div>
         </div>
 
@@ -1176,25 +1220,23 @@ function HealthyHabits() {
             <div className="footer__brand">
               <div>
                 <div className="footer__name">CampusZone</div>
-                <div className="footer__small">
-                  Student Wellness Platform
-                </div>
+                <div className="footer__small">Student Wellness Platform</div>
               </div>
             </div>
 
-            <div className="footer__socials">
-              <Link to="/" onClick={goToHome} aria-label="Facebook" className="footer__social-link">
-                <img src={facebookIcon} alt="facebook" className="footer__socialIcon"/>
-              </Link>
-              <Link to="/" onClick={goToHome} aria-label="Instagram" className="footer__social-link">
-                <img src={instagramIcon} alt="instagram" className="footer__socialIcon"/>
-              </Link>
-              <Link to="/" onClick={goToHome} aria-label="LinkedIn" className="footer__social-link">
-                <img src={linkedinIcon} alt="linkedin" className="footer__socialIcon"/>
-              </Link>
-              <Link to="/" onClick={goToHome} aria-label="YouTube" className="footer__social-link">
-                <img src={youtubeIcon} alt="youtube" className="footer__socialIcon"/>
-              </Link>
+            <div className="footer__socials" aria-label="Social links">
+              <a href="#top" onClick={scrollToTop} aria-label="Facebook">
+                <img className="footer__socialIcon" src={facebookIcon} alt="Facebook" />
+              </a>
+              <a href="#top" onClick={scrollToTop} aria-label="Instagram">
+                <img className="footer__socialIcon" src={instagramIcon} alt="Instagram" />
+              </a>
+              <a href="#top" onClick={scrollToTop} aria-label="LinkedIn">
+                <img className="footer__socialIcon" src={linkedinIcon} alt="LinkedIn" />
+              </a>
+              <a href="#top" onClick={scrollToTop} aria-label="YouTube">
+                <img className="footer__socialIcon" src={youtubeIcon} alt="YouTube" />
+              </a>
             </div>
 
             <a className="toTop" href="#top" onClick={scrollToTop} aria-label="Back to top">
