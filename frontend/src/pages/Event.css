@@ -1,6 +1,20 @@
+:root {
+  --sky-50: #f2fbff;
+  --sky-100: #dff6ff;
+  --sky-200: #bfeeff;
+  --sky-300: #8fe0ff;
+  --sky-400: #55ccff;
+  --sky-500: #25b6ff;
+  --ink-900: #071a2a;
+  --ink-800: #0b2337;
+  --ink-700: #15344d;
+}
+
 .event {
   min-height: 100vh;
-  background: linear-gradient(180deg, #f8f9fa 0%, #ffffff 100%);
+  background: radial-gradient(1100px 700px at 10% 5%, var(--sky-100), transparent 60%),
+    radial-gradient(900px 600px at 85% 10%, var(--sky-200), transparent 55%),
+    linear-gradient(180deg, var(--sky-50), #ffffff 40%, #ffffff);
   padding: 100px 0 60px;
 }
 
@@ -27,7 +41,7 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  color: #4A90E2;
+  color: var(--sky-500);
   font-weight: 600;
   text-decoration: none;
   border-radius: 8px;
@@ -36,7 +50,7 @@
 }
 
 .event__backBtn:hover {
-  background-color: rgba(74, 144, 226, 0.1);
+  background-color: rgba(37, 182, 255, 0.1);
 }
 
 .event__title {

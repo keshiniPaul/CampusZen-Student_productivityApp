@@ -1,7 +1,16 @@
 :root {
-  --primary-blue: #4A90E2;
-  --primary-blue-light: #E8F4FD;
-  --primary-blue-dark: #357ABD;
+  --sky-50: #f2fbff;
+  --sky-100: #dff6ff;
+  --sky-200: #bfeeff;
+  --sky-300: #8fe0ff;
+  --sky-400: #55ccff;
+  --sky-500: #25b6ff;
+  --ink-900: #071a2a;
+  --ink-800: #0b2337;
+  --ink-700: #15344d;
+  --primary-blue: var(--sky-500);
+  --primary-blue-light: var(--sky-100);
+  --primary-blue-dark: var(--sky-400);
   --text-primary: #1a1a1a;
   --text-secondary: #666666;
   --text-light: #999999;
@@ -24,7 +33,9 @@
 
 .activityDetails {
   min-height: 100vh;
-  background: var(--bg-gray);
+  background: radial-gradient(1100px 700px at 10% 5%, var(--sky-100), transparent 60%),
+    radial-gradient(900px 600px at 85% 10%, var(--sky-200), transparent 55%),
+    linear-gradient(180deg, var(--sky-50), #ffffff 40%, #ffffff);
   padding: 100px 0 60px;
 }
 

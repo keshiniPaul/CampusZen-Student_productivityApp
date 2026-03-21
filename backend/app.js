@@ -49,6 +49,14 @@ app.get("/api/health-check", (req, res) => {
   });
 });
 
+// Sport routes
+const sportRoutes = require("./routes/sportroutes");
+app.use("/api/sports", sportRoutes);
+
+// Club routes
+const clubRoutes = require("./routes/clubroutes");
+app.use("/api/clubs", clubRoutes);
+
 // Error handling middleware (must be last)
 app.use(notFound);
 app.use(errorHandler);

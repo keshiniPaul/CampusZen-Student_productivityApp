@@ -1,11 +1,13 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+
+const SECRET_KEY = process.env.JWT_SECRET || "campuszone_secret";
 
 const protect = (req, res, next) => {
   try {
     // Get token from Authorization header
-    const authHeader = req.headers.authorization;
+    const authHeader = req.headers.authorization || "";
     
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return res.status(401).json({ 
         success: false, 
         message: "Not authorized, no token provided" 
@@ -13,13 +15,16 @@ const protect = (req, res, next) => {
     }
 
     // Extract token
-    const token = authHeader.split(' ')[1];
+    const token = authHeader.split(" ")[1];
 
     // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'your-secret-key');
+    const decoded = jwt.verify(token, SECRET_KEY);
 
     // Attach user to request
-    req.user = { id: decoded.id };
+    req.user = { 
+      id: decoded.id,
+      role: decoded.role,
+    };
 
     next();
   } catch (error) {
@@ -41,15 +46,31 @@ const protect = (req, res, next) => {
 
     res.status(401).json({ 
       success: false, 
-      message: "Not authorized" 
+      message: "Not authorized. Token expired or invalid." 
     });
   }
 };
 
 const adminOnly = (req, res, next) => {
-  // This would check if user has admin role
-  // For now, just pass through
-  next();
+  if (req.user?.role !== "admin") {
+    return res.status(403).json({
+      success: false,
+      message: "Admin access required",
+    });
+  }
+
+  return next();
 };
 
-module.exports = { protect, adminOnly };
+const studentOnly = (req, res, next) => {
+  if (req.user?.role !== "user") {
+    return res.status(403).json({
+      success: false,
+      message: "Student access required",
+    });
+  }
+
+  return next();
+};
+
+module.exports = { protect, adminOnly, studentOnly };
