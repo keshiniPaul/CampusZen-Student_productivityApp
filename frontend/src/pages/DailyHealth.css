@@ -4,7 +4,7 @@
 
 /* Hero Section */
 .daily-health-hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #4a9eff 0%, #3a7bc8 100%);
   padding: 4rem 0 6rem;
   position: relative;
   overflow: hidden;
@@ -105,7 +105,7 @@
 
 .daily-health-sidebar__card--tip {
   background: linear-gradient(135deg, #f6f9fc 0%, #eef2f6 100%);
-  border-left: 4px solid #667eea;
+  border-left: 4px solid #4a9eff;
 }
 
 .daily-health-sidebar__title {
@@ -240,7 +240,7 @@
 
 .daily-health-progress__fill {
   height: 100%;
-  background: linear-gradient(90deg, #667eea, #764ba2);
+  background: linear-gradient(90deg, #4a9eff, #3a7bc8);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
@@ -272,7 +272,7 @@
 .daily-health-form-card__icon {
   width: 60px;
   height: 60px;
-  background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+  background: linear-gradient(135deg, #4a9eff15 0%, #3a7bc815 100%);
   border-radius: 16px;
   display: flex;
   align-items: center;
@@ -335,22 +335,22 @@
 }
 
 .mcq-item:hover {
-  border-color: #667eea;
+  border-color: #4a9eff;
   background: white;
   transform: translateX(5px);
 }
 
 .mcq-item.selected {
-  border-color: #667eea;
-  background: linear-gradient(135deg, #667eea08 0%, #764ba208 100%);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  border-color: #4a9eff;
+  background: linear-gradient(135deg, #4a9eff08 0%, #3a7bc808 100%);
+  box-shadow: 0 4px 12px rgba(74, 158, 255, 0.15);
 }
 
 .mcq-item input[type="radio"] {
   width: 20px;
   height: 20px;
   cursor: pointer;
-  accent-color: #667eea;
+  accent-color: #4a9eff;
 }
 
 .mcq-item-icon {
@@ -399,13 +399,13 @@
 }
 
 .btn--primary {
-  background: linear-gradient(135deg, #667eea, #764ba2);
+  background: linear-gradient(135deg, #4a9eff, #3a7bc8);
   color: white;
 }
 
 .btn--primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 5px 15px rgba(74, 158, 255, 0.4);
 }
 
 .btn--primary:disabled {
@@ -415,12 +415,12 @@
 
 .btn--ghost {
   background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #4a9eff;
+  border: 2px solid #4a9eff;
 }
 
 .btn--ghost:hover {
-  background: #667eea;
+  background: #4a9eff;
   color: white;
   transform: translateY(-2px);
 }

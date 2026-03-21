@@ -53,7 +53,6 @@ function DailyHealth() {
     day: 'numeric'
   });
 
-  // ⭐ Step 1 — Add This Mapping (Very Important)
   const sleepNumberMap = {
     "less-than-5": 4,
     "5-6": 5.5,
@@ -149,7 +148,10 @@ function DailyHealth() {
       const data = await response.json();
       
       if (response.ok) {
-        setEntries(data.data);
+        const sortedEntries = data.data.sort((a, b) => 
+          new Date(b.date) - new Date(a.date)
+        );
+        setEntries(sortedEntries);
       } else {
         showToast(data.message || 'Failed to fetch entries', 'error');
       }
@@ -197,8 +199,8 @@ function DailyHealth() {
       
       if (response.ok) {
         showToast('Health entry saved successfully! 🎉');
-        fetchEntries();
-        fetchUserStats();
+        await fetchEntries();
+        await fetchUserStats();
         resetForm();
       } else {
         showToast(data.message || 'Failed to save entry', 'error');
@@ -225,8 +227,8 @@ function DailyHealth() {
       
       if (response.ok) {
         showToast('Health entry updated successfully! ✏️');
-        fetchEntries();
-        fetchUserStats();
+        await fetchEntries();
+        await fetchUserStats();
         resetForm();
       } else {
         showToast(data.message || 'Failed to update entry', 'error');
@@ -237,7 +239,6 @@ function DailyHealth() {
     }
   };
 
-  // Fixed deleteEntry function
   const deleteEntry = async (id) => {
     try {
       const token = localStorage.getItem('token');
@@ -254,11 +255,18 @@ function DailyHealth() {
         throw new Error(data.message || 'Failed to delete entry');
       }
 
-      showToast('Entry deleted successfully');
-      fetchEntries();
-      fetchUserStats();
       setShowDeleteModal(false);
       setEntryToDelete(null);
+      
+      showToast('Entry deleted successfully');
+      
+      await fetchEntries();
+      await fetchUserStats();
+      
+      if (editingEntry && (editingEntry._id === id || editingEntry.id === id)) {
+        resetForm();
+      }
+      
     } catch (error) {
       console.error('Error deleting entry:', error);
       showToast(error.message || 'Error connecting to server', 'error');
@@ -323,16 +331,13 @@ function DailyHealth() {
     showToast("Editing entry from " + new Date(entry.date).toLocaleDateString(), "info");
   };
 
-  // Fixed handleDeleteClick function
   const handleDeleteClick = (entry) => {
     setEntryToDelete(entry);
     setShowDeleteModal(true);
   };
 
-  // Fixed confirmDelete function
   const confirmDelete = () => {
     if (entryToDelete) {
-      // Use the correct ID field - check both _id and id
       const entryId = entryToDelete._id || entryToDelete.id;
       deleteEntry(entryId);
     }
@@ -350,9 +355,11 @@ function DailyHealth() {
     setCurrentStep(1);
   };
 
-  // ⭐ Step 2 — Replace handleSubmit Function
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    if (isSubmitting) return;
+    
     setIsSubmitting(true);
 
     const requiredFields = ["sleepHours", "exerciseMinutes", "mood", "stress"];
@@ -370,8 +377,6 @@ function DailyHealth() {
       stress: formData.stress,
       notes: formData.notes || "",
       date: new Date().toISOString(),
-
-      // ⭐ Convert MCQ string → number
       sleepHours: sleepNumberMap[formData.sleepHours] || 0,
       exerciseMinutes: exerciseNumberMap[formData.exerciseMinutes] || 0
     };
@@ -385,9 +390,9 @@ function DailyHealth() {
     } catch (error) {
       console.error(error);
       showToast("Submission failed", "error");
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setIsSubmitting(false);
   };
 
   const nextStep = () => {
@@ -463,7 +468,6 @@ function DailyHealth() {
     return exerciseMap[exerciseValue] || exerciseValue;
   };
 
-  /* ================= MCQ DATA ================= */
   const sleepOptions = [
     { value: "less-than-5", label: "😴 Less than 5 hours", description: "Very poor sleep", icon: "🌙" },
     { value: "5-6", label: "🌤️ 5 – 6 hours", description: "Below recommended", icon: "⏰" },
@@ -1355,5 +1359,3 @@ function DailyHealth() {
 }
 
 export default DailyHealth;
-
-

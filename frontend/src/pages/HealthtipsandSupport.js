@@ -600,32 +600,6 @@ function HealthtipsandSupport() {
         </div>
       </section>
 
-      {/* ================= EMERGENCY SUPPORT BANNER ================= */}
-      <section className="tips-emergency">
-        <div className="container">
-          <div className="tips-emergency__content">
-            <div className="tips-emergency__icon">🆘</div>
-            <div className="tips-emergency__text">
-              <h3 className="tips-emergency__title">Need Immediate Support?</h3>
-              <p className="tips-emergency__subtitle">
-                Our crisis support team is available 24/7 for confidential assistance.
-              </p>
-            </div>
-            <div className="tips-emergency__actions">
-              <a href="tel:+94117544801" className="tips-emergency__phone">
-                📞 Call Now
-              </a>
-              <button 
-                className="tips-emergency__chat"
-                onClick={() => showToast("Live chat connecting...")}
-              >
-                💬 Live Chat
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ================= FOOTER ================= */}
       <footer className="footer">
         <div className="container footer__panel">

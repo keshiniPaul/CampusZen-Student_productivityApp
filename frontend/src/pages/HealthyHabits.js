@@ -17,6 +17,7 @@ function HealthyHabits() {
   const [activeTab, setActiveTab] = useState("goals");
   const [showGoalSummary, setShowGoalSummary] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   
   // New state for workouts and mindfulness
   const [selectedWorkout, setSelectedWorkout] = useState("");
@@ -74,11 +75,72 @@ function HealthyHabits() {
     days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   };
 
-  // Check login status on component mount
+  // Load saved data from localStorage on component mount
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    setIsLoggedIn(!!token);
+    const loadSavedData = () => {
+      const token = localStorage.getItem("token");
+      setIsLoggedIn(!!token);
+      
+      // Load goals from localStorage
+      const savedGoals = localStorage.getItem("healthyHabits_goals");
+      if (savedGoals) {
+        try {
+          const parsedGoals = JSON.parse(savedGoals);
+          setGoals(parsedGoals);
+          setShowGoalSummary(true);
+        } catch (e) {
+          console.error("Error loading goals:", e);
+        }
+      }
+      
+      // Load workouts from localStorage
+      const savedWorkouts = localStorage.getItem("healthyHabits_workouts");
+      if (savedWorkouts) {
+        try {
+          const parsedWorkouts = JSON.parse(savedWorkouts);
+          setAddedWorkouts(parsedWorkouts);
+        } catch (e) {
+          console.error("Error loading workouts:", e);
+        }
+      }
+      
+      // Load mindfulness from localStorage
+      const savedMindfulness = localStorage.getItem("healthyHabits_mindfulness");
+      if (savedMindfulness) {
+        try {
+          const parsedMindfulness = JSON.parse(savedMindfulness);
+          setAddedMindfulness(parsedMindfulness);
+        } catch (e) {
+          console.error("Error loading mindfulness:", e);
+        }
+      }
+      
+      setIsLoading(false);
+    };
+    
+    loadSavedData();
   }, []);
+
+  // Save goals to localStorage whenever they change
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem("healthyHabits_goals", JSON.stringify(goals));
+    }
+  }, [goals, isLoading]);
+
+  // Save workouts to localStorage whenever they change
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem("healthyHabits_workouts", JSON.stringify(addedWorkouts));
+    }
+  }, [addedWorkouts, isLoading]);
+
+  // Save mindfulness to localStorage whenever they change
+  useEffect(() => {
+    if (!isLoading) {
+      localStorage.setItem("healthyHabits_mindfulness", JSON.stringify(addedMindfulness));
+    }
+  }, [addedMindfulness, isLoading]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -419,6 +481,25 @@ function HealthyHabits() {
 
     return insights;
   };
+
+  // Show loading state while data is being loaded
+  if (isLoading) {
+    return (
+      <>
+        <header className="topbar" id="top">
+          <nav className="nav container">
+            <Link className="brand" to="/">
+              <img className="brand__logo--img" src={campusLogo} alt="CampusZone Logo" />
+            </Link>
+          </nav>
+        </header>
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <p>Loading your wellness data...</p>
+        </div>
+      </>
+    );
+  }
 
   return (
     <>
@@ -786,7 +867,7 @@ function HealthyHabits() {
                 </form>
               )}
 
-              {/* ================= NEW WORKOUT GOALS SECTION ================= */}
+              {/* ================= WORKOUT GOALS SECTION ================= */}
               <div className="workout-goals-section">
                 <h3 className="workout-goals__title">
                   <span className="workout-goals__icon">💪</span>
@@ -819,7 +900,7 @@ function HealthyHabits() {
                 </div>
 
                 {/* Display added workouts */}
-                {addedWorkouts.length > 0 && (
+                {addedWorkouts.length > 0 ? (
                   <div className="added-workouts-grid">
                     {addedWorkouts.map(workout => (
                       <div key={workout.id} className="workout-card">
@@ -838,16 +919,14 @@ function HealthyHabits() {
                       </div>
                     ))}
                   </div>
-                )}
-
-                {addedWorkouts.length === 0 && (
+                ) : (
                   <div className="empty-state">
                     <p className="empty-state__text">✨ No workouts added yet. Select a workout above to get started!</p>
                   </div>
                 )}
               </div>
 
-              {/* ================= NEW MINDFULNESS GOALS SECTION ================= */}
+              {/* ================= MINDFULNESS GOALS SECTION ================= */}
               <div className="mindfulness-goals-section">
                 <h3 className="mindfulness-goals__title">
                   <span className="mindfulness-goals__icon">🧠</span>
@@ -880,7 +959,7 @@ function HealthyHabits() {
                 </div>
 
                 {/* Display added mindfulness exercises */}
-                {addedMindfulness.length > 0 && (
+                {addedMindfulness.length > 0 ? (
                   <div className="added-mindfulness-grid">
                     {addedMindfulness.map(option => (
                       <div key={option.id} className="mindfulness-card">
@@ -899,9 +978,7 @@ function HealthyHabits() {
                       </div>
                     ))}
                   </div>
-                )}
-
-                {addedMindfulness.length === 0 && (
+                ) : (
                   <div className="empty-state">
                     <p className="empty-state__text">🧘 No mindfulness exercises added yet. Select one above to begin your journey!</p>
                   </div>
