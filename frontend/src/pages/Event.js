@@ -83,19 +83,93 @@ function Event() {
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [formErrors, setFormErrors] = useState({});
+  const [formTouched, setFormTouched] = useState({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     shortDescription: "",
     category: "Event",
     date: "",
     venue: "",
-    image: wiramaya1Image,
+    image: "",
   });
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
+  const fieldRefs = useRef({});
     const [toastText, setToastText] = useState("");
     const [toastVisible, setToastVisible] = useState(false);
+
+  const imageMap = {
+    viramaya: wiramaya1Image,
+    ganthers: ganthersImage,
+    lantharuma: lantharumaImage,
+    openday: opendayImage,
+    careerday: careerdayImage,
+    convacation: convacationImage,
+  };
+
+  const getImageKeyFromValue = (imageValue) => {
+    return Object.keys(imageMap).find((key) => imageMap[key] === imageValue) || "";
+  };
+
+  const validateField = (fieldName, value) => {
+    const trimmedValue = typeof value === "string" ? value.trim() : value;
+    const hasAlphabetCharacter = typeof trimmedValue === "string" && /[A-Za-z]/.test(trimmedValue);
+
+    switch (fieldName) {
+      case "title":
+        if (!trimmedValue) return "Title is required.";
+        if (trimmedValue.length < 3) return "Title must be at least 3 characters.";
+        if (trimmedValue.length > 100) return "Title cannot exceed 100 characters.";
+        if (!hasAlphabetCharacter) return "Title cannot contain only numbers or symbols.";
+        return "";
+      case "shortDescription":
+        if (!trimmedValue) return "Description is required.";
+        if (trimmedValue.length < 20) return "Description must be at least 20 characters.";
+        if (trimmedValue.length > 500) return "Description cannot exceed 500 characters.";
+        if (!hasAlphabetCharacter) return "Description cannot contain only numbers or symbols.";
+        return "";
+      case "category":
+        if (!trimmedValue) return "Category is required.";
+        return "";
+      case "date": {
+        if (!trimmedValue) return "Date is required.";
+        const selectedDate = new Date(`${trimmedValue}T00:00:00`);
+        const todayAtMidnight = new Date();
+        todayAtMidnight.setHours(0, 0, 0, 0);
+        if (Number.isNaN(selectedDate.getTime())) return "Please select a valid date.";
+        if (selectedDate <= todayAtMidnight) return "Date must be in the future.";
+        return "";
+      }
+      case "venue":
+        if (!trimmedValue) return "Venue is required.";
+        if (trimmedValue.length < 5) return "Venue must be at least 5 characters.";
+        if (trimmedValue.length > 150) return "Venue cannot exceed 150 characters.";
+        return "";
+      case "image":
+        if (!value) return "Please select an event image.";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  const validateForm = (values) => {
+    return {
+      title: validateField("title", values.title),
+      shortDescription: validateField("shortDescription", values.shortDescription),
+      category: validateField("category", values.category),
+      date: validateField("date", values.date),
+      venue: validateField("venue", values.venue),
+      image: validateField("image", values.image),
+    };
+  };
+
+  const shouldShowError = (fieldName) => {
+    return Boolean((formTouched[fieldName] || submitAttempted) && formErrors[fieldName]);
+  };
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -137,8 +211,11 @@ function Event() {
       category: "Event",
       date: "",
       venue: "",
-      image: wiramaya1Image,
+      image: "",
     });
+    setFormErrors({});
+    setFormTouched({});
+    setSubmitAttempted(false);
     setShowModal(true);
   };
 
@@ -156,6 +233,9 @@ function Event() {
       venue: event.venue,
       image: event.image,
     });
+    setFormErrors({});
+    setFormTouched({});
+    setSubmitAttempted(false);
     setShowModal(true);
   };
 
@@ -181,11 +261,29 @@ function Event() {
 
   const handleSubmitEvent = (e) => {
     e.preventDefault();
-    
-    if (!formData.title || !formData.date || !formData.venue) {
-        setToastText("❌ Please fill in all required fields.");
-        setToastVisible(true);
-        setTimeout(() => setToastVisible(false), 3000);
+
+    const nextErrors = validateForm(formData);
+    setFormErrors(nextErrors);
+    setSubmitAttempted(true);
+    setFormTouched({
+      title: true,
+      shortDescription: true,
+      category: true,
+      date: true,
+      venue: true,
+      image: true,
+    });
+
+    const fieldOrder = ["title", "shortDescription", "category", "date", "venue", "image"];
+    const firstErrorField = fieldOrder.find((fieldName) => nextErrors[fieldName]);
+    if (firstErrorField) {
+      const firstInvalidField = fieldRefs.current[firstErrorField];
+      if (firstInvalidField) {
+        firstInvalidField.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (typeof firstInvalidField.focus === "function") {
+          firstInvalidField.focus();
+        }
+      }
       return;
     }
 
@@ -217,29 +315,56 @@ function Event() {
 
     setShowModal(false);
     setEditingEvent(null);
+    setFormErrors({});
+    setFormTouched({});
+    setSubmitAttempted(false);
   };
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
+    setFormData((prev) => {
+      const nextValues = {
+        ...prev,
+        [name]: value,
+      };
+
+      if (formTouched[name] || submitAttempted) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: validateField(name, nextValues[name]),
+        }));
+      }
+
+      return nextValues;
+    });
+  };
+
+  const handleFieldBlur = (e) => {
+    const { name } = e.target;
+    setFormTouched((prev) => ({ ...prev, [name]: true }));
+    setFormErrors((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: validateField(name, formData[name]),
     }));
   };
 
   const handleImageChange = (imageName) => {
-    const imageMap = {
-      viramaya: wiramaya1Image,
-      ganthers: ganthersImage,
-      lantharuma: lantharumaImage,
-      openday: opendayImage,
-      careerday: careerdayImage,
-      convacation: convacationImage,
-    };
-    setFormData((prev) => ({
-      ...prev,
-      image: imageMap[imageName] || wiramaya1Image,
-    }));
+    setFormTouched((prev) => ({ ...prev, image: true }));
+    setFormData((prev) => {
+      const nextValues = {
+        ...prev,
+        image: imageMap[imageName] || "",
+      };
+
+      if (formTouched.image || submitAttempted) {
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          image: validateField("image", nextValues.image),
+        }));
+      }
+
+      return nextValues;
+    });
   };
 
   const scrollToTop = (event) => {
@@ -460,7 +585,12 @@ function Event() {
               </h2>
               <button
                 className="modal__close"
-                onClick={() => setShowModal(false)}
+                onClick={() => {
+                  setShowModal(false);
+                  setFormErrors({});
+                  setFormTouched({});
+                  setSubmitAttempted(false);
+                }}
                 aria-label="Close modal"
               >
                 ×
@@ -475,12 +605,16 @@ function Event() {
                   type="text"
                   id="title"
                   name="title"
-                  className="form__input"
+                  className={`form__input ${shouldShowError("title") ? "form__input--error" : ""}`.trim()}
                   value={formData.title}
                   onChange={handleFormChange}
-                  required
+                  onBlur={handleFieldBlur}
+                  ref={(element) => {
+                    fieldRefs.current.title = element;
+                  }}
                   placeholder="Enter event title"
                 />
+                {shouldShowError("title") && <p className="form__error">{formErrors.title}</p>}
               </div>
 
               <div className="form__group">
@@ -490,13 +624,17 @@ function Event() {
                 <textarea
                   id="shortDescription"
                   name="shortDescription"
-                  className="form__input form__textarea"
+                  className={`form__input form__textarea ${shouldShowError("shortDescription") ? "form__input--error" : ""}`.trim()}
                   value={formData.shortDescription}
                   onChange={handleFormChange}
-                  required
+                  onBlur={handleFieldBlur}
+                  ref={(element) => {
+                    fieldRefs.current.shortDescription = element;
+                  }}
                   rows="3"
                   placeholder="Enter event description"
                 />
+                {shouldShowError("shortDescription") && <p className="form__error">{formErrors.shortDescription}</p>}
               </div>
 
               <div className="form__row">
@@ -507,15 +645,21 @@ function Event() {
                   <select
                     id="category"
                     name="category"
-                    className="form__input"
+                    className={`form__input ${shouldShowError("category") ? "form__input--error" : ""}`.trim()}
                     value={formData.category}
                     onChange={handleFormChange}
-                    required
+                    onBlur={handleFieldBlur}
+                    ref={(element) => {
+                      fieldRefs.current.category = element;
+                    }}
                   >
                     <option value="Event">Event</option>
+                    <option value="Sports">Sports</option>
+                    <option value="Clubs">Clubs</option>
                     <option value="Activity">Activity</option>
                     <option value="Community">Community</option>
                   </select>
+                  {shouldShowError("category") && <p className="form__error">{formErrors.category}</p>}
                 </div>
 
                 <div className="form__group">
@@ -526,11 +670,15 @@ function Event() {
                     type="date"
                     id="date"
                     name="date"
-                    className="form__input"
+                    className={`form__input ${shouldShowError("date") ? "form__input--error" : ""}`.trim()}
                     value={formData.date}
                     onChange={handleFormChange}
-                    required
+                    onBlur={handleFieldBlur}
+                    ref={(element) => {
+                      fieldRefs.current.date = element;
+                    }}
                   />
+                  {shouldShowError("date") && <p className="form__error">{formErrors.date}</p>}
                 </div>
               </div>
 
@@ -542,35 +690,51 @@ function Event() {
                   type="text"
                   id="venue"
                   name="venue"
-                  className="form__input"
+                  className={`form__input ${shouldShowError("venue") ? "form__input--error" : ""}`.trim()}
                   value={formData.venue}
                   onChange={handleFormChange}
-                  required
+                  onBlur={handleFieldBlur}
+                  ref={(element) => {
+                    fieldRefs.current.venue = element;
+                  }}
                   placeholder="Enter event venue"
                 />
+                {shouldShowError("venue") && <p className="form__error">{formErrors.venue}</p>}
               </div>
 
               <div className="form__group">
                 <label className="form__label">Event Image</label>
-                <div className="form__imageSelect">
+                <div
+                  className={`form__imageSelect ${shouldShowError("image") ? "form__imageSelect--error" : ""}`.trim()}
+                  ref={(element) => {
+                    fieldRefs.current.image = element;
+                  }}
+                  tabIndex={-1}
+                >
                   {["viramaya", "ganthers", "lantharuma", "openday", "careerday", "convacation"].map((img) => (
                     <button
                       key={img}
                       type="button"
-                      className="form__imageOption"
+                      className={`form__imageOption ${getImageKeyFromValue(formData.image) === img ? "is-active" : ""}`.trim()}
                       onClick={() => handleImageChange(img)}
                     >
                       {img}
                     </button>
                   ))}
                 </div>
+                {shouldShowError("image") && <p className="form__error">{formErrors.image}</p>}
               </div>
 
               <div className="modal__actions">
                 <button
                   type="button"
                   className="btn btn--ghost"
-                  onClick={() => setShowModal(false)}
+                  onClick={() => {
+                    setShowModal(false);
+                    setFormErrors({});
+                    setFormTouched({});
+                    setSubmitAttempted(false);
+                  }}
                 >
                   Cancel
                 </button>

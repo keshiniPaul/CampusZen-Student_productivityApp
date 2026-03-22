@@ -178,6 +178,9 @@ function Clubs() {
     maxMembers: 100,
     registrationLink: "#",
   });
+  const [clubFormErrors, setClubFormErrors] = useState({});
+  const [clubFormTouched, setClubFormTouched] = useState({});
+  const [clubSubmitAttempted, setClubSubmitAttempted] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -187,6 +190,95 @@ function Clubs() {
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
+  const clubFieldRefs = useRef({});
+
+  const validateClubField = (fieldName, value, allValues) => {
+    const trimmed = typeof value === "string" ? value.trim() : value;
+    const hasLetters = typeof trimmed === "string" && /[A-Za-z]/.test(trimmed);
+
+    switch (fieldName) {
+      case "name":
+        if (!trimmed) return "Club/Society name is required.";
+        if (trimmed.length < 3) return "Name must be at least 3 characters.";
+        if (trimmed.length > 100) return "Name cannot exceed 100 characters.";
+        if (!hasLetters) return "Name cannot contain only numbers or symbols.";
+        return "";
+      case "category":
+        if (!trimmed) return "Category is required.";
+        return "";
+      case "description":
+        if (!trimmed) return "Description is required.";
+        if (trimmed.length < 20) return "Description must be at least 20 characters.";
+        if (trimmed.length > 1000) return "Description cannot exceed 1000 characters.";
+        if (!hasLetters) return "Description cannot contain only numbers or symbols.";
+        return "";
+      case "vision":
+        if (!trimmed) return "Vision is required.";
+        if (trimmed.length < 10) return "Vision must be at least 10 characters.";
+        if (!hasLetters) return "Vision cannot contain only numbers or symbols.";
+        return "";
+      case "mission":
+        if (!trimmed) return "Mission is required.";
+        if (trimmed.length < 10) return "Mission must be at least 10 characters.";
+        if (!hasLetters) return "Mission cannot contain only numbers or symbols.";
+        return "";
+      case "registrationOpen": {
+        if (!trimmed) return "Registration open date is required.";
+        const openDate = new Date(`${trimmed}T00:00:00`);
+        if (Number.isNaN(openDate.getTime())) return "Please provide a valid open date.";
+        return "";
+      }
+      case "registrationClose": {
+        if (!trimmed) return "Registration close date is required.";
+        const closeDate = new Date(`${trimmed}T00:00:00`);
+        const openDate = new Date(`${allValues.registrationOpen}T00:00:00`);
+        if (Number.isNaN(closeDate.getTime())) return "Please provide a valid close date.";
+        if (!Number.isNaN(openDate.getTime()) && closeDate < openDate) {
+          return "Close date must be the same as or after open date.";
+        }
+        return "";
+      }
+      case "president":
+        if (!trimmed) return "President name is required.";
+        if (trimmed.length < 3) return "President name must be at least 3 characters.";
+        if (!hasLetters) return "President name cannot contain only numbers or symbols.";
+        return "";
+      case "advisor":
+        if (!trimmed) return "Advisor name is required.";
+        if (trimmed.length < 3) return "Advisor name must be at least 3 characters.";
+        if (!hasLetters) return "Advisor name cannot contain only numbers or symbols.";
+        return "";
+      case "maxMembers": {
+        const max = Number(value);
+        if (!Number.isFinite(max) || max < 1) return "Max members must be at least 1.";
+        if (max > 10000) return "Max members cannot exceed 10000.";
+        return "";
+      }
+      case "registrationLink":
+        if (!trimmed || trimmed === "#") return "";
+        if (!/^https?:\/\//i.test(trimmed)) return "Registration link must start with http:// or https://.";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  const validateClubForm = (values) => ({
+    name: validateClubField("name", values.name, values),
+    category: validateClubField("category", values.category, values),
+    description: validateClubField("description", values.description, values),
+    vision: validateClubField("vision", values.vision, values),
+    mission: validateClubField("mission", values.mission, values),
+    registrationOpen: validateClubField("registrationOpen", values.registrationOpen, values),
+    registrationClose: validateClubField("registrationClose", values.registrationClose, values),
+    president: validateClubField("president", values.president, values),
+    advisor: validateClubField("advisor", values.advisor, values),
+    maxMembers: validateClubField("maxMembers", values.maxMembers, values),
+    registrationLink: validateClubField("registrationLink", values.registrationLink, values),
+  });
+
+  const shouldShowClubError = (fieldName) =>
+    Boolean((clubFormTouched[fieldName] || clubSubmitAttempted) && clubFormErrors[fieldName]);
 
   // Debug: Log when Clubs page loads
   useEffect(() => {
@@ -386,6 +478,9 @@ function Clubs() {
       maxMembers: 100,
       registrationLink: "#",
     });
+    setClubFormErrors({});
+    setClubFormTouched({});
+    setClubSubmitAttempted(false);
     setShowClubFormModal(true);
   };
 
@@ -409,6 +504,9 @@ function Clubs() {
       maxMembers: club.maxMembers || 100,
       registrationLink: club.registrationLink || "#",
     });
+    setClubFormErrors({});
+    setClubFormTouched({});
+    setClubSubmitAttempted(false);
     setShowClubFormModal(true);
   };
 
@@ -438,11 +536,77 @@ function Clubs() {
 
   const handleClubFormChange = (e) => {
     const { name, value } = e.target;
-    setClubFormData((prev) => ({ ...prev, [name]: value }));
+    setClubFormData((prev) => {
+      const nextValues = { ...prev, [name]: value };
+
+      if (clubFormTouched[name] || clubSubmitAttempted) {
+        setClubFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: validateClubField(name, nextValues[name], nextValues),
+          ...(name === "registrationOpen"
+            ? { registrationClose: validateClubField("registrationClose", nextValues.registrationClose, nextValues) }
+            : {}),
+        }));
+      }
+
+      return nextValues;
+    });
+  };
+
+  const handleClubFormBlur = (e) => {
+    const { name } = e.target;
+    setClubFormTouched((prev) => ({ ...prev, [name]: true }));
+    setClubFormErrors((prev) => ({
+      ...prev,
+      [name]: validateClubField(name, clubFormData[name], clubFormData),
+    }));
   };
 
   const handleClubFormSubmit = async (e) => {
     e.preventDefault();
+
+    const nextErrors = validateClubForm(clubFormData);
+    setClubFormErrors(nextErrors);
+    setClubSubmitAttempted(true);
+    setClubFormTouched({
+      name: true,
+      category: true,
+      description: true,
+      vision: true,
+      mission: true,
+      registrationOpen: true,
+      registrationClose: true,
+      president: true,
+      advisor: true,
+      maxMembers: true,
+      registrationLink: true,
+    });
+
+    const fieldOrder = [
+      "name",
+      "category",
+      "description",
+      "vision",
+      "mission",
+      "registrationOpen",
+      "registrationClose",
+      "president",
+      "advisor",
+      "maxMembers",
+      "registrationLink",
+    ];
+
+    const firstErrorField = fieldOrder.find((fieldName) => nextErrors[fieldName]);
+    if (firstErrorField) {
+      const firstField = clubFieldRefs.current[firstErrorField];
+      if (firstField) {
+        firstField.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (typeof firstField.focus === "function") {
+          firstField.focus();
+        }
+      }
+      return;
+    }
 
     const payload = {
       name: clubFormData.name,
@@ -475,6 +639,9 @@ function Clubs() {
         localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
       setShowClubFormModal(false);
       setEditingClub(null);
+        setClubFormErrors({});
+        setClubFormTouched({});
+        setClubSubmitAttempted(false);
           setToastText("✅ Club updated successfully!");
           setToastVisible(true);
           setTimeout(() => setToastVisible(false), 3000);
@@ -506,6 +673,9 @@ function Clubs() {
           ];
           localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
           setShowClubFormModal(false);
+          setClubFormErrors({});
+          setClubFormTouched({});
+          setClubSubmitAttempted(false);
           setToastText("✅ Club added successfully!");
           setToastVisible(true);
           setTimeout(() => setToastVisible(false), 3000);
@@ -521,6 +691,9 @@ function Clubs() {
     setClubs(updatedClubs);
     localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
     setShowClubFormModal(false);
+    setClubFormErrors({});
+    setClubFormTouched({});
+    setClubSubmitAttempted(false);
     setToastText("✅ Club added successfully!");
     setToastVisible(true);
     setTimeout(() => setToastVisible(false), 3000);
@@ -835,16 +1008,48 @@ function Clubs() {
 
       {/* Add/Edit Club Modal */}
       {showClubFormModal && (
-        <div className="modal__overlay" onClick={() => setShowClubFormModal(false)}>
+        <div className="modal__overlay" onClick={() => {
+          setShowClubFormModal(false);
+          setClubFormErrors({});
+          setClubFormTouched({});
+          setClubSubmitAttempted(false);
+        }}>
           <div className="clubsForm__content" onClick={(e) => e.stopPropagation()}>
             <div className="clubsForm__header">
               <h2>{editingClub ? "Update Club & Society" : "Add Club & Society"}</h2>
-              <button className="clubsForm__close" onClick={() => setShowClubFormModal(false)} aria-label="Close modal">×</button>
+              <button className="clubsForm__close" onClick={() => {
+                setShowClubFormModal(false);
+                setClubFormErrors({});
+                setClubFormTouched({});
+                setClubSubmitAttempted(false);
+              }} aria-label="Close modal">×</button>
             </div>
 
             <form className="clubsForm" onSubmit={handleClubFormSubmit}>
-              <input name="name" value={clubFormData.name} onChange={handleClubFormChange} placeholder="Club/Society name" required />
-              <select name="category" value={clubFormData.category} onChange={handleClubFormChange}>
+              <input
+                name="name"
+                value={clubFormData.name}
+                onChange={handleClubFormChange}
+                onBlur={handleClubFormBlur}
+                className={shouldShowClubError("name") ? "clubsForm__input--error" : ""}
+                ref={(element) => {
+                  clubFieldRefs.current.name = element;
+                }}
+                placeholder="Club/Society name"
+                required
+              />
+              {shouldShowClubError("name") && <p className="clubsForm__error">{clubFormErrors.name}</p>}
+
+              <select
+                name="category"
+                value={clubFormData.category}
+                onChange={handleClubFormChange}
+                onBlur={handleClubFormBlur}
+                className={shouldShowClubError("category") ? "clubsForm__input--error" : ""}
+                ref={(element) => {
+                  clubFieldRefs.current.category = element;
+                }}
+              >
                 <option value="Community">Community</option>
                 <option value="Technical">Technical</option>
                 <option value="Social Service">Social Service</option>
@@ -852,27 +1057,157 @@ function Clubs() {
                 <option value="Cultural">Cultural</option>
                 <option value="Creative">Creative</option>
               </select>
-              <textarea name="description" value={clubFormData.description} onChange={handleClubFormChange} placeholder="Description" required />
-              <textarea name="vision" value={clubFormData.vision} onChange={handleClubFormChange} placeholder="Vision" required />
-              <textarea name="mission" value={clubFormData.mission} onChange={handleClubFormChange} placeholder="Mission" required />
+              {shouldShowClubError("category") && <p className="clubsForm__error">{clubFormErrors.category}</p>}
+
+              <textarea
+                name="description"
+                value={clubFormData.description}
+                onChange={handleClubFormChange}
+                onBlur={handleClubFormBlur}
+                className={shouldShowClubError("description") ? "clubsForm__input--error" : ""}
+                ref={(element) => {
+                  clubFieldRefs.current.description = element;
+                }}
+                placeholder="Description"
+                required
+              />
+              {shouldShowClubError("description") && <p className="clubsForm__error">{clubFormErrors.description}</p>}
+
+              <textarea
+                name="vision"
+                value={clubFormData.vision}
+                onChange={handleClubFormChange}
+                onBlur={handleClubFormBlur}
+                className={shouldShowClubError("vision") ? "clubsForm__input--error" : ""}
+                ref={(element) => {
+                  clubFieldRefs.current.vision = element;
+                }}
+                placeholder="Vision"
+                required
+              />
+              {shouldShowClubError("vision") && <p className="clubsForm__error">{clubFormErrors.vision}</p>}
+
+              <textarea
+                name="mission"
+                value={clubFormData.mission}
+                onChange={handleClubFormChange}
+                onBlur={handleClubFormBlur}
+                className={shouldShowClubError("mission") ? "clubsForm__input--error" : ""}
+                ref={(element) => {
+                  clubFieldRefs.current.mission = element;
+                }}
+                placeholder="Mission"
+                required
+              />
+              {shouldShowClubError("mission") && <p className="clubsForm__error">{clubFormErrors.mission}</p>}
 
               <div className="clubsForm__row">
-                <input type="date" name="registrationOpen" value={clubFormData.registrationOpen} onChange={handleClubFormChange} required />
-                <input type="date" name="registrationClose" value={clubFormData.registrationClose} onChange={handleClubFormChange} required />
+                <div>
+                  <input
+                    type="date"
+                    name="registrationOpen"
+                    value={clubFormData.registrationOpen}
+                    onChange={handleClubFormChange}
+                    onBlur={handleClubFormBlur}
+                    className={shouldShowClubError("registrationOpen") ? "clubsForm__input--error" : ""}
+                    ref={(element) => {
+                      clubFieldRefs.current.registrationOpen = element;
+                    }}
+                    required
+                  />
+                  {shouldShowClubError("registrationOpen") && <p className="clubsForm__error">{clubFormErrors.registrationOpen}</p>}
+                </div>
+                <div>
+                  <input
+                    type="date"
+                    name="registrationClose"
+                    value={clubFormData.registrationClose}
+                    onChange={handleClubFormChange}
+                    onBlur={handleClubFormBlur}
+                    className={shouldShowClubError("registrationClose") ? "clubsForm__input--error" : ""}
+                    ref={(element) => {
+                      clubFieldRefs.current.registrationClose = element;
+                    }}
+                    required
+                  />
+                  {shouldShowClubError("registrationClose") && <p className="clubsForm__error">{clubFormErrors.registrationClose}</p>}
+                </div>
               </div>
 
               <div className="clubsForm__row">
-                <input name="president" value={clubFormData.president} onChange={handleClubFormChange} placeholder="President" required />
-                <input name="advisor" value={clubFormData.advisor} onChange={handleClubFormChange} placeholder="Advisor" required />
+                <div>
+                  <input
+                    name="president"
+                    value={clubFormData.president}
+                    onChange={handleClubFormChange}
+                    onBlur={handleClubFormBlur}
+                    className={shouldShowClubError("president") ? "clubsForm__input--error" : ""}
+                    ref={(element) => {
+                      clubFieldRefs.current.president = element;
+                    }}
+                    placeholder="President"
+                    required
+                  />
+                  {shouldShowClubError("president") && <p className="clubsForm__error">{clubFormErrors.president}</p>}
+                </div>
+                <div>
+                  <input
+                    name="advisor"
+                    value={clubFormData.advisor}
+                    onChange={handleClubFormChange}
+                    onBlur={handleClubFormBlur}
+                    className={shouldShowClubError("advisor") ? "clubsForm__input--error" : ""}
+                    ref={(element) => {
+                      clubFieldRefs.current.advisor = element;
+                    }}
+                    placeholder="Advisor"
+                    required
+                  />
+                  {shouldShowClubError("advisor") && <p className="clubsForm__error">{clubFormErrors.advisor}</p>}
+                </div>
               </div>
 
               <div className="clubsForm__row">
-                <input type="number" min="1" name="maxMembers" value={clubFormData.maxMembers} onChange={handleClubFormChange} placeholder="Max members" required />
-                <input name="registrationLink" value={clubFormData.registrationLink} onChange={handleClubFormChange} placeholder="Registration link" />
+                <div>
+                  <input
+                    type="number"
+                    min="1"
+                    name="maxMembers"
+                    value={clubFormData.maxMembers}
+                    onChange={handleClubFormChange}
+                    onBlur={handleClubFormBlur}
+                    className={shouldShowClubError("maxMembers") ? "clubsForm__input--error" : ""}
+                    ref={(element) => {
+                      clubFieldRefs.current.maxMembers = element;
+                    }}
+                    placeholder="Max members"
+                    required
+                  />
+                  {shouldShowClubError("maxMembers") && <p className="clubsForm__error">{clubFormErrors.maxMembers}</p>}
+                </div>
+                <div>
+                  <input
+                    name="registrationLink"
+                    value={clubFormData.registrationLink}
+                    onChange={handleClubFormChange}
+                    onBlur={handleClubFormBlur}
+                    className={shouldShowClubError("registrationLink") ? "clubsForm__input--error" : ""}
+                    ref={(element) => {
+                      clubFieldRefs.current.registrationLink = element;
+                    }}
+                    placeholder="Registration link"
+                  />
+                  {shouldShowClubError("registrationLink") && <p className="clubsForm__error">{clubFormErrors.registrationLink}</p>}
+                </div>
               </div>
 
               <div className="clubsForm__actions">
-                <button type="button" className="clubs__btn clubs__btn--secondary" onClick={() => setShowClubFormModal(false)}>Cancel</button>
+                <button type="button" className="clubs__btn clubs__btn--secondary" onClick={() => {
+                  setShowClubFormModal(false);
+                  setClubFormErrors({});
+                  setClubFormTouched({});
+                  setClubSubmitAttempted(false);
+                }}>Cancel</button>
                 <button type="submit" className="clubs__btn clubs__btn--primary">{editingClub ? "Update Club" : "Add Club"}</button>
               </div>
             </form>
