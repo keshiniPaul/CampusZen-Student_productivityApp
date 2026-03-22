@@ -16,6 +16,8 @@ import Event from "./pages/Event";
 import ActivityDetails from "./pages/ActivityDetails";
 import Sports from "./pages/Sports";
 import Clubs from "./pages/Clubs";
+import Career from "./pages/Career";
+
 
 // new pages for login
 import LoginDashboard from "./pages/LoginDashboard";
@@ -47,6 +49,8 @@ function App() {
         <Route path="/healthy-habits" element={<HealthyHabits />} />
         <Route path="/health" element={<Health />} />
         <Route path="/dashboard" element={<LoginDashboard />} />
+        <Route path="/career" element={<Career />} />
+
 
         {/* Default */}
         <Route path="*" element={<Navigate to="/" replace />} />
