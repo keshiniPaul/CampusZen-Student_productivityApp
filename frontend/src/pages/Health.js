@@ -423,16 +423,13 @@ function Health() {
           <div className="footer__support">
             <p className="footer__kicker">Need Support?</p>
             <h3 className="footer__heading">Health Help</h3>
-            <a className="footer__contact footer__contact--accent" href="#">
+            <a className="footer__contact footer__contact--accent" href="https://support.sliit.lk">
               🌐 support.campuszone.lk
             </a>
             <a className="footer__contact" href="tel:+94117544801">
               📞 +94 11 754 0000
             </a>
-            <a className="footer__feedback" href="#" onClick={(e) => {
-              e.preventDefault();
-              showToast("Feedback form coming soon");
-            }}>
+            <a className="footer__feedback" href="https://support.sliit.lk">
               Provide Feedback to CampusZone
             </a>
           </div>

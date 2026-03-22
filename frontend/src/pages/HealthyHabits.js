@@ -64,7 +64,7 @@ function HealthyHabits() {
     meditationUnit: 'minutes'
   });
 
-  const [progress, setProgress] = useState({
+  const [progress] = useState({
     sleepAvg: 7.2,
     exerciseAvg: 25,
     stressAvg: 5,

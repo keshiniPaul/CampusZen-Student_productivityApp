@@ -155,38 +155,135 @@ const activitiesData = {
   },
 };
 
+const FIELD_ORDER = ["title", "description", "category", "date", "venue", "image"];
+
+const validateField = (fieldName, value, formValues) => {
+  const trimmedValue = typeof value === "string" ? value.trim() : value;
+
+  switch (fieldName) {
+    case "title": {
+      if (!trimmedValue) return "Title is required.";
+      if (trimmedValue.length < 3) return "Title must be at least 3 characters.";
+      if (trimmedValue.length > 100) return "Title cannot exceed 100 characters.";
+      return "";
+    }
+    case "description": {
+      if (!trimmedValue) return "Description is required.";
+      if (trimmedValue.length < 20) return "Description must be at least 20 characters.";
+      if (trimmedValue.length > 1000) return "Description cannot exceed 1000 characters.";
+      return "";
+    }
+    case "category": {
+      if (!trimmedValue) return "Category is required.";
+      return "";
+    }
+    case "date": {
+      if (!trimmedValue) return "Date is required.";
+      const selectedDate = new Date(`${trimmedValue}T00:00:00`);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      if (Number.isNaN(selectedDate.getTime())) return "Please enter a valid date.";
+      if (selectedDate <= today) return "Date must be in the future.";
+      return "";
+    }
+    case "venue": {
+      if (!trimmedValue) return "Venue is required.";
+      if (trimmedValue.length < 5) return "Venue must be at least 5 characters.";
+      if (trimmedValue.length > 150) return "Venue cannot exceed 150 characters.";
+      return "";
+    }
+    case "image": {
+      if (!trimmedValue) return "Image is required.";
+      return "";
+    }
+    default:
+      return "";
+  }
+};
+
+function FieldError({ message }) {
+  if (!message) return null;
+  return (
+    <p className="modal__errorMsg" role="alert">
+      <span className="modal__errorIcon" aria-hidden="true">!</span>
+      {message}
+    </p>
+  );
+}
+
 function ActivityDetails() {
   const { activityType } = useParams();
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
   const displayName = currentUser?.fullName || currentUser?.email || "User";
   const [activity, setActivity] = useState(null);
-  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [showClosedMessage, setShowClosedMessage] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showClosedMessage] = useState(false);
+  const [showSuccessMessage] = useState(false);
   const [showNewActivityBanner, setShowNewActivityBanner] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showModalSuccess, setShowModalSuccess] = useState(false);
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [formData, setFormData] = useState({
+    title: "",
+    description: "",
+    category: "",
+    date: "",
+    venue: "",
+    image: "",
+  });
+  const [touched, setTouched] = useState({});
+  const [errors, setErrors] = useState({});
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
+  const successTimerRef = useRef(null);
+  const fieldRefs = useRef({});
 
   useEffect(() => {
     const data =
       activitiesData[activityType] || activitiesData["event"];
     setActivity(data);
 
-    // Check if registration is open
-    const today = new Date();
-    const regOpen = new Date(data.registrationOpen);
-    const regClose = new Date(data.registrationClose);
-    setIsRegistrationOpen(today >= regOpen && today <= regClose);
-
     // Show new activity banner if activity is new
     if (data.isNew) {
       setShowNewActivityBanner(true);
     }
   }, [activityType]);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const onModalEscape = (event) => {
+      if (event.key === "Escape") {
+        setIsModalOpen(false);
+        setShowModalSuccess(false);
+      }
+    };
+
+    document.addEventListener("keydown", onModalEscape);
+    return () => document.removeEventListener("keydown", onModalEscape);
+  }, [isModalOpen]);
+
+  useEffect(() => {
+    return () => {
+      if (successTimerRef.current) {
+        window.clearTimeout(successTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -224,6 +321,106 @@ function ActivityDetails() {
     event.preventDefault();
     navigate("/");
     setIsNavOpen(false);
+  };
+
+  const getAllFieldErrors = (values) => {
+    return FIELD_ORDER.reduce((accumulator, fieldName) => {
+      accumulator[fieldName] = validateField(fieldName, values[fieldName], values);
+      return accumulator;
+    }, {});
+  };
+
+  const shouldShowError = (fieldName) => {
+    return Boolean((touched[fieldName] || submitAttempted) && errors[fieldName]);
+  };
+
+  const handleOpenModal = () => {
+    if (successTimerRef.current) {
+      window.clearTimeout(successTimerRef.current);
+    }
+    setShowModalSuccess(false);
+    setSubmitAttempted(false);
+    setTouched({});
+    setErrors({});
+    setFormData({
+      title: "",
+      description: "",
+      category: "",
+      date: "",
+      venue: "",
+      image: "",
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    if (successTimerRef.current) {
+      window.clearTimeout(successTimerRef.current);
+    }
+    setShowModalSuccess(false);
+    setIsModalOpen(false);
+  };
+
+  const handleChange = (eventOrField, valueOverride) => {
+    const fieldName = typeof eventOrField === "string" ? eventOrField : eventOrField.target.name;
+    const fieldValue = typeof eventOrField === "string" ? valueOverride : eventOrField.target.value;
+
+    setFormData((previous) => {
+      const nextValues = { ...previous, [fieldName]: fieldValue };
+
+      if (touched[fieldName] || submitAttempted) {
+        setErrors((previousErrors) => ({
+          ...previousErrors,
+          [fieldName]: validateField(fieldName, nextValues[fieldName], nextValues),
+        }));
+      }
+
+      return nextValues;
+    });
+  };
+
+  const handleBlur = (eventOrField) => {
+    const fieldName = typeof eventOrField === "string" ? eventOrField : eventOrField.target.name;
+
+    setTouched((previous) => ({ ...previous, [fieldName]: true }));
+    setErrors((previous) => ({
+      ...previous,
+      [fieldName]: validateField(fieldName, formData[fieldName], formData),
+    }));
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+
+    const nextErrors = getAllFieldErrors(formData);
+    setErrors(nextErrors);
+    setSubmitAttempted(true);
+    setTouched(
+      FIELD_ORDER.reduce((accumulator, fieldName) => {
+        accumulator[fieldName] = true;
+        return accumulator;
+      }, {})
+    );
+
+    const firstErrorField = FIELD_ORDER.find((fieldName) => nextErrors[fieldName]);
+    if (firstErrorField) {
+      const firstFieldElement = fieldRefs.current[firstErrorField];
+      if (firstFieldElement) {
+        firstFieldElement.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (typeof firstFieldElement.focus === "function") {
+          firstFieldElement.focus();
+        }
+      }
+      return;
+    }
+
+    setShowModalSuccess(true);
+    if (successTimerRef.current) {
+      window.clearTimeout(successTimerRef.current);
+    }
+    successTimerRef.current = window.setTimeout(() => {
+      handleCloseModal();
+    }, 1400);
   };
 
 
@@ -441,11 +638,159 @@ function ActivityDetails() {
                     For more details about this activity, please check the information on the left or contact the organizers.
                   </p>
                 </div>
+
+                <button type="button" className="activityDetails__addBtn" onClick={handleOpenModal}>
+                  + Add New Event
+                </button>
               </div>
             </aside>
           </div>
         </div>
       </main>
+
+      {isModalOpen && (
+        <div
+          className="modal__overlay"
+          role="presentation"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) {
+              handleCloseModal();
+            }
+          }}
+        >
+          <div className="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+            <div className="modal__header">
+              <h2 className="modal__title" id="modalTitle">Create New Event</h2>
+              <button type="button" className="modal__close" onClick={handleCloseModal} aria-label="Close modal">
+                ×
+              </button>
+            </div>
+
+            {showModalSuccess && (
+              <div className="modal__successBanner" role="status" aria-live="polite">
+                Event created successfully. Closing modal...
+              </div>
+            )}
+
+            <form className="modal__form" onSubmit={handleSubmit} noValidate>
+              <label className="modal__label" htmlFor="eventTitle">Title</label>
+              <input
+                id="eventTitle"
+                name="title"
+                type="text"
+                value={formData.title}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`modal__input ${shouldShowError("title") ? "modal__input--error" : ""}`.trim()}
+                ref={(element) => {
+                  fieldRefs.current.title = element;
+                }}
+                maxLength={100}
+                placeholder="Enter event title"
+              />
+              <FieldError message={shouldShowError("title") ? errors.title : ""} />
+
+              <label className="modal__label" htmlFor="eventDescription">Description</label>
+              <textarea
+                id="eventDescription"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`modal__input modal__textarea ${shouldShowError("description") ? "modal__input--error" : ""}`.trim()}
+                ref={(element) => {
+                  fieldRefs.current.description = element;
+                }}
+                maxLength={1000}
+                placeholder="Write a detailed event description"
+              />
+              <p className="modal__charCount">{formData.description.length}/1000</p>
+              <FieldError message={shouldShowError("description") ? errors.description : ""} />
+
+              <span className="modal__label">Category</span>
+              <div
+                className={`modal__chips ${shouldShowError("category") ? "modal__chip--error" : ""}`.trim()}
+                ref={(element) => {
+                  fieldRefs.current.category = element;
+                }}
+                tabIndex={-1}
+              >
+                {["Event", "Sports", "Club & Society"].map((categoryOption) => (
+                  <button
+                    type="button"
+                    key={categoryOption}
+                    className={`modal__chip ${formData.category === categoryOption ? "is-active" : ""}`.trim()}
+                    onClick={() => {
+                      handleChange("category", categoryOption);
+                      handleBlur("category");
+                    }}
+                  >
+                    {categoryOption}
+                  </button>
+                ))}
+              </div>
+              <FieldError message={shouldShowError("category") ? errors.category : ""} />
+
+              <label className="modal__label" htmlFor="eventDate">Date</label>
+              <input
+                id="eventDate"
+                name="date"
+                type="date"
+                value={formData.date}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`modal__input ${shouldShowError("date") ? "modal__input--error" : ""}`.trim()}
+                ref={(element) => {
+                  fieldRefs.current.date = element;
+                }}
+              />
+              <FieldError message={shouldShowError("date") ? errors.date : ""} />
+
+              <label className="modal__label" htmlFor="eventVenue">Venue</label>
+              <input
+                id="eventVenue"
+                name="venue"
+                type="text"
+                value={formData.venue}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`modal__input ${shouldShowError("venue") ? "modal__input--error" : ""}`.trim()}
+                ref={(element) => {
+                  fieldRefs.current.venue = element;
+                }}
+                maxLength={150}
+                placeholder="Enter event venue"
+              />
+              <FieldError message={shouldShowError("venue") ? errors.venue : ""} />
+
+              <label className="modal__label" htmlFor="eventImage">Image URL</label>
+              <input
+                id="eventImage"
+                name="image"
+                type="text"
+                value={formData.image}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className={`modal__input ${shouldShowError("image") ? "modal__input--error" : ""}`.trim()}
+                ref={(element) => {
+                  fieldRefs.current.image = element;
+                }}
+                placeholder="https://example.com/event-image.jpg"
+              />
+              <FieldError message={shouldShowError("image") ? errors.image : ""} />
+
+              <div className="modal__actions">
+                <button type="button" className="modal__btn modal__btn--ghost" onClick={handleCloseModal}>
+                  Cancel
+                </button>
+                <button type="submit" className="modal__btn modal__btn--primary">
+                  Save Event
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       <footer className="footer">
         <div className="container footer__panel">

@@ -357,22 +357,40 @@ img{ max-width:100%; display:block; }
 .hero__actions{
 	margin-top: 18px;
 	display:flex;
-	gap: 12px;
+	gap: 16px;
 	flex-wrap: wrap;
+}
+
+.hero__actions .btn--lg{
+	padding: 14px 28px;
+	min-width: 172px;
+}
+
+.hero__actions .btn--primary{
+	color: #ffffff;
+	background: linear-gradient(135deg, #74c8ff 0%, #4e86de 100%);
+	border-color: rgba(78, 134, 222, .22);
+	box-shadow: 0 16px 40px rgba(78, 134, 222, .30);
+}
+
+.hero__actions .btn--primary:hover{
+	background: linear-gradient(135deg, #69bfff 0%, #447bd1 100%);
+	box-shadow: 0 20px 48px rgba(68, 123, 209, .34);
 }
 
 .hero__stats{
 	margin-top: 22px;
-	display:flex;
+	display:grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 16px;
-	flex-wrap: wrap;
+	max-width: 560px;
 }
 .stat{
 	background: rgba(255,255,255,.72);
 	border: 1px solid rgba(2,30,55,.07);
 	border-radius: 18px;
 	padding: 12px 14px;
-	min-width: 150px;
+	min-width: 0;
 	box-shadow: 0 16px 50px rgba(2,30,55,.08);
 }
 .stat__num{
@@ -476,37 +494,39 @@ img{ max-width:100%; display:block; }
 
 .heroCard__img{
 	width: 100%;
-	height: 300px;
+	height: 320px;
 	object-fit: cover;
 	display: block;
 }
 
-.heroCard__float{
+.heroCard__badges{
 	position: absolute;
-	display: flex;
-	gap: 12px;
-	align-items: center;
-	padding: 12px 14px;
-	background: rgba(255,255,255,.92);
-	border: 1px solid rgba(2,30,55,.08);
-	border-radius: 16px;
-	box-shadow: 0 12px 40px rgba(2,30,55,.16);
-	backdrop-filter: blur(10px);
-}
-
-.heroCard__float--left{
 	left: 16px;
-	bottom: 16px;
-}
-
-.heroCard__float--right{
 	right: 16px;
 	bottom: 16px;
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+
+.heroCard__float{
+	position: relative;
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	padding: 10px 12px;
+	background: rgba(255,255,255,.92);
+	border: 1px solid rgba(2,30,55,.08);
+	border-radius: 18px;
+	box-shadow: 0 12px 40px rgba(2,30,55,.16);
+	backdrop-filter: blur(10px);
+	min-width: 0;
 }
 
 .floatIcon{
-	font-size: 24px;
+	font-size: 22px;
 	font-weight: 900;
+	line-height: 1;
 }
 
 .floatTitle{
@@ -521,6 +541,7 @@ img{ max-width:100%; display:block; }
 	font-size: 12px;
 	color: rgba(7,26,42,.62);
 	margin: 4px 0 0;
+	white-space: nowrap;
 }
 
 .section{ padding: 54px 0; }
@@ -928,6 +949,22 @@ img{ max-width:100%; display:block; }
 	.footer__heading{ font-size: 38px; }
 	.footer__contact{ font-size: 18px; }
 	.footer__bottom .footer__inner{ justify-content: center; }
+	.hero__actions .btn--lg{ min-width: 150px; padding: 13px 20px; }
+	.hero__stats{ grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 100%; }
+	.heroCard{ width: min(420px, 100%); }
+	.heroCard__img{ height: 300px; }
+	.heroCard__badges{ left: 12px; right: 12px; bottom: 12px; gap: 8px; }
+	.heroCard__float{ padding: 9px 10px; gap: 8px; }
+	.floatTitle{ font-size: 12px; }
+	.floatText{ font-size: 11px; }
+}
+
+@media (max-width: 460px){
+	.hero__actions{ gap: 12px; }
+	.hero__actions .btn--lg{ width: 100%; min-width: 0; }
+	.hero__stats{ grid-template-columns: 1fr; }
+	.heroCard__badges{ grid-template-columns: 1fr; }
+	.floatText{ white-space: normal; }
 }
 
 /* Profile Dropdown Styles */

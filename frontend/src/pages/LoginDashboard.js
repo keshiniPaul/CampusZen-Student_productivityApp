@@ -10,7 +10,7 @@ import youtubeIcon from "../images/youtube.png";
 // Import dashboard images with .jpg extensions
 import overviewImg from "../images/overviewimg.jpg";
 import healthImg from "../images/healthimg.jpg";
-import eventImg from "../images/eventimg.jpg";
+import eventImg from "../images/eventimg.png";
 import careerImg from "../images/career.jpg";
 import studyImg from "../images/study.jpg";
 import resourcesImg from "../images/resources.jpg"; // New Resources image
@@ -19,14 +19,10 @@ function LoginDashboard() {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [toastText, setToastText] = useState("");
-  const [toastVisible, setToastVisible] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Set to true since this is dashboard
   
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileDropdownRef = useRef(null);
-  const toastTimerRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -96,22 +92,6 @@ function LoginDashboard() {
       document.removeEventListener("click", onDocumentClick);
     };
   }, []);
-
-  useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    };
-  }, []);
-
-  const showToast = (message) => {
-    setToastText(message || "Coming soon");
-    setToastVisible(true);
-
-    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
-    toastTimerRef.current = window.setTimeout(() => {
-      setToastVisible(false);
-    }, 2200);
-  };
 
   const handleLogout = () => {
     localStorage.clear();
@@ -557,17 +537,6 @@ function LoginDashboard() {
           </div>
         </div>
       </footer>
-
-      {/* Toast notification */}
-      <div
-        className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
-        id="toast"
-        role="status"
-        aria-live="polite"
-        aria-atomic="true"
-      >
-        {toastText}
-      </div>
     </div>
   );
 }
