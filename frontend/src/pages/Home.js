@@ -363,18 +363,20 @@ function Home() {
                   alt="Campus students"
                   loading="lazy"
                 />
-                <div className="heroCard__float heroCard__float--left">
-                  <div className="floatIcon" aria-hidden="true">🎓</div>
-                  <div>
-                    <div className="floatTitle">Student Hub</div>
-                    <div className="floatText">All-in-one services</div>
+                <div className="heroCard__badges">
+                  <div className="heroCard__float">
+                    <div className="floatIcon" aria-hidden="true">🎓</div>
+                    <div>
+                      <div className="floatTitle">Student Hub</div>
+                      <div className="floatText">All-in-one services</div>
+                    </div>
                   </div>
-                </div>
-                <div className="heroCard__float heroCard__float--right">
-                  <div className="floatIcon" aria-hidden="true">✅</div>
-                  <div>
-                    <div className="floatTitle">Easy Access</div>
-                    <div className="floatText">Modern &amp; secure</div>
+                  <div className="heroCard__float">
+                    <div className="floatIcon" aria-hidden="true">✅</div>
+                    <div>
+                      <div className="floatTitle">Easy Access</div>
+                      <div className="floatText">Modern &amp; secure</div>
+                    </div>
                   </div>
                 </div>
               </div>
