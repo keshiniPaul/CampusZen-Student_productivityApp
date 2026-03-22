@@ -161,9 +161,8 @@ function ActivityDetails() {
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
   const displayName = currentUser?.fullName || currentUser?.email || "User";
   const [activity, setActivity] = useState(null);
-  const [isRegistrationOpen, setIsRegistrationOpen] = useState(false);
-  const [showClosedMessage, setShowClosedMessage] = useState(false);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showClosedMessage] = useState(false);
+  const [showSuccessMessage] = useState(false);
   const [showNewActivityBanner, setShowNewActivityBanner] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -175,12 +174,6 @@ function ActivityDetails() {
     const data =
       activitiesData[activityType] || activitiesData["event"];
     setActivity(data);
-
-    // Check if registration is open
-    const today = new Date();
-    const regOpen = new Date(data.registrationOpen);
-    const regClose = new Date(data.registrationClose);
-    setIsRegistrationOpen(today >= regOpen && today <= regClose);
 
     // Show new activity banner if activity is new
     if (data.isNew) {
