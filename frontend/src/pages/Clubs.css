@@ -936,6 +936,18 @@
   font-size: 14px;
 }
 
+.clubsForm__input--error {
+  border-color: #e25353 !important;
+  background: #fff8f8;
+}
+
+.clubsForm__error {
+  margin: 6px 0 0;
+  font-size: 12px;
+  font-weight: 700;
+  color: #b61e2e;
+}
+
 .clubsForm textarea {
   min-height: 90px;
   resize: vertical;
