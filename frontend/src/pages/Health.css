@@ -1,0 +1,271 @@
+/* Health Page Specific Styles */
+
+/* Hero Section */
+.hero--health {
+  background: linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%);
+  padding: 4rem 0;
+  color: white;
+  margin-bottom: 2rem;
+}
+
+.hero__container {
+  display: flex;
+  justify-content: center;
+  text-align: center;
+}
+
+.hero__content {
+  max-width: 800px;
+}
+
+.hero__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.hero__subtitle {
+  font-size: 1.25rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.hero__stats {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  margin-top: 2rem;
+}
+
+.hero__stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.hero__stat-number {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.hero__stat-label {
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+/* Section Header */
+.section__tag {
+  display: inline-block;
+  background: rgba(33, 147, 176, 0.1);
+  color: #2193b0;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+/* Posts Grid */
+.posts--health {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+/* Featured Cards */
+.post--featured {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.post--featured:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.post__media {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+}
+
+.post__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.post--featured:hover .post__media img {
+  transform: scale(1.05);
+}
+
+.post__category {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: rgba(255,255,255,0.95);
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #2193b0;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.post__body {
+  padding: 1.5rem;
+}
+
+.post__title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.75rem;
+}
+
+.post__text {
+  color: #666;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+.post__features {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.post__feature {
+  background: #f5f5f5;
+  padding: 0.25rem 0.75rem;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.post__link {
+  display: inline-flex;
+  align-items: center;
+  color: #2193b0;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.post__link:hover {
+  color: #6dd5ed;
+}
+
+.post__link-arrow {
+  margin-left: 0.5rem;
+  transition: transform 0.3s ease;
+}
+
+.post__link:hover .post__link-arrow {
+  transform: translateX(5px);
+}
+
+/* Emergency Support Banner */
+.health-emergency {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  border-radius: 12px;
+  padding: 2.5rem;
+  margin-top: 4rem;
+  color: white;
+}
+
+.health-emergency__content {
+  text-align: center;
+}
+
+.health-emergency__title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.health-emergency__text {
+  font-size: 1.1rem;
+  opacity: 0.9;
+  margin-bottom: 1.5rem;
+}
+
+.health-emergency__contacts {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.health-emergency__phone {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background 0.3s ease;
+  display: inline-block;
+}
+
+.health-emergency__phone:hover {
+  background: rgba(255,255,255,0.3);
+}
+
+/* Active Navigation Link */
+.nav__link--active {
+  color: #2193b0;
+  font-weight: 600;
+  position: relative;
+}
+
+.nav__link--active::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: #2193b0;
+  border-radius: 2px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero__title {
+    font-size: 2rem;
+  }
+  
+  .hero__stats {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .posts--health {
+    grid-template-columns: 1fr;
+  }
+  
+  .health-emergency__contacts {
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .health-emergency__phone {
+    text-align: center;
+  }
+}
+
+/* Tablet Responsive */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .posts--health {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

@@ -8,7 +8,7 @@ import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
-import profileImg from "../images/profile.png";
+import sportIcon from "../images/sport.png";
 import cricketImg from "../images/cricket.png";
 import swimmingImg from "../images/swimming.png";
 import chessImg from "../images/chess.png";
@@ -25,17 +25,17 @@ const initialSportsData = [
     name: "Cricket Team Selection",
     category: "Team Selection",
     description: "Join the university cricket team and represent us in inter-university tournaments.",
-    registrationOpen: "2026-03-01",
-    registrationClose: "2026-03-25",
+    registrationOpen: "2026-01-01",
+    registrationClose: "2026-02-05",
     venue: "Cricket Ground",
     coach: "Coach Rajitha Silva",
     maxCapacity: 100,
-    registered: 45,
+    registered: 100,
     eligibility: "All students with basic cricket knowledge",
     selectionCriteria: "Batting, Bowling, Fielding skills assessment",
     requiresMedical: true,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/cricket-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: cricketImg,
   },
   {
@@ -53,7 +53,7 @@ const initialSportsData = [
     selectionCriteria: "Team formation and skill assessment",
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/volleyball-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: volleyballImg,
   },
   {
@@ -61,8 +61,8 @@ const initialSportsData = [
     name: "Netball Team Trials",
     category: "Team Selection",
     description: "Try out for the university netball team.",
-    registrationOpen: "2026-03-10",
-    registrationClose: "2026-04-05",
+    registrationOpen: "2026-06-10",
+    registrationClose: "2026-07-05",
     venue: "Netball Court",
     coach: "Coach Sanduni Perera",
     maxCapacity: 60,
@@ -71,7 +71,7 @@ const initialSportsData = [
     selectionCriteria: "Agility, teamwork, and game knowledge",
     requiresMedical: true,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/netball-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: netballImg,
   },
   {
@@ -89,7 +89,7 @@ const initialSportsData = [
     selectionCriteria: "Singles and doubles matches",
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/badminton-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: badmintonImg,
   },
   {
@@ -102,12 +102,12 @@ const initialSportsData = [
     venue: "Chess Club Room",
     coach: "Instructor Pradeep Kumar",
     maxCapacity: 50,
-    registered: 23,
+    registered: 33,
     eligibility: "All students",
     selectionCriteria: "Round-robin tournament format",
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/chess-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: chessImg,
   },
   {
@@ -120,12 +120,12 @@ const initialSportsData = [
     venue: "Recreation Center",
     coach: "Coordinator Ruwan Silva",
     maxCapacity: 40,
-    registered: 15,
+    registered: 25,
     eligibility: "All students",
     selectionCriteria: "Tournament knockout rounds",
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/carrom-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: carromImg,
   },
   {
@@ -143,7 +143,7 @@ const initialSportsData = [
     selectionCriteria: "Singles matches and reaction time",
     requiresMedical: false,
     skillLevels: ["Beginner", "Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/football-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: footballImg,
   },
   {
@@ -151,8 +151,8 @@ const initialSportsData = [
     name: "Swimming Team Selection",
     category: "Team Selection",
     description: "Join the university swimming team for competitive events.",
-    registrationOpen: "2026-03-20",
-    registrationClose: "2026-04-20",
+    registrationOpen: "2026-06-20",
+    registrationClose: "2026-07-20",
     venue: "University Pool",
     coach: "Coach Nimali Wickramarachchi",
     maxCapacity: 50,
@@ -161,18 +161,39 @@ const initialSportsData = [
     selectionCriteria: "Freestyle, backstroke, breaststroke trials",
     requiresMedical: true,
     skillLevels: ["Intermediate", "Advanced"],
-    registrationLink: "https://forms.gle/swimming-registration",
+    registrationLink: "https://www.sliit.lk/student-life/sports/",
     image: swimmingImg,
   },
 ];
 
 function Sports() {
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const displayName = currentUser?.fullName || currentUser?.email || "User";
+  const authToken = localStorage.getItem("token");
+  const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [sports, setSports] = useState(initialSportsData);
   const [selectedSport, setSelectedSport] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showSportFormModal, setShowSportFormModal] = useState(false);
+  const [editingSport, setEditingSport] = useState(null);
+  const [sportFormData, setSportFormData] = useState({
+    name: "",
+    category: "Tournament",
+    description: "",
+    registrationOpen: "",
+    registrationClose: "",
+    venue: "",
+    coach: "",
+    maxCapacity: 50,
+    eligibility: "All students",
+    selectionCriteria: "Skill assessment",
+    requiresMedical: false,
+    registrationLink: "#",
+    skillLevelsText: "Beginner, Intermediate, Advanced",
+  });
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -180,49 +201,67 @@ function Sports() {
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
+    const [toastText, setToastText] = useState("");
+    const [toastVisible, setToastVisible] = useState(false);
+
+  // Debug: Log when Sports page loads
+  useEffect(() => {
+    console.log('Sports page loaded successfully!');
+    console.log('Initial sports data:', initialSportsData.length, 'items');
+    document.title = 'Sports - CampusZone';
+  }, []);
 
   // Fetch sports data from API
   useEffect(() => {
     const fetchSports = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        console.log('Fetching sports from API...');
         const response = await sportsAPI.getAllSports();
         
-        if (response.success && response.data) {
+        if (response.success && response.data && response.data.length > 0) {
           // Map backend data to match frontend format
-          const mappedSports = response.data.map((sport) => ({
-            id: sport._id,
-            name: sport.name,
-            category: sport.category,
-            description: sport.description,
-            registrationOpen: sport.registrationOpen,
-            registrationClose: sport.registrationClose,
-            venue: sport.venue,
-            coach: sport.coach,
-            maxCapacity: sport.maxCapacity,
-            registered: sport.registered,
-            eligibility: sport.eligibility,
-            selectionCriteria: sport.selectionCriteria,
-            requiresMedical: sport.requiresMedical,
-            skillLevels: sport.skillLevels,
-            registrationLink: sport.registrationLink,
-          }));
+          const mappedSports = response.data.map((sport) => {
+            // Find matching initial data for image fallback
+            const initialSport = initialSportsData.find(s => s.id === sport._id || s.name === sport.name);
+            return {
+              id: sport._id,
+              name: sport.name,
+              category: sport.category,
+              description: sport.description,
+              registrationOpen: sport.registrationOpen,
+              registrationClose: sport.registrationClose,
+              venue: sport.venue,
+              coach: sport.coach,
+              maxCapacity: sport.maxCapacity,
+              registered: sport.registered,
+              eligibility: sport.eligibility,
+              selectionCriteria: sport.selectionCriteria,
+              requiresMedical: sport.requiresMedical,
+              skillLevels: sport.skillLevels,
+              registrationLink: sport.registrationLink,
+              image: sport.image || (initialSport ? initialSport.image : sportIcon),
+            };
+          });
+          console.log('API sports loaded:', mappedSports.length);
           setSports(mappedSports);
         } else {
-          // Use fallback data if API fails
-          setSports(initialSportsData);
+          // API returned no data, keep initial data
+          console.log('API returned no data, keeping initial sports data');
+          setError('Using sample sports data.');
         }
       } catch (err) {
         console.error('Error fetching sports:', err);
         setError('Failed to load sports. Showing sample data.');
-        // Use fallback data on error
-        setSports(initialSportsData);
+        console.log('Using initial sports data due to error');
+        // Don't call setSports, keep the initial data
       } finally {
         setLoading(false);
       }
     };
 
+    // Set initial loading state
+    setLoading(true);
+    setError(null);
     fetchSports();
   }, []);
 
@@ -232,6 +271,7 @@ function Sports() {
         setIsNavOpen(false);
         setIsProfileOpen(false);
         setShowDetailsModal(false);
+        setShowSportFormModal(false);
         setShowNotifications(false);
       }
     };
@@ -304,13 +344,19 @@ function Sports() {
   }, [sports]);
 
   const getRegistrationStatus = (sport) => {
-    const today = new Date();
-    const openDate = new Date(sport.registrationOpen);
-    const closeDate = new Date(sport.registrationClose);
+    const now = new Date();
 
-    if (today < openDate) {
+    // Normalize to date-only boundaries to avoid timezone/time-of-day issues.
+    const openDate = new Date(`${String(sport.registrationOpen).slice(0, 10)}T00:00:00`);
+    const closeDate = new Date(`${String(sport.registrationClose).slice(0, 10)}T23:59:59`);
+
+    if (Number.isNaN(openDate.getTime()) || Number.isNaN(closeDate.getTime())) {
+      return { status: "CLOSED", class: "status--closed", disabled: true };
+    }
+
+    if (now < openDate) {
       return { status: "COMING SOON", class: "status--comingSoon", disabled: true };
-    } else if (today >= openDate && today <= closeDate) {
+    } else if (now >= openDate && now <= closeDate) {
       if (sport.registered >= sport.maxCapacity) {
         return { status: "FULL", class: "status--full", disabled: true };
       }
@@ -335,6 +381,168 @@ function Sports() {
 
     // Open the registration link in a new tab
     window.open(sport.registrationLink, '_blank');
+  };
+
+  const handleAddSport = async () => {
+    if (!isAdmin) {
+      alert("Only administrators can add sports.");
+      return;
+    }
+    setEditingSport(null);
+    setSportFormData({
+      name: "",
+      category: "Tournament",
+      description: "",
+      registrationOpen: "",
+      registrationClose: "",
+      venue: "",
+      coach: "",
+      maxCapacity: 50,
+      eligibility: "All students",
+      selectionCriteria: "Skill assessment",
+      requiresMedical: false,
+      registrationLink: "#",
+      skillLevelsText: "Beginner, Intermediate, Advanced",
+    });
+    setShowSportFormModal(true);
+  };
+
+  const handleEditSport = async (sport) => {
+    if (!isAdmin) {
+      alert("Only administrators can update sports.");
+      return;
+    }
+
+    setEditingSport(sport);
+    setSportFormData({
+      name: sport.name || "",
+      category: sport.category || "Tournament",
+      description: sport.description || "",
+      registrationOpen: sport.registrationOpen ? String(sport.registrationOpen).slice(0, 10) : "",
+      registrationClose: sport.registrationClose ? String(sport.registrationClose).slice(0, 10) : "",
+      venue: sport.venue || "",
+      coach: sport.coach || "",
+      maxCapacity: sport.maxCapacity || 50,
+      eligibility: sport.eligibility || "All students",
+      selectionCriteria: sport.selectionCriteria || "Skill assessment",
+      requiresMedical: Boolean(sport.requiresMedical),
+      registrationLink: sport.registrationLink || "#",
+      skillLevelsText: Array.isArray(sport.skillLevels) ? sport.skillLevels.join(", ") : "Beginner, Intermediate, Advanced",
+    });
+    setShowSportFormModal(true);
+  };
+
+  const handleDeleteSport = async (sportId) => {
+    if (!isAdmin) {
+      alert("Only administrators can delete sports.");
+      return;
+    }
+
+    if (!window.confirm("Delete this sport?")) return;
+
+    if (authToken) {
+      try {
+        await sportsAPI.deleteSport(sportId, authToken);
+      } catch (error) {
+        console.error("API delete sport failed, using local delete:", error);
+      }
+    }
+
+    setSports((prev) => prev.filter((item) => item.id !== sportId));
+    alert("Sport deleted successfully.");
+  };
+
+  const handleSportFormChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setSportFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleSportFormSubmit = async (e) => {
+    e.preventDefault();
+
+    const skillLevels = sportFormData.skillLevelsText
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    const payload = {
+      name: sportFormData.name,
+      category: sportFormData.category,
+      description: sportFormData.description,
+      registrationOpen: sportFormData.registrationOpen,
+      registrationClose: sportFormData.registrationClose,
+      venue: sportFormData.venue,
+      coach: sportFormData.coach,
+      maxCapacity: Number(sportFormData.maxCapacity),
+      eligibility: sportFormData.eligibility,
+      selectionCriteria: sportFormData.selectionCriteria,
+      requiresMedical: sportFormData.requiresMedical,
+      registrationLink: sportFormData.registrationLink || "#",
+      skillLevels,
+    };
+
+    if (editingSport) {
+      if (authToken) {
+        try {
+          await sportsAPI.updateSport(editingSport.id, payload, authToken);
+        } catch (error) {
+          console.error("API update sport failed, using local update:", error);
+        }
+      }
+
+      setSports((prev) => prev.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels } : item)));
+      setShowSportFormModal(false);
+      setEditingSport(null);
+      alert("Sport updated successfully.");
+      return;
+    }
+
+    if (authToken) {
+      try {
+        const response = await sportsAPI.createSport(payload, authToken);
+        const created = response?.data;
+        if (created) {
+          setSports((prev) => [
+            {
+              ...created,
+              id: created._id,
+              image: created.image || sportIcon,
+              registered: created.registered || 0,
+            },
+            ...prev,
+          ]);
+          const updatedSports = [
+            {
+              ...created,
+              id: created._id,
+              image: created.image || sportIcon,
+              registered: created.registered || 0,
+            },
+            ...sports,
+          ];
+          localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+          setShowSportFormModal(false);
+          setToastText("✅ Sport added successfully!");
+          setToastVisible(true);
+          setTimeout(() => setToastVisible(false), 3000);
+          return;
+        }
+      } catch (error) {
+        console.error("API create sport failed, using local add:", error);
+      }
+    }
+
+    const newSport = { ...payload, id: `sport-${Date.now()}`, image: sportIcon, registered: 0 };
+    const updatedSports = [newSport, ...sports];
+    setSports(updatedSports);
+    localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+    setShowSportFormModal(false);
+    setToastText("✅ Sport added successfully!");
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 3000);
   };
 
   const scrollToTop = (event) => {
@@ -462,9 +670,7 @@ function Sports() {
               onClick={() => setIsProfileOpen((prev) => !prev)}
               aria-expanded={isProfileOpen}
             >
-              <span className="header__profileText"> UTHPALA </span>
-              <span className="header__profileArrow" aria-hidden="true">▼</span>
-              <img className="header__profileCircle" src={profileImg} alt="Uthpala" />
+              <span className="header__profileText">{displayName}</span>
             </button>
             {isProfileOpen && (
               <div className="header__profileMenu">
@@ -489,6 +695,13 @@ function Sports() {
               Join our sports teams and tournaments. Register during open periods to participate in university sports activities.
             </p>
           </div>
+          {isAdmin && (
+            <div className="sports__headerActions">
+              <button className="sports__addBtn" onClick={handleAddSport}>
+                + Add Sport
+              </button>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -523,6 +736,31 @@ function Sports() {
             return (
               <article key={sport.id} className="sports__card">
                 <div className="sports__cardImage">
+                  {isAdmin && (
+                    <div className="sports__adminActions">
+                      <button
+                        className="sports__actionBtn sports__actionBtn--edit"
+                        onClick={() => handleEditSport(sport)}
+                        title="Update Sport"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                      <button
+                        className="sports__actionBtn sports__actionBtn--delete"
+                        onClick={() => handleDeleteSport(sport.id)}
+                        title="Delete Sport"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M21 5.98001C17.67 5.65001 14.32 5.48001 10.98 5.48001C9 5.48001 7.02 5.58001 5.04 5.78001L3 5.98001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M18.85 9.14001L18.2 19.21C18.09 20.78 18 22 15.21 22H8.79002C6.00002 22 5.91002 20.78 5.80002 19.21L5.15002 9.14001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  )}
                   <img src={sport.image} alt={sport.name} className="sports__image" />
                   <div className="sports__cardBadges">
                     <span className="sports__categoryBadge">{sport.category}</span>
@@ -615,6 +853,56 @@ function Sports() {
         </div>
         )}
       </main>
+
+      {/* Add/Edit Sport Modal */}
+      {showSportFormModal && (
+        <div className="modal__overlay" onClick={() => setShowSportFormModal(false)}>
+          <div className="sportsForm__content" onClick={(e) => e.stopPropagation()}>
+            <div className="sportsForm__header">
+              <h2>{editingSport ? "Update Sport" : "Add New Sport"}</h2>
+              <button className="sportsForm__close" onClick={() => setShowSportFormModal(false)} aria-label="Close modal">×</button>
+            </div>
+
+            <form className="sportsForm" onSubmit={handleSportFormSubmit}>
+              <input name="name" value={sportFormData.name} onChange={handleSportFormChange} placeholder="Sport name" required />
+              <select name="category" value={sportFormData.category} onChange={handleSportFormChange}>
+                <option value="Tournament">Tournament</option>
+                <option value="Team Selection">Team Selection</option>
+              </select>
+              <textarea name="description" value={sportFormData.description} onChange={handleSportFormChange} placeholder="Description" required />
+
+              <div className="sportsForm__row">
+                <input type="date" name="registrationOpen" value={sportFormData.registrationOpen} onChange={handleSportFormChange} required />
+                <input type="date" name="registrationClose" value={sportFormData.registrationClose} onChange={handleSportFormChange} required />
+              </div>
+
+              <div className="sportsForm__row">
+                <input name="venue" value={sportFormData.venue} onChange={handleSportFormChange} placeholder="Venue" required />
+                <input name="coach" value={sportFormData.coach} onChange={handleSportFormChange} placeholder="Coach" required />
+              </div>
+
+              <div className="sportsForm__row">
+                <input type="number" min="1" name="maxCapacity" value={sportFormData.maxCapacity} onChange={handleSportFormChange} placeholder="Max capacity" required />
+                <input name="registrationLink" value={sportFormData.registrationLink} onChange={handleSportFormChange} placeholder="Registration link" />
+              </div>
+
+              <input name="eligibility" value={sportFormData.eligibility} onChange={handleSportFormChange} placeholder="Eligibility" />
+              <input name="selectionCriteria" value={sportFormData.selectionCriteria} onChange={handleSportFormChange} placeholder="Selection criteria" />
+              <input name="skillLevelsText" value={sportFormData.skillLevelsText} onChange={handleSportFormChange} placeholder="Skill levels (comma separated)" />
+
+              <label className="sportsForm__checkbox">
+                <input type="checkbox" name="requiresMedical" checked={sportFormData.requiresMedical} onChange={handleSportFormChange} />
+                Medical certificate required
+              </label>
+
+              <div className="sportsForm__actions">
+                <button type="button" className="sports__btn sports__btn--secondary" onClick={() => setShowSportFormModal(false)}>Cancel</button>
+                <button type="submit" className="sports__btn sports__btn--primary">{editingSport ? "Update Sport" : "Add Sport"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Sports Details Modal */}
       {showDetailsModal && selectedSport && (
@@ -743,6 +1031,15 @@ function Sports() {
             </a>
             <a className="footer__contact" href="tel:+94117544801">
               📞 +94 11 754 0000
+          <div
+            className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
+            id="toast"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {toastText}
+          </div>
             </a>
             <a className="footer__feedback" href="https://support.sliit.lk">
               Provide Feedback to CampusZone

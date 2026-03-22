@@ -20,6 +20,34 @@
 
 .clubs__header {
   margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.clubs__headerActions {
+  flex-shrink: 0;
+}
+
+.clubs__addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.clubs__addBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
 }
 
 .clubs__headerContent {
@@ -101,7 +129,7 @@
 .clubs__card:hover {
   box-shadow: 0 12px 32px rgba(245, 158, 11, 0.15);
   transform: translateY(-4px);
-  border-color: #f59e0b;
+  border-color: #92cbee;
 }
 
 .clubs__cardImage {
@@ -109,7 +137,43 @@
   width: 100%;
   height: 200px;
   overflow: hidden;
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  background: linear-gradient(135deg, #fef3c7 0%, #8adcfd 100%);
+}
+
+.clubs__adminActions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+
+.clubs__actionBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+}
+
+.clubs__actionBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.clubs__actionBtn--edit {
+  background: #4f84cf;
+  color: #fff;
+}
+
+.clubs__actionBtn--delete {
+  background: #fff;
+  color: #e45a45;
 }
 
 .clubs__image {
@@ -173,7 +237,7 @@
 }
 
 .status--comingSoon {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #0bb7f5, #0661d9);
   color: white;
 }
 
@@ -220,7 +284,7 @@
   padding: 16px;
   background: #fffbeb;
   border-radius: 12px;
-  border: 1px solid #fde68a;
+  border: 1px solid #8ad7fd;
 }
 
 .clubs__metaItem {
@@ -330,14 +394,14 @@
 }
 
 .clubs__btn--primary {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #59baf7, #204fdd);
   color: white;
   border: none;
 }
 
 .clubs__btn--primary:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+  background: linear-gradient(135deg, #59baf7, #204fdd);
+  box-shadow: 0 4px 12px rgba(92, 120, 246, 0.4);
   transform: translateY(-2px);
 }
 
@@ -384,7 +448,7 @@
 
 .notifications__dropdown {
   position: fixed;
-  top: 70px;
+  top: 96px;
   right: 20px;
   width: 360px;
   max-height: 500px;
@@ -796,7 +860,7 @@
 .clubDetails__joinBtn {
   width: 100%;
   padding: 16px 24px;
-  background: linear-gradient(135deg, #f59e0b, #d97706);
+  background: linear-gradient(135deg, #1cb8f5, #057fb0);
   color: white;
   border: none;
   border-radius: 10px;
@@ -807,7 +871,7 @@
 }
 
 .clubDetails__joinBtn:hover {
-  background: linear-gradient(135deg, #d97706, #b45309);
+  background: linear-gradient(135deg, #0fa8ea, #096ab4);
   box-shadow: 0 8px 24px rgba(245, 158, 11, 0.3);
   transform: translateY(-2px);
 }
@@ -822,6 +886,72 @@
   background: #e2e8f0;
   box-shadow: none;
   transform: none;
+}
+
+.clubsForm__content {
+  background: #fff;
+  width: min(760px, 96vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.clubsForm__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.clubsForm__header h2 {
+  margin: 0;
+  font-size: 30px;
+  color: #1e293b;
+}
+
+.clubsForm__close {
+  border: none;
+  background: #f1f5f9;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.clubsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.clubsForm input,
+.clubsForm select,
+.clubsForm textarea {
+  width: 100%;
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.clubsForm textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.clubsForm__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.clubsForm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
 }
 
 .footer{

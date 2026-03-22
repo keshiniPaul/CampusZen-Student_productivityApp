@@ -8,7 +8,6 @@ import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
-import profileImg from "../images/profile.png";
 import clubImg from "../images/club.png";
 import leoImg from "../images/LEO.png";
 import sisImg from "../images/SIS.png";
@@ -24,8 +23,8 @@ const initialClubsData = [
     name: "IEEE Student Branch",
     category: "Technical",
     description: "Institute of Electrical and Electronics Engineers - Advancing technology for humanity.",
-    registrationOpen: "2026-02-20",
-    registrationClose: "2026-03-20",
+    registrationOpen: "2026-03-20",
+    registrationClose: "2026-04-20",
     president: "Kasun Perera",
     advisor: "Dr. Chaminda Silva",
     maxMembers: 150,
@@ -38,7 +37,7 @@ const initialClubsData = [
       instagram: "https://instagram.com/ieee.sliit",
       linkedin: "https://linkedin.com/company/ieee-sliit"
     },
-    registrationLink: "https://forms.gle/ieee-registration",
+    registrationLink: "https://ieeesliit.com",
     image: ieeeImg,
   },
   {
@@ -47,7 +46,7 @@ const initialClubsData = [
     category: "Social Service",
     description: "Leadership, Experience, Opportunity - Youth empowerment through community service.",
     registrationOpen: "2026-03-01",
-    registrationClose: "2026-03-31",
+    registrationClose: "2026-05-01",
     president: "Nethmi Jayasinghe",
     advisor: "Ms. Sanduni Perera",
     maxMembers: 100,
@@ -60,7 +59,7 @@ const initialClubsData = [
       instagram: "https://instagram.com/leo.sliit",
       linkedin: "https://linkedin.com/company/leo-sliit"
     },
-    registrationLink: "https://forms.gle/leo-registration",
+    registrationLink: "https://sliitleo.org",
     image: leoImg,
   },
   {
@@ -68,8 +67,8 @@ const initialClubsData = [
     name: "AIESEC",
     category: "Professional",
     description: "Global youth-led organization for leadership development and international exchanges.",
-    registrationOpen: "2026-02-25",
-    registrationClose: "2026-03-25",
+    registrationOpen: "2026-01-05",
+    registrationClose: "2026-02-05",
     president: "Dinuka Fernando",
     advisor: "Mr. Rohan Wickramasinghe",
     maxMembers: 80,
@@ -82,7 +81,7 @@ const initialClubsData = [
       instagram: "https://instagram.com/aiesec.sliit",
       linkedin: "https://linkedin.com/company/aiesec-sliit"
     },
-    registrationLink: "https://forms.gle/aiesec-registration",
+    registrationLink: "https://www.sliit.lk/blog/aiesec-in-sliit-wins-the-most-outstanding-expansion-of-the-year-award/attachment/aiesec/",
     image: aiesecImg,
   },
   {
@@ -112,8 +111,8 @@ const initialClubsData = [
     name: "Media Unit",
     category: "Creative",
     description: "Capturing moments, telling stories - The official media unit of the university.",
-    registrationOpen: "2026-03-10",
-    registrationClose: "2026-04-10",
+    registrationOpen: "2026-06-10",
+    registrationClose: "2026-07-10",
     president: "Sachini Wijesinghe",
     advisor: "Mr. Lasitha Bandara",
     maxMembers: 60,
@@ -138,8 +137,8 @@ const initialClubsData = [
     registrationClose: "2026-03-28",
     president: "Ravindu Lakshan",
     advisor: "Ms. Priyanka Amarasinghe",
-    maxMembers: 100,
-    currentMembers: 73,
+    maxMembers: 30,
+    currentMembers: 25,
     vision: "Creating an inclusive and supportive student community.",
     mission: "Enhancing student welfare and fostering connections across batches.",
     upcomingEvents: ["Freshers' Welcome", "Mental Health Awareness Week", "Career Fair"],
@@ -155,11 +154,30 @@ const initialClubsData = [
 
 function Clubs() {
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const displayName = currentUser?.fullName || currentUser?.email || "User";
+  const authToken = localStorage.getItem("token");
+  const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [clubs, setClubs] = useState(initialClubsData);
   const [selectedClub, setSelectedClub] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
+  const [showClubFormModal, setShowClubFormModal] = useState(false);
+  const [editingClub, setEditingClub] = useState(null);
+  const [clubFormData, setClubFormData] = useState({
+    name: "",
+    category: "Community",
+    description: "",
+    vision: "",
+    mission: "",
+    registrationOpen: "",
+    registrationClose: "",
+    president: "",
+    advisor: "",
+    maxMembers: 100,
+    registrationLink: "#",
+  });
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -170,46 +188,62 @@ function Clubs() {
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
 
+  // Debug: Log when Clubs page loads
+  useEffect(() => {
+    console.log('Clubs page loaded successfully!');
+    console.log('Initial clubs data:', initialClubsData.length, 'items');
+    document.title = 'Clubs - CampusZone';
+  }, []);
+
   // Fetch clubs data from API
   useEffect(() => {
     const fetchClubs = async () => {
       try {
-        setLoading(true);
-        setError(null);
+        console.log('Fetching clubs from API...');
         const response = await clubsAPI.getAllClubs();
         
-        if (response.success && response.data) {
-          const mappedClubs = response.data.map((club) => ({
-            id: club._id,
-            name: club.name,
-            category: club.category,
-            description: club.description,
-            registrationOpen: club.registrationOpen,
-            registrationClose: club.registrationClose,
-            president: club.president,
-            advisor: club.advisor,
-            maxMembers: club.maxMembers,
-            currentMembers: club.currentMembers,
-            vision: club.vision,
-            mission: club.mission,
-            upcomingEvents: club.upcomingEvents,
-            socialMedia: club.socialMedia,
-            registrationLink: club.registrationLink,
-            image: club.image || clubImg,
-          }));
+        if (response.success && response.data && response.data.length > 0) {
+          const mappedClubs = response.data.map((club) => {
+            // Find matching initial data for image fallback
+            const initialClub = initialClubsData.find(c => c.id === club._id || c.name === club.name);
+            return {
+              id: club._id,
+              name: club.name,
+              category: club.category,
+              description: club.description,
+              registrationOpen: club.registrationOpen,
+              registrationClose: club.registrationClose,
+              president: club.president,
+              advisor: club.advisor,
+              maxMembers: club.maxMembers,
+              currentMembers: club.currentMembers,
+              vision: club.vision,
+              mission: club.mission,
+              upcomingEvents: club.upcomingEvents,
+              socialMedia: club.socialMedia,
+              registrationLink: club.registrationLink,
+              image: club.image || (initialClub ? initialClub.image : clubImg),
+            };
+          });
+          console.log('API clubs loaded:', mappedClubs.length);
           setClubs(mappedClubs);
         } else {
-          setClubs(initialClubsData);
+          // API returned no data, keep initial data
+          console.log('API returned no data, keeping initial clubs data');
+          setError('Using sample clubs data.');
         }
       } catch (err) {
         console.error('Error fetching clubs:', err);
         setError('Failed to load clubs. Showing sample data.');
-        setClubs(initialClubsData);
+        console.log('Using initial clubs data due to error');
+        // Don't call setClubs, keep the initial data
       } finally {
         setLoading(false);
       }
     };
 
+    // Set initial loading state
+    setError(null);
     fetchClubs();
   }, []);
 
@@ -219,6 +253,7 @@ function Clubs() {
         setIsNavOpen(false);
         setIsProfileOpen(false);
         setShowDetailsModal(false);
+        setShowClubFormModal(false);
         setShowNotifications(false);
       }
     };
@@ -330,6 +365,165 @@ function Clubs() {
 
     // Open the registration link in a new tab
     window.open(club.registrationLink, '_blank');
+  };
+
+  const handleAddClub = async () => {
+    if (!isAdmin) {
+      alert("Only administrators can add clubs.");
+      return;
+    }
+    setEditingClub(null);
+    setClubFormData({
+      name: "",
+      category: "Community",
+      description: "",
+      vision: "",
+      mission: "",
+      registrationOpen: "",
+      registrationClose: "",
+      president: "",
+      advisor: "",
+      maxMembers: 100,
+      registrationLink: "#",
+    });
+    setShowClubFormModal(true);
+  };
+
+  const handleEditClub = async (club) => {
+    if (!isAdmin) {
+      alert("Only administrators can update clubs.");
+      return;
+    }
+
+    setEditingClub(club);
+    setClubFormData({
+      name: club.name || "",
+      category: club.category || "Community",
+      description: club.description || "",
+      vision: club.vision || "",
+      mission: club.mission || "",
+      registrationOpen: club.registrationOpen ? String(club.registrationOpen).slice(0, 10) : "",
+      registrationClose: club.registrationClose ? String(club.registrationClose).slice(0, 10) : "",
+      president: club.president || "",
+      advisor: club.advisor || "",
+      maxMembers: club.maxMembers || 100,
+      registrationLink: club.registrationLink || "#",
+    });
+    setShowClubFormModal(true);
+  };
+
+  const handleDeleteClub = async (clubId) => {
+    if (!isAdmin) {
+      alert("Only administrators can delete clubs.");
+      return;
+    }
+
+    if (!window.confirm("Delete this club?")) return;
+
+    if (authToken) {
+      try {
+        await clubsAPI.deleteClub(clubId, authToken);
+      } catch (error) {
+        console.error("API delete club failed, using local delete:", error);
+      }
+    }
+
+      const updatedClubs = clubs.filter((item) => item.id !== clubId);
+      setClubs(updatedClubs);
+      localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+      setToastText("✅ Club deleted successfully!");
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+  };
+
+  const handleClubFormChange = (e) => {
+    const { name, value } = e.target;
+    setClubFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleClubFormSubmit = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      name: clubFormData.name,
+      category: clubFormData.category,
+      description: clubFormData.description,
+      vision: clubFormData.vision,
+      mission: clubFormData.mission,
+      registrationOpen: clubFormData.registrationOpen,
+      registrationClose: clubFormData.registrationClose,
+      president: clubFormData.president,
+      advisor: clubFormData.advisor,
+      maxMembers: Number(clubFormData.maxMembers),
+      registrationLink: clubFormData.registrationLink || "#",
+      upcomingEvents: [],
+      socialMedia: {},
+    };
+
+    if (editingClub) {
+      if (authToken) {
+        try {
+          await clubsAPI.updateClub(editingClub.id, payload, authToken);
+        } catch (error) {
+          console.error("API update club failed, using local update:", error);
+        }
+      }
+
+      setClubs((prev) => prev.map((item) => (item.id === editingClub.id ? { ...item, ...payload } : item)));
+        const updatedClubs = clubs.map((item) => (item.id === editingClub.id ? { ...item, ...payload, currentMembers: item.currentMembers } : item));
+        setClubs(updatedClubs);
+        localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+      setShowClubFormModal(false);
+      setEditingClub(null);
+          setToastText("✅ Club updated successfully!");
+          setToastVisible(true);
+          setTimeout(() => setToastVisible(false), 3000);
+      return;
+    }
+
+    if (authToken) {
+      try {
+        const response = await clubsAPI.createClub(payload, authToken);
+        const created = response?.data;
+        if (created) {
+          setClubs((prev) => [
+            {
+              ...created,
+              id: created._id,
+              image: created.image || clubImg,
+              currentMembers: created.currentMembers || 0,
+            },
+            ...prev,
+          ]);
+          const updatedClubs = [
+            {
+              ...created,
+              id: created._id,
+              image: created.image || clubImg,
+              currentMembers: created.currentMembers || 0,
+            },
+            ...clubs,
+          ];
+          localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+          setShowClubFormModal(false);
+          setToastText("✅ Club added successfully!");
+          setToastVisible(true);
+          setTimeout(() => setToastVisible(false), 3000);
+          return;
+        }
+      } catch (error) {
+        console.error("API create club failed, using local add:", error);
+      }
+    }
+
+    const newClub = { ...payload, id: `club-${Date.now()}`, image: clubImg, currentMembers: 0 };
+    const updatedClubs = [newClub, ...clubs];
+    setClubs(updatedClubs);
+    localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+    setShowClubFormModal(false);
+    setToastText("✅ Club added successfully!");
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 3000);
   };
 
   const scrollToTop = (event) => {
@@ -453,9 +647,7 @@ function Clubs() {
               onClick={() => setIsProfileOpen((prev) => !prev)}
               aria-expanded={isProfileOpen}
             >
-              <span className="header__profileText"> UTHPALA </span>
-              <span className="header__profileArrow" aria-hidden="true">▼</span>
-              <img className="header__profileCircle" src={profileImg} alt="Uthpala" />
+              <span className="header__profileText">{displayName}</span>
             </button>
             {isProfileOpen && (
               <div className="header__profileMenu">
@@ -480,6 +672,13 @@ function Clubs() {
               Join student clubs and societies. Register during open periods to become a member and participate in exciting activities.
             </p>
           </div>
+          {isAdmin && (
+            <div className="clubs__headerActions">
+              <button className="clubs__addBtn" onClick={handleAddClub}>
+                + Add Club & Society
+              </button>
+            </div>
+          )}
         </div>
 
         {error && (
@@ -514,6 +713,31 @@ function Clubs() {
               return (
                 <article key={club.id} className="clubs__card">
                   <div className="clubs__cardImage">
+                    {isAdmin && (
+                      <div className="clubs__adminActions">
+                        <button
+                          className="clubs__actionBtn clubs__actionBtn--edit"
+                          onClick={() => handleEditClub(club)}
+                          title="Update Club"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                        <button
+                          className="clubs__actionBtn clubs__actionBtn--delete"
+                          onClick={() => handleDeleteClub(club.id)}
+                          title="Delete Club"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 5.98001C17.67 5.65001 14.32 5.48001 10.98 5.48001C9 5.48001 7.02 5.58001 5.04 5.78001L3 5.98001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M18.85 9.14001L18.2 19.21C18.09 20.78 18 22 15.21 22H8.79002C6.00002 22 5.91002 20.78 5.80002 19.21L5.15002 9.14001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    )}
                     <img src={club.image} alt={club.name} className="clubs__image" />
                     <div className="clubs__cardBadges">
                       <span className="clubs__categoryBadge">{club.category}</span>
@@ -608,6 +832,53 @@ function Clubs() {
           </div>
         )}
       </main>
+
+      {/* Add/Edit Club Modal */}
+      {showClubFormModal && (
+        <div className="modal__overlay" onClick={() => setShowClubFormModal(false)}>
+          <div className="clubsForm__content" onClick={(e) => e.stopPropagation()}>
+            <div className="clubsForm__header">
+              <h2>{editingClub ? "Update Club & Society" : "Add Club & Society"}</h2>
+              <button className="clubsForm__close" onClick={() => setShowClubFormModal(false)} aria-label="Close modal">×</button>
+            </div>
+
+            <form className="clubsForm" onSubmit={handleClubFormSubmit}>
+              <input name="name" value={clubFormData.name} onChange={handleClubFormChange} placeholder="Club/Society name" required />
+              <select name="category" value={clubFormData.category} onChange={handleClubFormChange}>
+                <option value="Community">Community</option>
+                <option value="Technical">Technical</option>
+                <option value="Social Service">Social Service</option>
+                <option value="Professional">Professional</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Creative">Creative</option>
+              </select>
+              <textarea name="description" value={clubFormData.description} onChange={handleClubFormChange} placeholder="Description" required />
+              <textarea name="vision" value={clubFormData.vision} onChange={handleClubFormChange} placeholder="Vision" required />
+              <textarea name="mission" value={clubFormData.mission} onChange={handleClubFormChange} placeholder="Mission" required />
+
+              <div className="clubsForm__row">
+                <input type="date" name="registrationOpen" value={clubFormData.registrationOpen} onChange={handleClubFormChange} required />
+                <input type="date" name="registrationClose" value={clubFormData.registrationClose} onChange={handleClubFormChange} required />
+              </div>
+
+              <div className="clubsForm__row">
+                <input name="president" value={clubFormData.president} onChange={handleClubFormChange} placeholder="President" required />
+                <input name="advisor" value={clubFormData.advisor} onChange={handleClubFormChange} placeholder="Advisor" required />
+              </div>
+
+              <div className="clubsForm__row">
+                <input type="number" min="1" name="maxMembers" value={clubFormData.maxMembers} onChange={handleClubFormChange} placeholder="Max members" required />
+                <input name="registrationLink" value={clubFormData.registrationLink} onChange={handleClubFormChange} placeholder="Registration link" />
+              </div>
+
+              <div className="clubsForm__actions">
+                <button type="button" className="clubs__btn clubs__btn--secondary" onClick={() => setShowClubFormModal(false)}>Cancel</button>
+                <button type="submit" className="clubs__btn clubs__btn--primary">{editingClub ? "Update Club" : "Add Club"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Club Details Modal */}
       {showDetailsModal && selectedClub && (

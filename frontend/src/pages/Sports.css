@@ -20,6 +20,34 @@
 
 .sports__header {
   margin-bottom: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.sports__headerActions {
+  flex-shrink: 0;
+}
+
+.sports__addBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #4A90E2, #357ABD);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.sports__addBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
 }
 
 .sports__headerContent {
@@ -159,6 +187,42 @@
   overflow: hidden;
 }
 
+.sports__adminActions {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 5;
+}
+
+.sports__actionBtn {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18);
+}
+
+.sports__actionBtn svg {
+  width: 20px;
+  height: 20px;
+}
+
+.sports__actionBtn--edit {
+  background: #4f84cf;
+  color: #fff;
+}
+
+.sports__actionBtn--delete {
+  background: #fff;
+  color: #e45a45;
+}
+
 .sports__image {
   width: 100%;
   height: 100%;
@@ -239,6 +303,7 @@
 .sports__content {
   display: flex;
   flex-direction: column;
+  padding: 24px;
 }
 
 .sports__name {
@@ -402,7 +467,7 @@
 /* Notifications Dropdown */
 .notifications__dropdown {
   position: absolute;
-  top: calc(100% + 12px);
+  top: calc(100% + 28px);
   right: 140px;
   width: 380px;
   max-height: 500px;
@@ -736,6 +801,80 @@
   font-size: 13px;
   font-weight: 600;
   color: #1e293b;
+}
+
+.sportsForm__content {
+  background: #fff;
+  width: min(760px, 96vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.sportsForm__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.sportsForm__header h2 {
+  margin: 0;
+  font-size: 30px;
+  color: #1e293b;
+}
+
+.sportsForm__close {
+  border: none;
+  background: #f1f5f9;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.sportsForm {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sportsForm input,
+.sportsForm select,
+.sportsForm textarea {
+  width: 100%;
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-size: 14px;
+}
+
+.sportsForm textarea {
+  min-height: 90px;
+  resize: vertical;
+}
+
+.sportsForm__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.sportsForm__checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 14px;
+}
+
+.sportsForm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
 }
 
 /* Responsive Design */
