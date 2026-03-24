@@ -233,9 +233,10 @@ function LoginDashboard() {
             <a href="/events" onClick={goToEventsDashboard}>
               Events
             </a>
-            <a href="#career" onClick={(e) => scrollToSection(e, "career")}>
+            <a href="/career" onClick={goToCareer}>
               Career
             </a>
+
             <a href="#study" onClick={(e) => scrollToSection(e, "study")}>
               Study
             </a>

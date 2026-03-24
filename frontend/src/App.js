@@ -16,6 +16,12 @@ import Event from "./pages/Event";
 import ActivityDetails from "./pages/ActivityDetails";
 import Sports from "./pages/Sports";
 import Clubs from "./pages/Clubs";
+import Career from "./pages/Career";
+import CareerInternships from "./pages/CareerInternships";
+import CareerGuidance from "./pages/CareerGuidance";
+import CareerResources from "./pages/CareerResources";
+import CareerManagement from "./pages/CareerManagement";
+
 
 // new pages for login
 import LoginDashboard from "./pages/LoginDashboard";
@@ -47,6 +53,14 @@ function App() {
         <Route path="/healthy-habits" element={<HealthyHabits />} />
         <Route path="/health" element={<Health />} />
         <Route path="/dashboard" element={<LoginDashboard />} />
+
+        {/* Career Module */}
+        <Route path="/career" element={<Career />} />
+        <Route path="/career/internships" element={<CareerInternships />} />
+        <Route path="/career/guidance" element={<CareerGuidance />} />
+        <Route path="/career/resources" element={<CareerResources />} />
+        <Route path="/career/management" element={<CareerManagement />} />
+
 
         {/* Default */}
         <Route path="*" element={<Navigate to="/" replace />} />
