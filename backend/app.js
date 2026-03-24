@@ -4,6 +4,7 @@ const requestLogger = require("./middleware/requestLogger");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 const healthyHabitRoutes = require("./routes/HealthyHabitRoutes");
 const careerRoutes = require("./routes/careerRoutes");
+const resumeRoutes = require("./routes/resumeRoutes");
 const app = express();
 const path = require("path");
 
@@ -17,6 +18,7 @@ app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(requestLogger);
 app.use("/api/health/habits", healthyHabitRoutes);
 app.use("/api/careers", careerRoutes);
+app.use("/api/resumes", resumeRoutes);
 
 
 // Home route
