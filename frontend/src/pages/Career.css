@@ -139,6 +139,28 @@
   margin-bottom: 1.25rem;
 }
 
+.career__card-company {
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.career__card-location,
+.career__card-duration {
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+.career__card-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.career__card-info {
+  margin-bottom: 1.5rem;
+}
+
 .career__card-link {
   display: inline-flex;
   align-items: center;
@@ -459,5 +481,170 @@
 .btn--ghostOnDark:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: white;
+}
+
+/* Explore Modal Specific Styles */
+.career__modal--explore {
+  max-width: 700px;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.career__modal-close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-size: 1.2rem;
+  cursor: pointer;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.career__modal-close:hover {
+  background: #f1f5f9;
+  transform: rotate(90deg);
+}
+
+.career__explore-content {
+  display: flex;
+  flex-direction: column;
+  max-height: 85vh;
+}
+
+.career__explore-media {
+  width: 100%;
+  height: 300px;
+  background: #f8fafc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.career__explore-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.career__explore-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5rem;
+}
+
+.career__explore-body {
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.career__explore-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.5rem;
+}
+
+.career__explore-company-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+}
+
+.career__explore-company,
+.career__explore-location,
+.career__explore-duration {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.career__explore-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin-bottom: 2rem;
+}
+
+.career__explore-subtitle {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+}
+
+.career__explore-desc {
+  color: #475569;
+  line-height: 1.8;
+  font-size: 1rem;
+  margin-bottom: 2.5rem;
+  white-space: pre-wrap;
+  flex-grow: 1;
+}
+
+.career__explore-actions {
+  margin-top: auto;
+}
+
+.career__explore-btn {
+  display: inline-block;
+  padding: 1rem 2.5rem;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  text-decoration: none;
+  border-radius: 12px;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.career__explore-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+}
+
+.career__explore-btn--disabled {
+  background: #cbd5e1 !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+.career__explore-btn--disabled:hover {
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 900px) {
+  .career__explore-content {
+    flex-direction: column;
+  }
+  
+  .career__explore-media {
+    height: 250px;
+  }
+  
+  .career__explore-body {
+    padding: 2rem;
+  }
 }
 

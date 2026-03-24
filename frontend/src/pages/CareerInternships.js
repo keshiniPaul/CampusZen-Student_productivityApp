@@ -22,9 +22,11 @@ function CareerInternships() {
   const [careers, setCareers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
+  const [showExploreModal, setShowExploreModal] = useState(false);
+  const [selectedCareer, setSelectedCareer] = useState(null);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
-    title: "", description: "", color: "#667eea", link: "#", image: null, category: "internship"
+    title: "", description: "", company: "", location: "", duration: "", color: "#667eea", link: "#", image: null, category: "internship"
   });
 
   const profileDropdownRef = useRef(null);
@@ -92,16 +94,20 @@ function CareerInternships() {
     if (type === "file") setFormData(prev => ({ ...prev, [name]: files[0] }));
     else setFormData(prev => ({ ...prev, [name]: value }));
   };
-  const openAddModal = () => { setEditingId(null); setFormData({ title: "", description: "", image: null, color: "#667eea", link: "#", category: "internship" }); setShowModal(true); };
-  const openEditModal = (c) => { setEditingId(c._id); setFormData({ title: c.title, description: c.description, image: null, color: c.color, link: c.link || "#", category: c.category || "internship" }); setShowModal(true); };
+  const openAddModal = () => { setEditingId(null); setFormData({ title: "", description: "", company: "", location: "", duration: "", image: null, color: "#667eea", link: "#", category: "internship" }); setShowModal(true); };
+  const openEditModal = (c) => { setEditingId(c._id); setFormData({ title: c.title, description: c.description, company: c.company || "", location: c.location || "", duration: c.duration || "", image: null, color: c.color, link: c.link || "#", category: c.category || "internship" }); setShowModal(true); };
+  const openExploreModal = (c) => { setSelectedCareer(c); setShowExploreModal(true); };
   const handleSubmit = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
     const data = new FormData();
     data.append("title", formData.title);
     data.append("description", formData.description);
+    data.append("company", formData.company);
+    data.append("location", formData.location);
+    data.append("duration", formData.duration);
     data.append("color", formData.color);
-    data.append("link", formData.link);
+    data.append("link", formData.link || "#");
     data.append("category", formData.category);
     if (formData.image) data.append("image", formData.image);
 
@@ -210,9 +216,16 @@ function CareerInternships() {
                         "💼"
                       )}
                     </div>
-                    <h3 className="career__card-title">{c.title}</h3>
-                    <p className="career__card-desc">{c.description}</p>
-                    <a className="career__card-link" href={c.link||"#"} onClick={e=>e.preventDefault()}>Explore Now <span>→</span></a>
+                    <div className="career__card-info">
+                      <h3 className="career__card-title">{c.title}</h3>
+                      <div className="career__card-meta">
+                        <p className="career__card-company">🏢 {c.company || "Company Name"}</p>
+                        <p className="career__card-location">📍 {c.location || "Location"}</p>
+                        <p className="career__card-duration">⏳ {c.duration || "Duration"}</p>
+                      </div>
+                    </div>
+                    {/* <p className="career__card-desc">{c.description}</p> */}
+                    <a className="career__card-link" href={c.link||"#"} onClick={e => { e.preventDefault(); openExploreModal(c); }}>Explore More <span>→</span></a>
                   </div>
                 </article>
               ))}
@@ -233,10 +246,16 @@ function CareerInternships() {
           <div className="career__modal" onClick={e=>e.stopPropagation()}>
             <h2 className="career__modal-title">{editingId?"Edit Internship":"Add New Internship"}</h2>
             <form className="career__form" onSubmit={handleSubmit}>
-              <div className="career__form-group"><label>Title</label><input name="title" value={formData.title} onChange={handleInputChange} required placeholder="e.g. Software Engineering Intern"/></div>
-              <div className="career__form-group"><label>Description</label><textarea name="description" value={formData.description} onChange={handleInputChange} required rows="3" placeholder="Describe the opportunity..."/></div>
+              <div className="career__form-group"><label>Intern Role / Title</label><input name="title" value={formData.title} onChange={handleInputChange} required placeholder="e.g. Software Engineering Intern"/></div>
+              <div className="career__form-group"><label>Company Name</label><input name="company" value={formData.company} onChange={handleInputChange} required placeholder="e.g. Google, Meta, etc."/></div>
               <div className="career__form-row">
-                <div className="career__form-group"><label>Image (Upload)</label><input type="file" name="image" onChange={handleInputChange} accept="image/*"/></div>
+                <div className="career__form-group"><label>Location</label><input name="location" value={formData.location} onChange={handleInputChange} required placeholder="e.g. Colombo, Remote, Hybrid"/></div>
+                <div className="career__form-group"><label>Duration</label><input name="duration" value={formData.duration} onChange={handleInputChange} required placeholder="e.g. 6 Months, Period"/></div>
+              </div>
+              <div className="career__form-group"><label>Description</label><textarea name="description" value={formData.description} onChange={handleInputChange} required rows="3" placeholder="Describe the opportunity..."/></div>
+              <div className="career__form-group"><label>Image (Upload)</label><input type="file" name="image" onChange={handleInputChange} accept="image/*"/></div>
+              <div className="career__form-row">
+                <div className="career__form-group"><label>Apply Link (optional)</label><input name="link" value={formData.link === "#" ? "" : formData.link} onChange={handleInputChange} placeholder="e.g. https://google.com/careers"/></div>
                 <div className="career__form-group"><label>Theme Color</label><input type="color" name="color" value={formData.color} onChange={handleInputChange} style={{height:42,cursor:"pointer"}}/></div>
               </div>
               <div className="career__form-actions">
@@ -244,6 +263,48 @@ function CareerInternships() {
                 <button type="submit" className="career__form-submitBtn">{editingId?"Update":"Create"}</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Explore Modal */}
+      {showExploreModal && selectedCareer && (
+        <div className="career__modal-overlay" onClick={() => setShowExploreModal(false)}>
+          <div className="career__modal career__modal--explore" onClick={e => e.stopPropagation()}>
+            <button className="career__modal-close" onClick={() => setShowExploreModal(false)}>×</button>
+            <div className="career__explore-content">
+              <div className="career__explore-media">
+                {selectedCareer.image ? (
+                  <img src={`${SERVER_URL}${selectedCareer.image}`} alt={selectedCareer.title} />
+                ) : (
+                  <div className="career__explore-placeholder" style={{ background: selectedCareer.color }}>💼</div>
+                )}
+              </div>
+              <div className="career__explore-body">
+                <h2 className="career__explore-title">{selectedCareer.title}</h2>
+                <div className="career__explore-company-row">
+                  <p className="career__explore-company">🏢 {selectedCareer.company || "Company Name"}</p>
+                  <p className="career__explore-location">📍 {selectedCareer.location || "Location"}</p>
+                  <p className="career__explore-duration">⏳ {selectedCareer.duration || "Duration"}</p>
+                </div>
+                <div className="career__explore-divider"></div>
+                <h4 className="career__explore-subtitle">Job Description</h4>
+                <p className="career__explore-desc">{selectedCareer.description}</p>
+                 <div className="career__explore-actions">
+                  {(!selectedCareer.link || selectedCareer.link === "#") ? (
+                    <button className="career__explore-btn career__explore-btn--disabled" onClick={() => showToast("Application link not provided for this role")}>
+                      Apply Now (Link Not Available)
+                    </button>
+                  ) : (
+                    <a href={selectedCareer.link.startsWith("http") ? selectedCareer.link : `https://${selectedCareer.link}`} 
+                       target="_blank" rel="noopener noreferrer" 
+                       className="career__explore-btn">
+                      Apply Now
+                    </a>
+                  )}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}
