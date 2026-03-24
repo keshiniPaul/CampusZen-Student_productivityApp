@@ -11,6 +11,18 @@ const CareerSchema = new mongoose.Schema(
       type: String,
       required: [true, "Description is required"],
     },
+    company: {
+      type: String,
+      default: ""
+    },
+    location: {
+      type: String,
+      default: ""
+    },
+    duration: {
+      type: String,
+      default: ""
+    },
     image: {
       type: String,
       default: ""
