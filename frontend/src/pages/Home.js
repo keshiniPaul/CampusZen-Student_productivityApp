@@ -232,7 +232,11 @@ function Home() {
             <a href="/events" onClick={goToEventsDashboard}>
               Events
             </a>
-            <a href="#career" onClick={(e) => scrollToSection(e, "career")}>
+            <a href="/career" onClick={(e) => {
+                e.preventDefault();
+                navigate("/career");
+                setIsNavOpen(false);
+            }}>
               Career
             </a>
             <a href="#study" onClick={(e) => scrollToSection(e, "study")}>
@@ -556,10 +560,10 @@ function Home() {
                 <p className="card__text">Save internship posts and track application status.</p>
                 <a
                   className="card__link"
-                  href="/"
+                  href="/career/internships"
                   onClick={(e) => {
                     e.preventDefault();
-                    showToast("Internships module coming soon");
+                    navigate("/career/internships");
                   }}
                 >
                   Learn more →
@@ -572,10 +576,10 @@ function Home() {
                 <p className="card__text">Build a clean CV and organize your achievements.</p>
                 <a
                   className="card__link"
-                  href="/"
+                  href="/career/resume-builder"
                   onClick={(e) => {
                     e.preventDefault();
-                    showToast("CV builder coming soon");
+                    navigate("/career/resume-builder");
                   }}
                 >
                   Learn more →
@@ -588,10 +592,10 @@ function Home() {
                 <p className="card__text">Set goals and track skills for your dream career.</p>
                 <a
                   className="card__link"
-                  href="/"
+                  href="/career/guidance"
                   onClick={(e) => {
                     e.preventDefault();
-                    showToast("Goals tracker coming soon");
+                    navigate("/career/guidance");
                   }}
                 >
                   Learn more →
@@ -604,10 +608,10 @@ function Home() {
                 <p className="card__text">Practice questions and prepare confidently.</p>
                 <a
                   className="card__link"
-                  href="/"
+                  href="/career/resources"
                   onClick={(e) => {
                     e.preventDefault();
-                    showToast("Interview prep coming soon");
+                    navigate("/career/resources");
                   }}
                 >
                   Learn more →

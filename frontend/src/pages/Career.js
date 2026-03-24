@@ -396,6 +396,37 @@ function Career() {
                 </a>
               </div>
             </article>
+
+            {/* Resume Builder Card */}
+            <article className="post">
+              <div className="post__media">
+                <img
+                  src={resourcesImg}
+                  alt="Resume Builder"
+                  loading="lazy"
+                />
+                <span className="tag tag--activity">Tools</span>
+              </div>
+              <div className="post__body">
+                <h3 className="post__title">CV / Resume Builder</h3>
+                {!isAdmin && (
+                  <p className="post__text">
+                    Create, edit, and export ATS-friendly professional resumes tailored to your career goals.
+                  </p>
+                )}
+                <a
+                  className={`post__link ${isAdmin ? "post__link--admin" : ""}`}
+                  href="/career/resume-builder"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    navigate("/career/resume-builder");
+                    setIsNavOpen(false);
+                  }}
+                >
+                  {isAdmin ? "Build Sample Resume →" : "Build Resume →"}
+                </a>
+              </div>
+            </article>
           </div>
         </div>
       </main>
