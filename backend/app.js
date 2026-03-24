@@ -3,14 +3,21 @@ const cors = require("cors");
 const requestLogger = require("./middleware/requestLogger");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
 const healthyHabitRoutes = require("./routes/HealthyHabitRoutes");
+const careerRoutes = require("./routes/careerRoutes");
 const app = express();
+const path = require("path");
 
 // Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Serve static images
+app.use("/images", express.static(path.join(__dirname, "images")));
 app.use(requestLogger);
 app.use("/api/health/habits", healthyHabitRoutes);
+app.use("/api/careers", careerRoutes);
+
 
 // Home route
 app.get("/", (req, res) => {

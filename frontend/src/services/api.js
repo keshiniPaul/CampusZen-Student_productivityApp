@@ -427,6 +427,95 @@ export const clubsAPI = {
   },
 };
 
-const api = { sportsAPI, eventAPI, clubsAPI };
+// Career API endpoints
+export const careerAPI = {
+  // Get all careers
+  getAllCareers: async () => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/careers`);
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to fetch careers');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error fetching careers:', error);
+      throw error;
+    }
+  },
+
+  // Create new career (Admin only)
+  createCareer: async (formData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/careers`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData, // FormData handles its own headers
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to create career');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error creating career:', error);
+      throw error;
+    }
+  },
+
+  // Update career (Admin only)
+  updateCareer: async (id, formData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/careers/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData, // FormData handles its own headers
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to update career');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error updating career:', error);
+      throw error;
+    }
+  },
+
+  // Delete career (Admin only)
+  deleteCareer: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/careers/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to delete career');
+      }
+      
+      return data;
+    } catch (error) {
+      console.error('Error deleting career:', error);
+      throw error;
+    }
+  },
+};
+
+const api = { sportsAPI, eventAPI, clubsAPI, careerAPI };
+
 
 export default api;
