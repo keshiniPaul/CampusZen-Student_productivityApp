@@ -21,6 +21,7 @@ import CareerInternships from "./pages/CareerInternships";
 import CareerGuidance from "./pages/CareerGuidance";
 import CareerResources from "./pages/CareerResources";
 import CareerManagement from "./pages/CareerManagement";
+import ResumeBuilder from "./pages/ResumeBuilder";
 
 
 // new pages for login
@@ -60,6 +61,7 @@ function App() {
         <Route path="/career/guidance" element={<CareerGuidance />} />
         <Route path="/career/resources" element={<CareerResources />} />
         <Route path="/career/management" element={<CareerManagement />} />
+        <Route path="/career/resume-builder" element={<ResumeBuilder />} />
 
 
         {/* Default */}
