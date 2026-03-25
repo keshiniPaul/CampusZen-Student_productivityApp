@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import html2pdf from 'html2pdf.js';
-import axios from 'axios';
 import campusLogo from '../images/campus_logo.png';
 import './ResumeBuilder.css';
 
@@ -34,6 +33,17 @@ const ResumeBuilder = () => {
   const API_URL = "http://localhost:5000/api/resumes";
   const token = localStorage.getItem('token');
 
+  const requestJson = async (url, options = {}) => {
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `Request failed with status ${response.status}`);
+    }
+
+    return response.json();
+  };
+
   useEffect(() => {
     fetchResumes();
     // Auto-fill personal details from user profile for new resumes
@@ -47,14 +57,17 @@ const ResumeBuilder = () => {
         phone: user.phone || '',
       }));
     }
+    // Intentionally run once on mount to initialize dashboard data and profile defaults.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchResumes = async () => {
     try {
-      const res = await axios.get(`${API_URL}/my-resumes`, {
+      const data = await requestJson(`${API_URL}/my-resumes`, {
+        method: 'GET',
         headers: { Authorization: `Bearer ${token}` }
       });
-      setResumes(res.data);
+      setResumes(data);
     } catch (err) {
       console.error("Error fetching resumes", err);
     }
@@ -120,11 +133,16 @@ const ResumeBuilder = () => {
     };
 
     try {
-      const res = await axios.post(`${API_URL}/save`, resumeData, {
-        headers: { Authorization: `Bearer ${token}` }
+      const data = await requestJson(`${API_URL}/save`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(resumeData)
       });
       if (!currentResumeId) {
-        setCurrentResumeId(res.data._id);
+        setCurrentResumeId(data._id);
       }
       fetchResumes();
       alert("Draft saved successfully!");
@@ -140,7 +158,8 @@ const ResumeBuilder = () => {
     e.stopPropagation();
     if (!window.confirm("Are you sure you want to delete this resume?")) return;
     try {
-      await axios.delete(`${API_URL}/${id}`, {
+      await requestJson(`${API_URL}/${id}`, {
+        method: 'DELETE',
         headers: { Authorization: `Bearer ${token}` }
       });
       fetchResumes();

@@ -143,6 +143,7 @@ function Home() {
 
   const goToEventsDashboard = (event) => {
     event.preventDefault();
+    showToast("Opening events dashboard");
     navigate("/events");
     setIsNavOpen(false);
   };
