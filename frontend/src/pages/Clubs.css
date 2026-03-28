@@ -1025,6 +1025,26 @@
   color: #b61e2e;
 }
 
+.clubsForm__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.clubsForm__label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.clubsForm__previewImage {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 10px;
+  border: 1px solid #dbe3ef;
+}
+
 .clubsForm textarea {
   min-height: 90px;
   resize: vertical;

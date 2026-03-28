@@ -192,6 +192,10 @@ function Clubs() {
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
   const clubFieldRefs = useRef({});
+  const clubImageInputRef = useRef(null);
+  const [clubImagePreview, setClubImagePreview] = useState("");
+
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
 
   const validateClubField = (fieldName, value, allValues) => {
     const trimmed = typeof value === "string" ? value.trim() : value;
@@ -227,6 +231,7 @@ function Clubs() {
         if (!trimmed) return "Registration open date is required.";
         const openDate = new Date(`${trimmed}T00:00:00`);
         if (Number.isNaN(openDate.getTime())) return "Please provide a valid open date.";
+        if (trimmed < getTodayDate()) return "Registration open date cannot be in the past.";
         return "";
       }
       case "registrationClose": {
@@ -234,6 +239,7 @@ function Clubs() {
         const closeDate = new Date(`${trimmed}T00:00:00`);
         const openDate = new Date(`${allValues.registrationOpen}T00:00:00`);
         if (Number.isNaN(closeDate.getTime())) return "Please provide a valid close date.";
+        if (trimmed < getTodayDate()) return "Registration close date cannot be in the past.";
         if (!Number.isNaN(openDate.getTime()) && closeDate < openDate) {
           return "Close date must be the same as or after open date.";
         }
@@ -298,7 +304,10 @@ function Clubs() {
         if (response.success && response.data && response.data.length > 0) {
           const mappedClubs = response.data.map((club) => {
             // Find matching initial data for image fallback
-            const initialClub = initialClubsData.find(c => c.id === club._id || c.name === club.name);
+            const initialClub = initialClubsData.find((c) => c.id === club._id);
+            const hasUploadedImage =
+              typeof club.image === "string" &&
+              (club.image.startsWith("data:image/") || club.image.startsWith("http"));
             return {
               id: club._id,
               name: club.name,
@@ -315,7 +324,7 @@ function Clubs() {
               upcomingEvents: club.upcomingEvents,
               socialMedia: club.socialMedia,
               registrationLink: club.registrationLink,
-              image: club.image || (initialClub ? initialClub.image : clubImg),
+              image: hasUploadedImage ? club.image : (initialClub ? initialClub.image : clubImg),
             };
           });
           console.log('API clubs loaded:', mappedClubs.length);
@@ -477,11 +486,15 @@ function Clubs() {
       president: "",
       advisor: "",
       maxMembers: 100,
-      registrationLink: "#",
+      registrationLink: "https://forms.google.com",
     });
     setClubFormErrors({});
     setClubFormTouched({});
     setClubSubmitAttempted(false);
+    setClubImagePreview("");
+    if (clubImageInputRef.current) {
+      clubImageInputRef.current.value = "";
+    }
     setShowClubFormModal(true);
   };
 
@@ -508,7 +521,32 @@ function Clubs() {
     setClubFormErrors({});
     setClubFormTouched({});
     setClubSubmitAttempted(false);
+    setClubImagePreview(club.image || "");
+    if (clubImageInputRef.current) {
+      clubImageInputRef.current.value = "";
+    }
     setShowClubFormModal(true);
+  };
+
+  const handleClubImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size must be less than 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setClubImagePreview(reader.result ? String(reader.result) : "");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDeleteClub = async (clubId) => {
@@ -565,6 +603,11 @@ function Clubs() {
 
   const handleClubFormSubmit = async (e) => {
     e.preventDefault();
+
+    if (!editingClub && !clubImagePreview) {
+      alert("Please upload an image for the club/society.");
+      return;
+    }
 
     const nextErrors = validateClubForm(clubFormData);
     setClubFormErrors(nextErrors);
@@ -623,6 +666,7 @@ function Clubs() {
       registrationLink: clubFormData.registrationLink || "#",
       upcomingEvents: [],
       socialMedia: {},
+      image: clubImagePreview || editingClub?.image || "",
     };
 
     if (editingClub) {
@@ -658,7 +702,7 @@ function Clubs() {
             {
               ...created,
               id: created._id,
-              image: created.image || clubImg,
+              image: created.image || payload.image || clubImg,
               currentMembers: created.currentMembers || 0,
             },
             ...prev,
@@ -667,7 +711,7 @@ function Clubs() {
             {
               ...created,
               id: created._id,
-              image: created.image || clubImg,
+              image: created.image || payload.image || clubImg,
               currentMembers: created.currentMembers || 0,
             },
             ...clubs,
@@ -687,7 +731,7 @@ function Clubs() {
       }
     }
 
-    const newClub = { ...payload, id: `club-${Date.now()}`, image: clubImg, currentMembers: 0 };
+    const newClub = { ...payload, id: `club-${Date.now()}`, image: payload.image || clubImg, currentMembers: 0 };
     const updatedClubs = [newClub, ...clubs];
     setClubs(updatedClubs);
     localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
@@ -1081,6 +1125,19 @@ function Clubs() {
             </div>
 
             <form className="clubsForm" onSubmit={handleClubFormSubmit}>
+              <div className="clubsForm__field">
+                <label className="clubsForm__label">Club/Society Image *</label>
+                <input
+                  ref={clubImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleClubImageChange}
+                />
+                {clubImagePreview && (
+                  <img src={clubImagePreview} alt="Club preview" className="clubsForm__previewImage" />
+                )}
+              </div>
+
               <input
                 name="name"
                 value={clubFormData.name}
@@ -1157,13 +1214,16 @@ function Clubs() {
               {shouldShowClubError("mission") && <p className="clubsForm__error">{clubFormErrors.mission}</p>}
 
               <div className="clubsForm__row">
-                <div>
+                <div className="clubsForm__field">
+                  <label className="clubsForm__label">Registration Open Date *</label>
                   <input
                     type="date"
                     name="registrationOpen"
                     value={clubFormData.registrationOpen}
                     onChange={handleClubFormChange}
                     onBlur={handleClubFormBlur}
+                    placeholder="mm/dd/yyyy"
+                    min={getTodayDate()}
                     className={shouldShowClubError("registrationOpen") ? "clubsForm__input--error" : ""}
                     ref={(element) => {
                       clubFieldRefs.current.registrationOpen = element;
@@ -1172,13 +1232,16 @@ function Clubs() {
                   />
                   {shouldShowClubError("registrationOpen") && <p className="clubsForm__error">{clubFormErrors.registrationOpen}</p>}
                 </div>
-                <div>
+                <div className="clubsForm__field">
+                  <label className="clubsForm__label">Registration Close Date *</label>
                   <input
                     type="date"
                     name="registrationClose"
                     value={clubFormData.registrationClose}
                     onChange={handleClubFormChange}
                     onBlur={handleClubFormBlur}
+                    placeholder="mm/dd/yyyy"
+                    min={clubFormData.registrationOpen || getTodayDate()}
                     className={shouldShowClubError("registrationClose") ? "clubsForm__input--error" : ""}
                     ref={(element) => {
                       clubFieldRefs.current.registrationClose = element;

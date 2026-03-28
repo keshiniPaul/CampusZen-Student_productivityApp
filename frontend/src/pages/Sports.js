@@ -386,6 +386,7 @@ function Sports() {
         if (!trimmed) return "Registration open date is required.";
         const openDate = new Date(`${trimmed}T00:00:00`);
         if (Number.isNaN(openDate.getTime())) return "Please provide a valid open date.";
+        if (trimmed < getTodayDate()) return "Registration open date cannot be in the past.";
         return "";
       }
       case "registrationClose": {
@@ -393,6 +394,7 @@ function Sports() {
         const closeDate = new Date(`${trimmed}T00:00:00`);
         const openDate = new Date(`${allValues.registrationOpen}T00:00:00`);
         if (Number.isNaN(closeDate.getTime())) return "Please provide a valid close date.";
+        if (trimmed < getTodayDate()) return "Registration close date cannot be in the past.";
         if (!Number.isNaN(openDate.getTime()) && closeDate < openDate) {
           return "Close date must be the same as or after open date.";
         }
