@@ -194,15 +194,26 @@ function Sports() {
     registrationLink: "#",
     skillLevelsText: "Beginner, Intermediate, Advanced",
   });
+  const [sportFormErrors, setSportFormErrors] = useState({});
+  const [sportFormTouched, setSportFormTouched] = useState({});
+  const [sportSubmitAttempted, setSportSubmitAttempted] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
-    const [toastText, setToastText] = useState("");
-    const [toastVisible, setToastVisible] = useState(false);
+  const sportImageInputRef = useRef(null);
+  const sportFieldRefs = useRef({});
+  const hasFetchedSportsRef = useRef(false);
+  const [sportImagePreview, setSportImagePreview] = useState("");
+  const [toastText, setToastText] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const [isSubmittingSport, setIsSubmittingSport] = useState(false);
+
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
 
   // Debug: Log when Sports page loads
   useEffect(() => {
@@ -213,6 +224,11 @@ function Sports() {
 
   // Fetch sports data from API
   useEffect(() => {
+    if (hasFetchedSportsRef.current) {
+      return;
+    }
+    hasFetchedSportsRef.current = true;
+
     const fetchSports = async () => {
       try {
         console.log('Fetching sports from API...');
@@ -343,6 +359,99 @@ function Sports() {
     setNotifications(newNotifications);
   }, [sports]);
 
+  const validateSportField = (fieldName, value, allValues) => {
+    const trimmed = typeof value === "string" ? value.trim() : value;
+    const hasLetters = typeof trimmed === "string" && /[A-Za-z]/.test(trimmed);
+
+    switch (fieldName) {
+      case "name":
+        if (!trimmed) return "Sport name is required.";
+        if (trimmed.length < 3) return "Name must be at least 3 characters.";
+        if (trimmed.length > 100) return "Name cannot exceed 100 characters.";
+        if (!hasLetters) return "Name cannot contain only numbers or symbols.";
+        return "";
+      case "category":
+        if (!trimmed) return "Category is required.";
+        return "";
+      case "description":
+        if (!trimmed) return "Description is required.";
+        if (trimmed.length < 20) return "Description must be at least 20 characters.";
+        if (trimmed.length > 1000) return "Description cannot exceed 1000 characters.";
+        if (!hasLetters) return "Description cannot contain only numbers or symbols.";
+        return "";
+      case "venue":
+        if (!trimmed) return "Venue is required.";
+        if (trimmed.length < 3) return "Venue must be at least 3 characters.";
+        if (!hasLetters) return "Venue cannot contain only numbers or symbols.";
+        return "";
+      case "coach":
+        if (!trimmed) return "Coach name is required.";
+        if (trimmed.length < 3) return "Coach name must be at least 3 characters.";
+        if (!hasLetters) return "Coach name cannot contain only numbers or symbols.";
+        return "";
+      case "registrationOpen": {
+        if (!trimmed) return "Registration open date is required.";
+        const openDate = new Date(`${trimmed}T00:00:00`);
+        if (Number.isNaN(openDate.getTime())) return "Please provide a valid open date.";
+        if (trimmed < getTodayDate()) return "Registration open date cannot be in the past.";
+        return "";
+      }
+      case "registrationClose": {
+        if (!trimmed) return "Registration close date is required.";
+        const closeDate = new Date(`${trimmed}T00:00:00`);
+        const openDate = new Date(`${allValues.registrationOpen}T00:00:00`);
+        if (Number.isNaN(closeDate.getTime())) return "Please provide a valid close date.";
+        if (trimmed < getTodayDate()) return "Registration close date cannot be in the past.";
+        if (!Number.isNaN(openDate.getTime()) && closeDate < openDate) {
+          return "Close date must be the same as or after open date.";
+        }
+        return "";
+      }
+      case "maxCapacity": {
+        const max = Number(value);
+        if (!Number.isFinite(max) || max < 1) return "Max capacity must be at least 1.";
+        if (max > 10000) return "Max capacity cannot exceed 10000.";
+        return "";
+      }
+      case "eligibility":
+        if (!trimmed) return "Eligibility is required.";
+        if (trimmed.length < 5) return "Eligibility must be at least 5 characters.";
+        return "";
+      case "selectionCriteria":
+        if (!trimmed) return "Selection criteria is required.";
+        if (trimmed.length < 5) return "Selection criteria must be at least 5 characters.";
+        return "";
+      case "skillLevelsText":
+        if (!trimmed) return "Skill levels are required.";
+        if (trimmed.length < 3) return "Skill levels must be at least 3 characters.";
+        return "";
+      case "registrationLink":
+        if (!trimmed || trimmed === "#") return "";
+        if (!/^https?:\/\//i.test(trimmed)) return "Registration link must start with http:// or https://.";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  const validateSportForm = (values) => ({
+    name: validateSportField("name", values.name, values),
+    category: validateSportField("category", values.category, values),
+    description: validateSportField("description", values.description, values),
+    venue: validateSportField("venue", values.venue, values),
+    coach: validateSportField("coach", values.coach, values),
+    registrationOpen: validateSportField("registrationOpen", values.registrationOpen, values),
+    registrationClose: validateSportField("registrationClose", values.registrationClose, values),
+    maxCapacity: validateSportField("maxCapacity", values.maxCapacity, values),
+    eligibility: validateSportField("eligibility", values.eligibility, values),
+    selectionCriteria: validateSportField("selectionCriteria", values.selectionCriteria, values),
+    skillLevelsText: validateSportField("skillLevelsText", values.skillLevelsText, values),
+    registrationLink: validateSportField("registrationLink", values.registrationLink, values),
+  });
+
+  const shouldShowSportError = (fieldName) =>
+    Boolean((sportFormTouched[fieldName] || sportSubmitAttempted) && sportFormErrors[fieldName]);
+
   const getRegistrationStatus = (sport) => {
     const now = new Date();
 
@@ -383,30 +492,6 @@ function Sports() {
     window.open(sport.registrationLink, '_blank');
   };
 
-  const handleAddSport = async () => {
-    if (!isAdmin) {
-      alert("Only administrators can add sports.");
-      return;
-    }
-    setEditingSport(null);
-    setSportFormData({
-      name: "",
-      category: "Tournament",
-      description: "",
-      registrationOpen: "",
-      registrationClose: "",
-      venue: "",
-      coach: "",
-      maxCapacity: 50,
-      eligibility: "All students",
-      selectionCriteria: "Skill assessment",
-      requiresMedical: false,
-      registrationLink: "#",
-      skillLevelsText: "Beginner, Intermediate, Advanced",
-    });
-    setShowSportFormModal(true);
-  };
-
   const handleEditSport = async (sport) => {
     if (!isAdmin) {
       alert("Only administrators can update sports.");
@@ -429,7 +514,68 @@ function Sports() {
       registrationLink: sport.registrationLink || "#",
       skillLevelsText: Array.isArray(sport.skillLevels) ? sport.skillLevels.join(", ") : "Beginner, Intermediate, Advanced",
     });
+    setSportFormErrors({});
+    setSportFormTouched({});
+    setSportSubmitAttempted(false);
+    setSportImagePreview(sport.image || "");
     setShowSportFormModal(true);
+  };
+
+  const resetSportForm = () => {
+    setSportFormData({
+      name: "",
+      category: "Tournament",
+      description: "",
+      registrationOpen: "",
+      registrationClose: "",
+      venue: "",
+      coach: "",
+      maxCapacity: 50,
+      eligibility: "All students",
+      selectionCriteria: "Skill assessment",
+      requiresMedical: false,
+      registrationLink: "https://forms.google.com",
+      skillLevelsText: "Beginner, Intermediate, Advanced",
+    });
+    setSportFormErrors({});
+    setSportFormTouched({});
+    setSportSubmitAttempted(false);
+    setSportImagePreview("");
+    setEditingSport(null);
+    if (sportImageInputRef.current) {
+      sportImageInputRef.current.value = "";
+    }
+  };
+
+  const openAddSportModal = () => {
+    resetSportForm();
+    setShowSportFormModal(true);
+  };
+
+  const closeSportFormModal = () => {
+    setShowSportFormModal(false);
+    setEditingSport(null);
+  };
+
+  const handleSportImageChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size must be less than 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setSportImagePreview(reader.result ? String(reader.result) : "");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDeleteSport = async (sportId) => {
@@ -440,28 +586,124 @@ function Sports() {
 
     if (!window.confirm("Delete this sport?")) return;
 
-    if (authToken) {
-      try {
-        await sportsAPI.deleteSport(sportId, authToken);
-      } catch (error) {
-        console.error("API delete sport failed, using local delete:", error);
-      }
+    if (!authToken) {
+      setToastText("❌ Please login as admin to delete sports.");
+      setToastVisible(true);
+      setTimeout(() => navigate("/login"), 1500);
+      return;
     }
 
-    setSports((prev) => prev.filter((item) => item.id !== sportId));
-    alert("Sport deleted successfully.");
+    try {
+      await sportsAPI.deleteSport(sportId, authToken);
+      setSports((prev) => prev.filter((item) => item.id !== sportId));
+      setToastText("✅ Sport deleted successfully!");
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 2500);
+    } catch (error) {
+      console.error("API delete sport failed:", error);
+      const errorMessage = error?.message || "Failed to delete sport";
+
+      if (/token expired|not authorized|invalid token/i.test(errorMessage)) {
+        localStorage.removeItem("token");
+        setToastText("❌ Session expired. Please login again.");
+        setToastVisible(true);
+        setTimeout(() => navigate("/login"), 1500);
+        return;
+      }
+
+      setToastText(`❌ ${errorMessage}`);
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+    }
   };
 
   const handleSportFormChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setSportFormData((prev) => ({
+    setSportFormData((prev) => {
+      const nextValues = {
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      };
+
+      if (sportFormTouched[name] || sportSubmitAttempted) {
+        setSportFormErrors((prevErrors) => ({
+          ...prevErrors,
+          [name]: validateSportField(name, nextValues[name], nextValues),
+          ...(name === "registrationOpen"
+            ? { registrationClose: validateSportField("registrationClose", nextValues.registrationClose, nextValues) }
+            : {}),
+        }));
+      }
+
+      return nextValues;
+    });
+  };
+
+  const handleSportFormBlur = (e) => {
+    const { name } = e.target;
+    setSportFormTouched((prev) => ({ ...prev, [name]: true }));
+    setSportFormErrors((prev) => ({
       ...prev,
-      [name]: type === "checkbox" ? checked : value,
+      [name]: validateSportField(name, sportFormData[name], sportFormData),
     }));
   };
 
   const handleSportFormSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmittingSport) {
+      return;
+    }
+
+    if (!editingSport && !sportImagePreview) {
+      alert("Please upload an image for the sport.");
+      return;
+    }
+
+    const nextErrors = validateSportForm(sportFormData);
+    setSportFormErrors(nextErrors);
+    setSportSubmitAttempted(true);
+    setSportFormTouched({
+      name: true,
+      category: true,
+      description: true,
+      venue: true,
+      coach: true,
+      registrationOpen: true,
+      registrationClose: true,
+      maxCapacity: true,
+      eligibility: true,
+      selectionCriteria: true,
+      skillLevelsText: true,
+      registrationLink: true,
+    });
+
+    const fieldOrder = [
+      "name",
+      "category",
+      "description",
+      "venue",
+      "coach",
+      "registrationOpen",
+      "registrationClose",
+      "maxCapacity",
+      "eligibility",
+      "selectionCriteria",
+      "skillLevelsText",
+      "registrationLink",
+    ];
+
+    const firstErrorField = fieldOrder.find((fieldName) => nextErrors[fieldName]);
+    if (firstErrorField) {
+      const firstField = sportFieldRefs.current[firstErrorField];
+      if (firstField) {
+        firstField.scrollIntoView({ behavior: "smooth", block: "center" });
+        if (typeof firstField.focus === "function") {
+          firstField.focus();
+        }
+      }
+      return;
+    }
 
     const skillLevels = sportFormData.skillLevelsText
       .split(",")
@@ -482,67 +724,89 @@ function Sports() {
       requiresMedical: sportFormData.requiresMedical,
       registrationLink: sportFormData.registrationLink || "#",
       skillLevels,
+      image: sportImagePreview || (editingSport?.image || ""),
     };
 
-    if (editingSport) {
+    setIsSubmittingSport(true);
+
+    try {
+      if (editingSport) {
+        if (authToken) {
+          try {
+            await sportsAPI.updateSport(editingSport.id, payload, authToken);
+          } catch (error) {
+            console.error("API update sport failed, using local update:", error);
+          }
+        }
+
+        setSports((prev) => prev.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels } : item)));
+        const updatedSports = sports.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels, registered: item.registered } : item));
+        setSports(updatedSports);
+        localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+        setShowSportFormModal(false);
+        resetSportForm();
+        setToastText("✅ Sport updated successfully!");
+        setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 3000);
+        return;
+      }
+
       if (authToken) {
         try {
-          await sportsAPI.updateSport(editingSport.id, payload, authToken);
+          const response = await sportsAPI.createSport(payload, authToken);
+          const created = response?.data;
+          if (created) {
+            setSports((prev) => [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || sportIcon,
+                registered: created.registered || 0,
+              },
+              ...prev,
+            ]);
+            const updatedSports = [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || sportIcon,
+                registered: created.registered || 0,
+              },
+              ...sports,
+            ];
+            localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+            setShowSportFormModal(false);
+            resetSportForm();
+            setToastText("✅ Sport added successfully!");
+            setToastVisible(true);
+            setTimeout(() => setToastVisible(false), 3000);
+            return;
+          }
         } catch (error) {
-          console.error("API update sport failed, using local update:", error);
+          console.error("API create sport failed, using local add:", error);
+          const errorMessage = error?.message || "Failed to add sport";
+          if (/token expired|not authorized|invalid token/i.test(errorMessage)) {
+            localStorage.removeItem("token");
+            setToastText("❌ Session expired. Please login again.");
+            setToastVisible(true);
+            setTimeout(() => navigate("/login"), 1500);
+            return;
+          }
         }
       }
 
-      setSports((prev) => prev.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels } : item)));
+      const newSport = { ...payload, id: `sport-${Date.now()}`, image: payload.image || sportIcon, registered: 0 };
+      const updatedSports = [newSport, ...sports];
+      setSports(updatedSports);
+      localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
       setShowSportFormModal(false);
-      setEditingSport(null);
-      alert("Sport updated successfully.");
-      return;
+      resetSportForm();
+      setToastText("✅ Sport added successfully!");
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+    } finally {
+      setIsSubmittingSport(false);
     }
-
-    if (authToken) {
-      try {
-        const response = await sportsAPI.createSport(payload, authToken);
-        const created = response?.data;
-        if (created) {
-          setSports((prev) => [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || sportIcon,
-              registered: created.registered || 0,
-            },
-            ...prev,
-          ]);
-          const updatedSports = [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || sportIcon,
-              registered: created.registered || 0,
-            },
-            ...sports,
-          ];
-          localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
-          setShowSportFormModal(false);
-          setToastText("✅ Sport added successfully!");
-          setToastVisible(true);
-          setTimeout(() => setToastVisible(false), 3000);
-          return;
-        }
-      } catch (error) {
-        console.error("API create sport failed, using local add:", error);
-      }
-    }
-
-    const newSport = { ...payload, id: `sport-${Date.now()}`, image: sportIcon, registered: 0 };
-    const updatedSports = [newSport, ...sports];
-    setSports(updatedSports);
-    localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
-    setShowSportFormModal(false);
-    setToastText("✅ Sport added successfully!");
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 3000);
   };
 
   const scrollToTop = (event) => {
@@ -579,6 +843,27 @@ function Sports() {
   while (calendarDays.length % 7 !== 0) {
     calendarDays.push(null);
   }
+
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const filteredSports = sports.filter((sport) => {
+    if (!normalizedSearch) return true;
+
+    const status = getRegistrationStatus(sport).status.toLowerCase();
+    const searchableText = [
+      sport.name,
+      sport.category,
+      sport.description,
+      sport.venue,
+      sport.coach,
+      sport.eligibility,
+      status,
+      Array.isArray(sport.skillLevels) ? sport.skillLevels.join(" ") : "",
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(normalizedSearch);
+  });
 
   return (
     <>
@@ -697,11 +982,38 @@ function Sports() {
           </div>
           {isAdmin && (
             <div className="sports__headerActions">
-              <button className="sports__addBtn" onClick={handleAddSport}>
+              <button type="button" className="sports__addBtn" onClick={openAddSportModal}>
                 + Add Sport
               </button>
             </div>
           )}
+        </div>
+
+        <div className="sports__searchWrap container">
+          <div className="sports__searchBar" role="search">
+            <span className="sports__searchIcon" aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              className="sports__searchInput"
+              placeholder="Search by sport, venue, coach, category, status..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              aria-label="Search sports"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="sports__searchClear"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p className="sports__searchMeta">
+            Showing {filteredSports.length} of {sports.length} sports programs
+          </p>
         </div>
 
         {error && (
@@ -727,9 +1039,9 @@ function Sports() {
             <div className="loading__spinner"></div>
             <p className="loading__text">Loading sports programs...</p>
           </div>
-        ) : (
+        ) : filteredSports.length > 0 ? (
           <div className="sports__grid container">
-            {sports.map((sport) => {
+            {filteredSports.map((sport) => {
             const statusInfo = getRegistrationStatus(sport);
             const filledPercentage = (sport.registered / sport.maxCapacity) * 100;
 
@@ -851,53 +1163,258 @@ function Sports() {
             );
           })}
         </div>
+        ) : (
+          <div className="sports__empty container">
+            <p className="sports__emptyTitle">No sports matched your search</p>
+            <p className="sports__emptyText">Try a different keyword like "tournament", "open", or a venue name.</p>
+          </div>
         )}
       </main>
 
       {/* Add/Edit Sport Modal */}
       {showSportFormModal && (
-        <div className="modal__overlay" onClick={() => setShowSportFormModal(false)}>
+        <div className="modal__overlay" onClick={closeSportFormModal}>
           <div className="sportsForm__content" onClick={(e) => e.stopPropagation()}>
             <div className="sportsForm__header">
               <h2>{editingSport ? "Update Sport" : "Add New Sport"}</h2>
-              <button className="sportsForm__close" onClick={() => setShowSportFormModal(false)} aria-label="Close modal">×</button>
+              <button className="sportsForm__close" onClick={closeSportFormModal} aria-label="Close modal">×</button>
             </div>
 
             <form className="sportsForm" onSubmit={handleSportFormSubmit}>
-              <input name="name" value={sportFormData.name} onChange={handleSportFormChange} placeholder="Sport name" required />
-              <select name="category" value={sportFormData.category} onChange={handleSportFormChange}>
-                <option value="Tournament">Tournament</option>
-                <option value="Team Selection">Team Selection</option>
-              </select>
-              <textarea name="description" value={sportFormData.description} onChange={handleSportFormChange} placeholder="Description" required />
+              <div className="sportsForm__field">
+                <label className="sportsForm__label">Sport Image *</label>
+                <input
+                  ref={sportImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSportImageChange}
+                />
+                {sportImagePreview && (
+                  <img src={sportImagePreview} alt="Sport preview" className="sportsForm__previewImage" />
+                )}
+              </div>
 
-              <div className="sportsForm__row">
-                <input type="date" name="registrationOpen" value={sportFormData.registrationOpen} onChange={handleSportFormChange} required />
-                <input type="date" name="registrationClose" value={sportFormData.registrationClose} onChange={handleSportFormChange} required />
+              <div className="sportsForm__field">
+                <input 
+                  ref={(el) => (sportFieldRefs.current.name = el)}
+                  name="name" 
+                  value={sportFormData.name} 
+                  onChange={handleSportFormChange} 
+                  onBlur={handleSportFormBlur}
+                  placeholder="Sport name" 
+                  className={shouldShowSportError("name") ? "sportsForm__input--error" : ""}
+                  required 
+                />
+                {shouldShowSportError("name") && (
+                  <span className="sportsForm__error">{sportFormErrors.name}</span>
+                )}
+              </div>
+
+              <div className="sportsForm__field">
+                <select 
+                  ref={(el) => (sportFieldRefs.current.category = el)}
+                  name="category" 
+                  value={sportFormData.category} 
+                  onChange={handleSportFormChange}
+                  onBlur={handleSportFormBlur}
+                  className={shouldShowSportError("category") ? "sportsForm__input--error" : ""}
+                >
+                  <option value="Tournament">Tournament</option>
+                  <option value="Team Selection">Team Selection</option>
+                </select>
+                {shouldShowSportError("category") && (
+                  <span className="sportsForm__error">{sportFormErrors.category}</span>
+                )}
+              </div>
+
+              <div className="sportsForm__field">
+                <textarea 
+                  ref={(el) => (sportFieldRefs.current.description = el)}
+                  name="description" 
+                  value={sportFormData.description} 
+                  onChange={handleSportFormChange}
+                  onBlur={handleSportFormBlur}
+                  placeholder="Description" 
+                  className={shouldShowSportError("description") ? "sportsForm__input--error" : ""}
+                  required 
+                />
+                {shouldShowSportError("description") && (
+                  <span className="sportsForm__error">{sportFormErrors.description}</span>
+                )}
               </div>
 
               <div className="sportsForm__row">
-                <input name="venue" value={sportFormData.venue} onChange={handleSportFormChange} placeholder="Venue" required />
-                <input name="coach" value={sportFormData.coach} onChange={handleSportFormChange} placeholder="Coach" required />
+                <div className="sportsForm__field">
+                  <label className="sportsForm__label">Registration Open Date *</label>
+                  <input 
+                    ref={(el) => (sportFieldRefs.current.registrationOpen = el)}
+                    type="date" 
+                    name="registrationOpen" 
+                    value={sportFormData.registrationOpen} 
+                    onChange={handleSportFormChange}
+                    onBlur={handleSportFormBlur}
+                    placeholder="mm/dd/yyyy"
+                    min={getTodayDate()}
+                    className={shouldShowSportError("registrationOpen") ? "sportsForm__input--error" : ""}
+                    required 
+                  />
+                  {shouldShowSportError("registrationOpen") && (
+                    <span className="sportsForm__error">{sportFormErrors.registrationOpen}</span>
+                  )}
+                </div>
+                <div className="sportsForm__field">
+                  <label className="sportsForm__label">Registration Close Date *</label>
+                  <input 
+                    ref={(el) => (sportFieldRefs.current.registrationClose = el)}
+                    type="date" 
+                    name="registrationClose" 
+                    value={sportFormData.registrationClose} 
+                    onChange={handleSportFormChange}
+                    onBlur={handleSportFormBlur}
+                    placeholder="mm/dd/yyyy"
+                    min={sportFormData.registrationOpen || getTodayDate()}
+                    className={shouldShowSportError("registrationClose") ? "sportsForm__input--error" : ""}
+                    required 
+                  />
+                  {shouldShowSportError("registrationClose") && (
+                    <span className="sportsForm__error">{sportFormErrors.registrationClose}</span>
+                  )}
+                </div>
               </div>
 
               <div className="sportsForm__row">
-                <input type="number" min="1" name="maxCapacity" value={sportFormData.maxCapacity} onChange={handleSportFormChange} placeholder="Max capacity" required />
-                <input name="registrationLink" value={sportFormData.registrationLink} onChange={handleSportFormChange} placeholder="Registration link" />
+                <div className="sportsForm__field">
+                  <input 
+                    ref={(el) => (sportFieldRefs.current.venue = el)}
+                    name="venue" 
+                    value={sportFormData.venue} 
+                    onChange={handleSportFormChange}
+                    onBlur={handleSportFormBlur}
+                    placeholder="Venue" 
+                    className={shouldShowSportError("venue") ? "sportsForm__input--error" : ""}
+                    required 
+                  />
+                  {shouldShowSportError("venue") && (
+                    <span className="sportsForm__error">{sportFormErrors.venue}</span>
+                  )}
+                </div>
+                <div className="sportsForm__field">
+                  <input 
+                    ref={(el) => (sportFieldRefs.current.coach = el)}
+                    name="coach" 
+                    value={sportFormData.coach} 
+                    onChange={handleSportFormChange}
+                    onBlur={handleSportFormBlur}
+                    placeholder="Coach" 
+                    className={shouldShowSportError("coach") ? "sportsForm__input--error" : ""}
+                    required 
+                  />
+                  {shouldShowSportError("coach") && (
+                    <span className="sportsForm__error">{sportFormErrors.coach}</span>
+                  )}
+                </div>
               </div>
 
-              <input name="eligibility" value={sportFormData.eligibility} onChange={handleSportFormChange} placeholder="Eligibility" />
-              <input name="selectionCriteria" value={sportFormData.selectionCriteria} onChange={handleSportFormChange} placeholder="Selection criteria" />
-              <input name="skillLevelsText" value={sportFormData.skillLevelsText} onChange={handleSportFormChange} placeholder="Skill levels (comma separated)" />
+              <div className="sportsForm__row">
+                <div className="sportsForm__field">
+                  <input 
+                    ref={(el) => (sportFieldRefs.current.maxCapacity = el)}
+                    type="number" 
+                    min="1" 
+                    name="maxCapacity" 
+                    value={sportFormData.maxCapacity} 
+                    onChange={handleSportFormChange}
+                    onBlur={handleSportFormBlur}
+                    placeholder="Max capacity" 
+                    className={shouldShowSportError("maxCapacity") ? "sportsForm__input--error" : ""}
+                    required 
+                  />
+                  {shouldShowSportError("maxCapacity") && (
+                    <span className="sportsForm__error">{sportFormErrors.maxCapacity}</span>
+                  )}
+                </div>
+                <div className="sportsForm__field">
+                  <input 
+                    ref={(el) => (sportFieldRefs.current.registrationLink = el)}
+                    name="registrationLink" 
+                    value={sportFormData.registrationLink} 
+                    onChange={handleSportFormChange}
+                    onBlur={handleSportFormBlur}
+                    placeholder="Registration link" 
+                    className={shouldShowSportError("registrationLink") ? "sportsForm__input--error" : ""}
+                  />
+                  {shouldShowSportError("registrationLink") && (
+                    <span className="sportsForm__error">{sportFormErrors.registrationLink}</span>
+                  )}
+                </div>
+              </div>
+
+              <div className="sportsForm__field">
+                <input 
+                  ref={(el) => (sportFieldRefs.current.eligibility = el)}
+                  name="eligibility" 
+                  value={sportFormData.eligibility} 
+                  onChange={handleSportFormChange}
+                  onBlur={handleSportFormBlur}
+                  placeholder="Eligibility" 
+                  className={shouldShowSportError("eligibility") ? "sportsForm__input--error" : ""}
+                />
+                {shouldShowSportError("eligibility") && (
+                  <span className="sportsForm__error">{sportFormErrors.eligibility}</span>
+                )}
+              </div>
+
+              <div className="sportsForm__field">
+                <input 
+                  ref={(el) => (sportFieldRefs.current.selectionCriteria = el)}
+                  name="selectionCriteria" 
+                  value={sportFormData.selectionCriteria} 
+                  onChange={handleSportFormChange}
+                  onBlur={handleSportFormBlur}
+                  placeholder="Selection criteria" 
+                  className={shouldShowSportError("selectionCriteria") ? "sportsForm__input--error" : ""}
+                />
+                {shouldShowSportError("selectionCriteria") && (
+                  <span className="sportsForm__error">{sportFormErrors.selectionCriteria}</span>
+                )}
+              </div>
+
+              <div className="sportsForm__field">
+                <input 
+                  ref={(el) => (sportFieldRefs.current.skillLevelsText = el)}
+                  name="skillLevelsText" 
+                  value={sportFormData.skillLevelsText} 
+                  onChange={handleSportFormChange}
+                  onBlur={handleSportFormBlur}
+                  placeholder="Skill levels (comma separated)" 
+                  className={shouldShowSportError("skillLevelsText") ? "sportsForm__input--error" : ""}
+                />
+                {shouldShowSportError("skillLevelsText") && (
+                  <span className="sportsForm__error">{sportFormErrors.skillLevelsText}</span>
+                )}
+              </div>
 
               <label className="sportsForm__checkbox">
-                <input type="checkbox" name="requiresMedical" checked={sportFormData.requiresMedical} onChange={handleSportFormChange} />
+                <input 
+                  type="checkbox" 
+                  name="requiresMedical" 
+                  checked={sportFormData.requiresMedical} 
+                  onChange={handleSportFormChange} 
+                />
                 Medical certificate required
               </label>
 
               <div className="sportsForm__actions">
-                <button type="button" className="sports__btn sports__btn--secondary" onClick={() => setShowSportFormModal(false)}>Cancel</button>
-                <button type="submit" className="sports__btn sports__btn--primary">{editingSport ? "Update Sport" : "Add Sport"}</button>
+                <button type="button" className="sports__btn sports__btn--secondary" onClick={closeSportFormModal}>Cancel</button>
+                <button type="submit" className="sports__btn sports__btn--primary" disabled={isSubmittingSport}>
+                  {isSubmittingSport
+                    ? editingSport
+                      ? "Updating..."
+                      : "Adding..."
+                    : editingSport
+                      ? "Update Sport"
+                      : "Add Sport"}
+                </button>
               </div>
             </form>
           </div>
@@ -1031,15 +1548,6 @@ function Sports() {
             </a>
             <a className="footer__contact" href="tel:+94117544801">
               📞 +94 11 754 0000
-          <div
-            className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
-            id="toast"
-            role="status"
-            aria-live="polite"
-            aria-atomic="true"
-          >
-            {toastText}
-          </div>
             </a>
             <a className="footer__feedback" href="https://support.sliit.lk">
               Provide Feedback to CampusZone
@@ -1105,6 +1613,16 @@ function Sports() {
           </div>
         </div>
       </footer>
+
+      <div
+        className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
+        id="toast"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {toastText}
+      </div>
     </>
   );
 }

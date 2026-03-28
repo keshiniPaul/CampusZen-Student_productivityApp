@@ -91,17 +91,17 @@ function Register() {
               Register as {role === "admin" ? "Admin" : "Student"} and get started with CampusZone.
             </p>
 
-            <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+            <div className="register__roleToggle">
               <button
                 type="button"
-                className="btn btn--ghost"
+                className={`btn btn--ghost register__roleBtn ${role === "student" ? "is-active" : ""}`.trim()}
                 onClick={() => setRole("student")}
               >
                 Student Register
               </button>
               <button
                 type="button"
-                className="btn btn--ghost"
+                className={`btn btn--ghost register__roleBtn ${role === "admin" ? "is-active" : ""}`.trim()}
                 onClick={() => setRole("admin")}
               >
                 Admin Register

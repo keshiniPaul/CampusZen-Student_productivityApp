@@ -185,12 +185,19 @@ function Clubs() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
+  const [isSubmittingClub, setIsSubmittingClub] = useState(false);
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
   const clubFieldRefs = useRef({});
+  const clubImageInputRef = useRef(null);
+  const hasFetchedClubsRef = useRef(false);
+  const [clubImagePreview, setClubImagePreview] = useState("");
+
+  const getTodayDate = () => new Date().toISOString().split("T")[0];
 
   const validateClubField = (fieldName, value, allValues) => {
     const trimmed = typeof value === "string" ? value.trim() : value;
@@ -226,6 +233,7 @@ function Clubs() {
         if (!trimmed) return "Registration open date is required.";
         const openDate = new Date(`${trimmed}T00:00:00`);
         if (Number.isNaN(openDate.getTime())) return "Please provide a valid open date.";
+        if (trimmed < getTodayDate()) return "Registration open date cannot be in the past.";
         return "";
       }
       case "registrationClose": {
@@ -233,6 +241,7 @@ function Clubs() {
         const closeDate = new Date(`${trimmed}T00:00:00`);
         const openDate = new Date(`${allValues.registrationOpen}T00:00:00`);
         if (Number.isNaN(closeDate.getTime())) return "Please provide a valid close date.";
+        if (trimmed < getTodayDate()) return "Registration close date cannot be in the past.";
         if (!Number.isNaN(openDate.getTime()) && closeDate < openDate) {
           return "Close date must be the same as or after open date.";
         }
@@ -289,6 +298,11 @@ function Clubs() {
 
   // Fetch clubs data from API
   useEffect(() => {
+    if (hasFetchedClubsRef.current) {
+      return;
+    }
+    hasFetchedClubsRef.current = true;
+
     const fetchClubs = async () => {
       try {
         console.log('Fetching clubs from API...');
@@ -297,7 +311,10 @@ function Clubs() {
         if (response.success && response.data && response.data.length > 0) {
           const mappedClubs = response.data.map((club) => {
             // Find matching initial data for image fallback
-            const initialClub = initialClubsData.find(c => c.id === club._id || c.name === club.name);
+            const initialClub = initialClubsData.find((c) => c.id === club._id);
+            const hasUploadedImage =
+              typeof club.image === "string" &&
+              (club.image.startsWith("data:image/") || club.image.startsWith("http"));
             return {
               id: club._id,
               name: club.name,
@@ -314,7 +331,7 @@ function Clubs() {
               upcomingEvents: club.upcomingEvents,
               socialMedia: club.socialMedia,
               registrationLink: club.registrationLink,
-              image: club.image || (initialClub ? initialClub.image : clubImg),
+              image: hasUploadedImage ? club.image : (initialClub ? initialClub.image : clubImg),
             };
           });
           console.log('API clubs loaded:', mappedClubs.length);
@@ -476,11 +493,15 @@ function Clubs() {
       president: "",
       advisor: "",
       maxMembers: 100,
-      registrationLink: "#",
+      registrationLink: "https://forms.google.com",
     });
     setClubFormErrors({});
     setClubFormTouched({});
     setClubSubmitAttempted(false);
+    setClubImagePreview("");
+    if (clubImageInputRef.current) {
+      clubImageInputRef.current.value = "";
+    }
     setShowClubFormModal(true);
   };
 
@@ -507,7 +528,32 @@ function Clubs() {
     setClubFormErrors({});
     setClubFormTouched({});
     setClubSubmitAttempted(false);
+    setClubImagePreview(club.image || "");
+    if (clubImageInputRef.current) {
+      clubImageInputRef.current.value = "";
+    }
     setShowClubFormModal(true);
+  };
+
+  const handleClubImageChange = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      alert("Please select a valid image file.");
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image size must be less than 5MB.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setClubImagePreview(reader.result ? String(reader.result) : "");
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleDeleteClub = async (clubId) => {
@@ -564,6 +610,15 @@ function Clubs() {
 
   const handleClubFormSubmit = async (e) => {
     e.preventDefault();
+
+    if (isSubmittingClub) {
+      return;
+    }
+
+    if (!editingClub && !clubImagePreview) {
+      alert("Please upload an image for the club/society.");
+      return;
+    }
 
     const nextErrors = validateClubForm(clubFormData);
     setClubFormErrors(nextErrors);
@@ -622,81 +677,88 @@ function Clubs() {
       registrationLink: clubFormData.registrationLink || "#",
       upcomingEvents: [],
       socialMedia: {},
+      image: clubImagePreview || editingClub?.image || "",
     };
 
-    if (editingClub) {
-      if (authToken) {
-        try {
-          await clubsAPI.updateClub(editingClub.id, payload, authToken);
-        } catch (error) {
-          console.error("API update club failed, using local update:", error);
-        }
-      }
+    setIsSubmittingClub(true);
 
-      setClubs((prev) => prev.map((item) => (item.id === editingClub.id ? { ...item, ...payload } : item)));
+    try {
+      if (editingClub) {
+        if (authToken) {
+          try {
+            await clubsAPI.updateClub(editingClub.id, payload, authToken);
+          } catch (error) {
+            console.error("API update club failed, using local update:", error);
+          }
+        }
+
+        setClubs((prev) => prev.map((item) => (item.id === editingClub.id ? { ...item, ...payload } : item)));
         const updatedClubs = clubs.map((item) => (item.id === editingClub.id ? { ...item, ...payload, currentMembers: item.currentMembers } : item));
         setClubs(updatedClubs);
         localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
-      setShowClubFormModal(false);
-      setEditingClub(null);
+        setShowClubFormModal(false);
+        setEditingClub(null);
         setClubFormErrors({});
         setClubFormTouched({});
         setClubSubmitAttempted(false);
-          setToastText("✅ Club updated successfully!");
-          setToastVisible(true);
-          setTimeout(() => setToastVisible(false), 3000);
-      return;
-    }
-
-    if (authToken) {
-      try {
-        const response = await clubsAPI.createClub(payload, authToken);
-        const created = response?.data;
-        if (created) {
-          setClubs((prev) => [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || clubImg,
-              currentMembers: created.currentMembers || 0,
-            },
-            ...prev,
-          ]);
-          const updatedClubs = [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || clubImg,
-              currentMembers: created.currentMembers || 0,
-            },
-            ...clubs,
-          ];
-          localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
-          setShowClubFormModal(false);
-          setClubFormErrors({});
-          setClubFormTouched({});
-          setClubSubmitAttempted(false);
-          setToastText("✅ Club added successfully!");
-          setToastVisible(true);
-          setTimeout(() => setToastVisible(false), 3000);
-          return;
-        }
-      } catch (error) {
-        console.error("API create club failed, using local add:", error);
+        setToastText("✅ Club updated successfully!");
+        setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 3000);
+        return;
       }
-    }
 
-    const newClub = { ...payload, id: `club-${Date.now()}`, image: clubImg, currentMembers: 0 };
-    const updatedClubs = [newClub, ...clubs];
-    setClubs(updatedClubs);
-    localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
-    setShowClubFormModal(false);
-    setClubFormErrors({});
-    setClubFormTouched({});
-    setClubSubmitAttempted(false);
-    setToastText("✅ Club added successfully!");
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 3000);
+      if (authToken) {
+        try {
+          const response = await clubsAPI.createClub(payload, authToken);
+          const created = response?.data;
+          if (created) {
+            setClubs((prev) => [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || clubImg,
+                currentMembers: created.currentMembers || 0,
+              },
+              ...prev,
+            ]);
+            const updatedClubs = [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || clubImg,
+                currentMembers: created.currentMembers || 0,
+              },
+              ...clubs,
+            ];
+            localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+            setShowClubFormModal(false);
+            setClubFormErrors({});
+            setClubFormTouched({});
+            setClubSubmitAttempted(false);
+            setToastText("✅ Club added successfully!");
+            setToastVisible(true);
+            setTimeout(() => setToastVisible(false), 3000);
+            return;
+          }
+        } catch (error) {
+          console.error("API create club failed, using local add:", error);
+        }
+      }
+
+      const newClub = { ...payload, id: `club-${Date.now()}`, image: payload.image || clubImg, currentMembers: 0 };
+      const updatedClubs = [newClub, ...clubs];
+      setClubs(updatedClubs);
+      localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+      setShowClubFormModal(false);
+      setClubFormErrors({});
+      setClubFormTouched({});
+      setClubSubmitAttempted(false);
+      setToastText("✅ Club added successfully!");
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+    } finally {
+      setIsSubmittingClub(false);
+    }
   };
 
   const scrollToTop = (event) => {
@@ -733,6 +795,28 @@ function Clubs() {
   while (calendarDays.length % 7 !== 0) {
     calendarDays.push(null);
   }
+
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const filteredClubs = clubs.filter((club) => {
+    if (!normalizedSearch) return true;
+
+    const status = getRegistrationStatus(club).status.toLowerCase();
+    const searchableText = [
+      club.name,
+      club.category,
+      club.description,
+      club.vision,
+      club.mission,
+      club.president,
+      club.advisor,
+      status,
+      Array.isArray(club.upcomingEvents) ? club.upcomingEvents.join(" ") : "",
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(normalizedSearch);
+  });
 
   return (
     <>
@@ -854,6 +938,33 @@ function Clubs() {
           )}
         </div>
 
+        <div className="clubs__searchWrap container">
+          <div className="clubs__searchBar" role="search">
+            <span className="clubs__searchIcon" aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              className="clubs__searchInput"
+              placeholder="Search by club, category, mission, advisors, status..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              aria-label="Search clubs and societies"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="clubs__searchClear"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p className="clubs__searchMeta">
+            Showing {filteredClubs.length} of {clubs.length} clubs and societies
+          </p>
+        </div>
+
         {error && (
           <div className="clubs__alertBanner container">
             <div className="alert alert--warning">
@@ -877,9 +988,9 @@ function Clubs() {
             <div className="loading__spinner"></div>
             <p className="loading__text">Loading clubs & societies...</p>
           </div>
-        ) : (
+        ) : filteredClubs.length > 0 ? (
           <div className="clubs__grid container">
-            {clubs.map((club) => {
+            {filteredClubs.map((club) => {
               const statusInfo = getRegistrationStatus(club);
               const filledPercentage = (club.currentMembers / club.maxMembers) * 100;
 
@@ -1003,6 +1114,11 @@ function Clubs() {
               );
             })}
           </div>
+        ) : (
+          <div className="clubs__empty container">
+            <p className="clubs__emptyTitle">No clubs matched your search</p>
+            <p className="clubs__emptyText">Try a different keyword like "technical", "open", or a club name.</p>
+          </div>
         )}
       </main>
 
@@ -1026,6 +1142,19 @@ function Clubs() {
             </div>
 
             <form className="clubsForm" onSubmit={handleClubFormSubmit}>
+              <div className="clubsForm__field">
+                <label className="clubsForm__label">Club/Society Image *</label>
+                <input
+                  ref={clubImageInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleClubImageChange}
+                />
+                {clubImagePreview && (
+                  <img src={clubImagePreview} alt="Club preview" className="clubsForm__previewImage" />
+                )}
+              </div>
+
               <input
                 name="name"
                 value={clubFormData.name}
@@ -1102,13 +1231,16 @@ function Clubs() {
               {shouldShowClubError("mission") && <p className="clubsForm__error">{clubFormErrors.mission}</p>}
 
               <div className="clubsForm__row">
-                <div>
+                <div className="clubsForm__field">
+                  <label className="clubsForm__label">Registration Open Date *</label>
                   <input
                     type="date"
                     name="registrationOpen"
                     value={clubFormData.registrationOpen}
                     onChange={handleClubFormChange}
                     onBlur={handleClubFormBlur}
+                    placeholder="mm/dd/yyyy"
+                    min={getTodayDate()}
                     className={shouldShowClubError("registrationOpen") ? "clubsForm__input--error" : ""}
                     ref={(element) => {
                       clubFieldRefs.current.registrationOpen = element;
@@ -1117,13 +1249,16 @@ function Clubs() {
                   />
                   {shouldShowClubError("registrationOpen") && <p className="clubsForm__error">{clubFormErrors.registrationOpen}</p>}
                 </div>
-                <div>
+                <div className="clubsForm__field">
+                  <label className="clubsForm__label">Registration Close Date *</label>
                   <input
                     type="date"
                     name="registrationClose"
                     value={clubFormData.registrationClose}
                     onChange={handleClubFormChange}
                     onBlur={handleClubFormBlur}
+                    placeholder="mm/dd/yyyy"
+                    min={clubFormData.registrationOpen || getTodayDate()}
                     className={shouldShowClubError("registrationClose") ? "clubsForm__input--error" : ""}
                     ref={(element) => {
                       clubFieldRefs.current.registrationClose = element;
@@ -1208,7 +1343,15 @@ function Clubs() {
                   setClubFormTouched({});
                   setClubSubmitAttempted(false);
                 }}>Cancel</button>
-                <button type="submit" className="clubs__btn clubs__btn--primary">{editingClub ? "Update Club" : "Add Club"}</button>
+                <button type="submit" className="clubs__btn clubs__btn--primary" disabled={isSubmittingClub}>
+                  {isSubmittingClub
+                    ? editingClub
+                      ? "Updating..."
+                      : "Adding..."
+                    : editingClub
+                      ? "Update Club"
+                      : "Add Club"}
+                </button>
               </div>
             </form>
           </div>

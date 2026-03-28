@@ -334,25 +334,6 @@ function ActivityDetails() {
     return Boolean((touched[fieldName] || submitAttempted) && errors[fieldName]);
   };
 
-  const handleOpenModal = () => {
-    if (successTimerRef.current) {
-      window.clearTimeout(successTimerRef.current);
-    }
-    setShowModalSuccess(false);
-    setSubmitAttempted(false);
-    setTouched({});
-    setErrors({});
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      date: "",
-      venue: "",
-      image: "",
-    });
-    setIsModalOpen(true);
-  };
-
   const handleCloseModal = () => {
     if (successTimerRef.current) {
       window.clearTimeout(successTimerRef.current);
@@ -638,10 +619,6 @@ function ActivityDetails() {
                     For more details about this activity, please check the information on the left or contact the organizers.
                   </p>
                 </div>
-
-                <button type="button" className="activityDetails__addBtn" onClick={handleOpenModal}>
-                  + Add New Event
-                </button>
               </div>
             </aside>
           </div>

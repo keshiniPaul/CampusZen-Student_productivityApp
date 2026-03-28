@@ -33,6 +33,24 @@
   font-size: 14px;
 }
 
+.login__roleToggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.login__roleBtn {
+  flex: 1;
+  border: 1px solid rgba(2, 30, 55, 0.08);
+  transition: all 0.2s ease;
+}
+
+.login__roleBtn.is-active {
+  background: #8fd9ff;
+  border-color: #69c9fb;
+  color: #05314d;
+}
+
 .login__form {
   margin-top: 24px;
   display: flex;

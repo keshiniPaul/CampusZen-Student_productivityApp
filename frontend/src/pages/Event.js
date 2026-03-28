@@ -86,6 +86,8 @@ function Event() {
   const [formErrors, setFormErrors] = useState({});
   const [formTouched, setFormTouched] = useState({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedImageName, setSelectedImageName] = useState("");
   const [formData, setFormData] = useState({
     title: "",
     shortDescription: "",
@@ -100,19 +102,6 @@ function Event() {
   const fieldRefs = useRef({});
     const [toastText, setToastText] = useState("");
     const [toastVisible, setToastVisible] = useState(false);
-
-  const imageMap = {
-    viramaya: wiramaya1Image,
-    ganthers: ganthersImage,
-    lantharuma: lantharumaImage,
-    openday: opendayImage,
-    careerday: careerdayImage,
-    convacation: convacationImage,
-  };
-
-  const getImageKeyFromValue = (imageValue) => {
-    return Object.keys(imageMap).find((key) => imageMap[key] === imageValue) || "";
-  };
 
   const validateField = (fieldName, value) => {
     const trimmedValue = typeof value === "string" ? value.trim() : value;
@@ -216,6 +205,7 @@ function Event() {
     setFormErrors({});
     setFormTouched({});
     setSubmitAttempted(false);
+    setSelectedImageName("");
     setShowModal(true);
   };
 
@@ -236,6 +226,7 @@ function Event() {
     setFormErrors({});
     setFormTouched({});
     setSubmitAttempted(false);
+    setSelectedImageName("");
     setShowModal(true);
   };
 
@@ -348,23 +339,47 @@ function Event() {
     }));
   };
 
-  const handleImageChange = (imageName) => {
+  const handleImageUpload = (e) => {
+    const file = e.target.files?.[0];
     setFormTouched((prev) => ({ ...prev, image: true }));
-    setFormData((prev) => {
-      const nextValues = {
-        ...prev,
-        image: imageMap[imageName] || "",
-      };
 
-      if (formTouched.image || submitAttempted) {
-        setFormErrors((prevErrors) => ({
-          ...prevErrors,
-          image: validateField("image", nextValues.image),
-        }));
-      }
+    if (!file) {
+      setSelectedImageName("");
+      setFormData((prev) => ({ ...prev, image: "" }));
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        image: validateField("image", ""),
+      }));
+      return;
+    }
 
-      return nextValues;
-    });
+    if (!file.type.startsWith("image/")) {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        image: "Please upload a valid image file.",
+      }));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const encodedImage = typeof reader.result === "string" ? reader.result : "";
+      setSelectedImageName(file.name);
+      setFormData((prev) => ({ ...prev, image: encodedImage }));
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        image: validateField("image", encodedImage),
+      }));
+    };
+
+    reader.onerror = () => {
+      setFormErrors((prevErrors) => ({
+        ...prevErrors,
+        image: "Unable to read this image. Please try another file.",
+      }));
+    };
+
+    reader.readAsDataURL(file);
   };
 
   const scrollToTop = (event) => {
@@ -401,6 +416,23 @@ function Event() {
   while (calendarDays.length % 7 !== 0) {
     calendarDays.push(null);
   }
+
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const filteredEvents = events.filter((event) => {
+    if (!normalizedSearch) return true;
+
+    const searchableText = [
+      event.title,
+      event.shortDescription,
+      event.category,
+      event.venue,
+      event.date,
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(normalizedSearch);
+  });
 
 
   return (
@@ -506,8 +538,36 @@ function Event() {
           </div>
         </div>
 
-        <div className="event__grid container">
-          {events.map((event) => (
+        <div className="event__searchWrap container">
+          <div className="event__searchBar" role="search">
+            <span className="event__searchIcon" aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              className="event__searchInput"
+              placeholder="Search events by title, category, venue, date..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              aria-label="Search events"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="event__searchClear"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p className="event__searchMeta">
+            Showing {filteredEvents.length} of {events.length} events
+          </p>
+        </div>
+
+        {filteredEvents.length > 0 ? (
+          <div className="event__grid container">
+            {filteredEvents.map((event) => (
             <article key={event.id} className="event__card">
               {isAdmin && (
                 <div className="event__adminActions">
@@ -571,8 +631,14 @@ function Event() {
                 </Link>
               </div>
             </article>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="event__empty container">
+            <p className="event__emptyTitle">No events matched your search</p>
+            <p className="event__emptyText">Try keywords like "career", "community", or a venue name.</p>
+          </div>
+        )}
       </main>
 
       {/* Add/Edit Event Modal */}
@@ -703,25 +769,27 @@ function Event() {
               </div>
 
               <div className="form__group">
-                <label className="form__label">Event Image</label>
-                <div
-                  className={`form__imageSelect ${shouldShowError("image") ? "form__imageSelect--error" : ""}`.trim()}
+                <label htmlFor="image" className="form__label">Event Image *</label>
+                <input
+                  type="file"
+                  id="image"
+                  name="image"
+                  accept="image/*"
+                  className={`form__input form__fileInput ${shouldShowError("image") ? "form__input--error" : ""}`.trim()}
+                  onChange={handleImageUpload}
+                  onBlur={handleFieldBlur}
                   ref={(element) => {
                     fieldRefs.current.image = element;
                   }}
-                  tabIndex={-1}
-                >
-                  {["viramaya", "ganthers", "lantharuma", "openday", "careerday", "convacation"].map((img) => (
-                    <button
-                      key={img}
-                      type="button"
-                      className={`form__imageOption ${getImageKeyFromValue(formData.image) === img ? "is-active" : ""}`.trim()}
-                      onClick={() => handleImageChange(img)}
-                    >
-                      {img}
-                    </button>
-                  ))}
-                </div>
+                />
+                {formData.image && (
+                  <div className="form__imagePreviewWrap">
+                    <img src={formData.image} alt="Event preview" className="form__imagePreview" />
+                    <p className="form__imagePreviewText">
+                      {selectedImageName || "Current image selected"}
+                    </p>
+                  </div>
+                )}
                 {shouldShowError("image") && <p className="form__error">{formErrors.image}</p>}
               </div>
 

@@ -95,17 +95,17 @@ function Login() {
               Login as {role === "admin" ? "Admin" : "Student"} to continue to CampusZone.
             </p>
 
-            <div style={{ display: "flex", gap: "8px", marginBottom: "12px" }}>
+            <div className="login__roleToggle">
               <button
                 type="button"
-                className="btn btn--ghost"
+                className={`btn btn--ghost login__roleBtn ${role === "student" ? "is-active" : ""}`.trim()}
                 onClick={() => setRole("student")}
               >
                 Student Login
               </button>
               <button
                 type="button"
-                className="btn btn--ghost"
+                className={`btn btn--ghost login__roleBtn ${role === "admin" ? "is-active" : ""}`.trim()}
                 onClick={() => setRole("admin")}
               >
                 Admin Login

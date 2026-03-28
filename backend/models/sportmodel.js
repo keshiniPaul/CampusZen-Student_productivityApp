@@ -70,6 +70,11 @@ const sportSchema = new mongoose.Schema(
       required: [true, "Registration link is required"],
       trim: true,
     },
+    image: {
+      type: String,
+      default: "",
+      trim: true,
+    },
     isActive: {
       type: Boolean,
       default: true,

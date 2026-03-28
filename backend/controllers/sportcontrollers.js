@@ -84,13 +84,24 @@ const createSport = async (req, res) => {
       requiresMedical,
       skillLevels,
       registrationLink,
+      image,
     } = req.body;
-    
+
     // Validate required fields
     if (!name || !description || !registrationOpen || !registrationClose || !venue || !coach || !maxCapacity) {
+      const missingFields = [];
+      if (!name) missingFields.push("name");
+      if (!description) missingFields.push("description");
+      if (!registrationOpen) missingFields.push("registrationOpen");
+      if (!registrationClose) missingFields.push("registrationClose");
+      if (!venue) missingFields.push("venue");
+      if (!coach) missingFields.push("coach");
+      if (!maxCapacity) missingFields.push("maxCapacity");
+
+      console.error("Missing required fields:", missingFields);
       return res.status(400).json({
         success: false,
-        message: "Please provide all required fields",
+        message: `Please provide all required fields: ${missingFields.join(", ")}`,
       });
     }
     
@@ -101,7 +112,7 @@ const createSport = async (req, res) => {
         message: "Registration close date must be after open date",
       });
     }
-    
+
     const sport = await Sport.create({
       name,
       category,
@@ -114,13 +125,21 @@ const createSport = async (req, res) => {
       eligibility,
       selectionCriteria,
       requiresMedical,
-      skillLevels,
+      skillLevels: skillLevels && skillLevels.length > 0 ? skillLevels : ["Beginner", "Intermediate", "Advanced"],
       registrationLink,
+      image,
       createdBy: req.user?.id,
     });
+
+    console.log("Sport created successfully:", sport._id);
     
-    // Create notification for sport opening
-    await createSportNotification(sport, "CREATED");
+    // Create notification for sport opening (don't fail if this fails)
+    try {
+      await createSportNotification(sport, "CREATED");
+    } catch (notificationError) {
+      console.error("Error creating notification:", notificationError);
+      // Don't throw - notification failure shouldn't prevent sport creation
+    }
     
     res.status(201).json({
       success: true,
@@ -128,10 +147,20 @@ const createSport = async (req, res) => {
       data: sport,
     });
   } catch (error) {
+    console.error("Error creating sport:", error);
+    console.error("Error details:", {
+      message: error.message,
+      name: error.name,
+      errors: error.errors,
+    });
     res.status(500).json({
       success: false,
       message: "Error creating sport",
       error: error.message,
+      details: error.errors ? Object.keys(error.errors).map(key => ({
+        field: key,
+        message: error.errors[key].message
+      })) : null,
     });
   }
 };
@@ -164,6 +193,7 @@ const updateSport = async (req, res) => {
       "requiresMedical",
       "skillLevels",
       "registrationLink",
+      "image",
     ];
     
     allowedUpdates.forEach((field) => {

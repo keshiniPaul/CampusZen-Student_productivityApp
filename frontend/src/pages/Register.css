@@ -33,6 +33,24 @@
   font-size: 14px;
 }
 
+.register__roleToggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.register__roleBtn {
+  flex: 1;
+  border: 1px solid rgba(2, 30, 55, 0.08);
+  transition: all 0.2s ease;
+}
+
+.register__roleBtn.is-active {
+  background: #8fd9ff;
+  border-color: #69c9fb;
+  color: #05314d;
+}
+
 .register__form {
   margin-top: 24px;
   display: flex;
