@@ -185,6 +185,7 @@ function Clubs() {
   const [showNotifications, setShowNotifications] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
   const navLinksRef = useRef(null);
@@ -734,6 +735,28 @@ function Clubs() {
     calendarDays.push(null);
   }
 
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+  const filteredClubs = clubs.filter((club) => {
+    if (!normalizedSearch) return true;
+
+    const status = getRegistrationStatus(club).status.toLowerCase();
+    const searchableText = [
+      club.name,
+      club.category,
+      club.description,
+      club.vision,
+      club.mission,
+      club.president,
+      club.advisor,
+      status,
+      Array.isArray(club.upcomingEvents) ? club.upcomingEvents.join(" ") : "",
+    ]
+      .join(" ")
+      .toLowerCase();
+
+    return searchableText.includes(normalizedSearch);
+  });
+
   return (
     <>
       <header className="topbar" id="top">
@@ -854,6 +877,33 @@ function Clubs() {
           )}
         </div>
 
+        <div className="clubs__searchWrap container">
+          <div className="clubs__searchBar" role="search">
+            <span className="clubs__searchIcon" aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              className="clubs__searchInput"
+              placeholder="Search by club, category, mission, advisors, status..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              aria-label="Search clubs and societies"
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className="clubs__searchClear"
+                onClick={() => setSearchQuery("")}
+                aria-label="Clear search"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <p className="clubs__searchMeta">
+            Showing {filteredClubs.length} of {clubs.length} clubs and societies
+          </p>
+        </div>
+
         {error && (
           <div className="clubs__alertBanner container">
             <div className="alert alert--warning">
@@ -877,9 +927,9 @@ function Clubs() {
             <div className="loading__spinner"></div>
             <p className="loading__text">Loading clubs & societies...</p>
           </div>
-        ) : (
+        ) : filteredClubs.length > 0 ? (
           <div className="clubs__grid container">
-            {clubs.map((club) => {
+            {filteredClubs.map((club) => {
               const statusInfo = getRegistrationStatus(club);
               const filledPercentage = (club.currentMembers / club.maxMembers) * 100;
 
@@ -1002,6 +1052,11 @@ function Clubs() {
                 </article>
               );
             })}
+          </div>
+        ) : (
+          <div className="clubs__empty container">
+            <p className="clubs__emptyTitle">No clubs matched your search</p>
+            <p className="clubs__emptyText">Try a different keyword like "technical", "open", or a club name.</p>
           </div>
         )}
       </main>
