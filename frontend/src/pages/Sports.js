@@ -586,16 +586,35 @@ function Sports() {
 
     if (!window.confirm("Delete this sport?")) return;
 
-    if (authToken) {
-      try {
-        await sportsAPI.deleteSport(sportId, authToken);
-      } catch (error) {
-        console.error("API delete sport failed, using local delete:", error);
-      }
+    if (!authToken) {
+      setToastText("❌ Please login as admin to delete sports.");
+      setToastVisible(true);
+      setTimeout(() => navigate("/login"), 1500);
+      return;
     }
 
-    setSports((prev) => prev.filter((item) => item.id !== sportId));
-    alert("Sport deleted successfully.");
+    try {
+      await sportsAPI.deleteSport(sportId, authToken);
+      setSports((prev) => prev.filter((item) => item.id !== sportId));
+      setToastText("✅ Sport deleted successfully!");
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 2500);
+    } catch (error) {
+      console.error("API delete sport failed:", error);
+      const errorMessage = error?.message || "Failed to delete sport";
+
+      if (/token expired|not authorized|invalid token/i.test(errorMessage)) {
+        localStorage.removeItem("token");
+        setToastText("❌ Session expired. Please login again.");
+        setToastVisible(true);
+        setTimeout(() => navigate("/login"), 1500);
+        return;
+      }
+
+      setToastText(`❌ ${errorMessage}`);
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+    }
   };
 
   const handleSportFormChange = (e) => {
