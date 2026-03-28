@@ -334,25 +334,6 @@ function ActivityDetails() {
     return Boolean((touched[fieldName] || submitAttempted) && errors[fieldName]);
   };
 
-  const handleOpenModal = () => {
-    if (successTimerRef.current) {
-      window.clearTimeout(successTimerRef.current);
-    }
-    setShowModalSuccess(false);
-    setSubmitAttempted(false);
-    setTouched({});
-    setErrors({});
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      date: "",
-      venue: "",
-      image: "",
-    });
-    setIsModalOpen(true);
-  };
-
   const handleCloseModal = () => {
     if (successTimerRef.current) {
       window.clearTimeout(successTimerRef.current);
