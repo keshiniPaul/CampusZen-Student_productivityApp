@@ -87,23 +87,6 @@ const createSport = async (req, res) => {
       image,
     } = req.body;
 
-    console.log("Creating sport with data:", {
-      name,
-      category,
-      description,
-      registrationOpen,
-      registrationClose,
-      venue,
-      coach,
-      maxCapacity,
-      eligibility,
-      selectionCriteria,
-      requiresMedical,
-      skillLevels,
-      registrationLink,
-      image,
-    });
-    
     // Validate required fields
     if (!name || !description || !registrationOpen || !registrationClose || !venue || !coach || !maxCapacity) {
       const missingFields = [];

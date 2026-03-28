@@ -207,9 +207,11 @@ function Sports() {
   const profileRef = useRef(null);
   const sportImageInputRef = useRef(null);
   const sportFieldRefs = useRef({});
+  const hasFetchedSportsRef = useRef(false);
   const [sportImagePreview, setSportImagePreview] = useState("");
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
+  const [isSubmittingSport, setIsSubmittingSport] = useState(false);
 
   const getTodayDate = () => new Date().toISOString().split("T")[0];
 
@@ -222,6 +224,11 @@ function Sports() {
 
   // Fetch sports data from API
   useEffect(() => {
+    if (hasFetchedSportsRef.current) {
+      return;
+    }
+    hasFetchedSportsRef.current = true;
+
     const fetchSports = async () => {
       try {
         console.log('Fetching sports from API...');
@@ -625,6 +632,10 @@ function Sports() {
   const handleSportFormSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmittingSport) {
+      return;
+    }
+
     if (!editingSport && !sportImagePreview) {
       alert("Please upload an image for the sport.");
       return;
@@ -697,80 +708,86 @@ function Sports() {
       image: sportImagePreview || (editingSport?.image || ""),
     };
 
-    if (editingSport) {
+    setIsSubmittingSport(true);
+
+    try {
+      if (editingSport) {
+        if (authToken) {
+          try {
+            await sportsAPI.updateSport(editingSport.id, payload, authToken);
+          } catch (error) {
+            console.error("API update sport failed, using local update:", error);
+          }
+        }
+
+        setSports((prev) => prev.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels } : item)));
+        const updatedSports = sports.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels, registered: item.registered } : item));
+        setSports(updatedSports);
+        localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+        setShowSportFormModal(false);
+        resetSportForm();
+        setToastText("✅ Sport updated successfully!");
+        setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 3000);
+        return;
+      }
+
       if (authToken) {
         try {
-          await sportsAPI.updateSport(editingSport.id, payload, authToken);
+          const response = await sportsAPI.createSport(payload, authToken);
+          const created = response?.data;
+          if (created) {
+            setSports((prev) => [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || sportIcon,
+                registered: created.registered || 0,
+              },
+              ...prev,
+            ]);
+            const updatedSports = [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || sportIcon,
+                registered: created.registered || 0,
+              },
+              ...sports,
+            ];
+            localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+            setShowSportFormModal(false);
+            resetSportForm();
+            setToastText("✅ Sport added successfully!");
+            setToastVisible(true);
+            setTimeout(() => setToastVisible(false), 3000);
+            return;
+          }
         } catch (error) {
-          console.error("API update sport failed, using local update:", error);
+          console.error("API create sport failed, using local add:", error);
+          const errorMessage = error?.message || "Failed to add sport";
+          if (/token expired|not authorized|invalid token/i.test(errorMessage)) {
+            localStorage.removeItem("token");
+            setToastText("❌ Session expired. Please login again.");
+            setToastVisible(true);
+            setTimeout(() => navigate("/login"), 1500);
+            return;
+          }
         }
       }
 
-      setSports((prev) => prev.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels } : item)));
-      const updatedSports = sports.map((item) => (item.id === editingSport.id ? { ...item, ...payload, skillLevels, registered: item.registered } : item));
+      const newSport = { ...payload, id: `sport-${Date.now()}`, image: payload.image || sportIcon, registered: 0 };
+      const updatedSports = [newSport, ...sports];
       setSports(updatedSports);
       localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
       setShowSportFormModal(false);
       resetSportForm();
-      setToastText("✅ Sport updated successfully!");
+      setToastText("✅ Sport added successfully!");
       setToastVisible(true);
       setTimeout(() => setToastVisible(false), 3000);
-      return;
+    } finally {
+      setIsSubmittingSport(false);
     }
-
-    if (authToken) {
-      try {
-        const response = await sportsAPI.createSport(payload, authToken);
-        const created = response?.data;
-        if (created) {
-          setSports((prev) => [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || payload.image || sportIcon,
-              registered: created.registered || 0,
-            },
-            ...prev,
-          ]);
-          const updatedSports = [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || payload.image || sportIcon,
-              registered: created.registered || 0,
-            },
-            ...sports,
-          ];
-          localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
-          setShowSportFormModal(false);
-          resetSportForm();
-          setToastText("✅ Sport added successfully!");
-          setToastVisible(true);
-          setTimeout(() => setToastVisible(false), 3000);
-          return;
-        }
-      } catch (error) {
-        console.error("API create sport failed, using local add:", error);
-        const errorMessage = error?.message || "Failed to add sport";
-        if (/token expired|not authorized|invalid token/i.test(errorMessage)) {
-          localStorage.removeItem("token");
-          setToastText("❌ Session expired. Please login again.");
-          setToastVisible(true);
-          setTimeout(() => navigate("/login"), 1500);
-          return;
-        }
-      }
-    }
-
-    const newSport = { ...payload, id: `sport-${Date.now()}`, image: payload.image || sportIcon, registered: 0 };
-    const updatedSports = [newSport, ...sports];
-    setSports(updatedSports);
-    localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
-    setShowSportFormModal(false);
-    resetSportForm();
-    setToastText("✅ Sport added successfully!");
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 3000);
   };
 
   const scrollToTop = (event) => {
@@ -1370,7 +1387,15 @@ function Sports() {
 
               <div className="sportsForm__actions">
                 <button type="button" className="sports__btn sports__btn--secondary" onClick={closeSportFormModal}>Cancel</button>
-                <button type="submit" className="sports__btn sports__btn--primary">{editingSport ? "Update Sport" : "Add Sport"}</button>
+                <button type="submit" className="sports__btn sports__btn--primary" disabled={isSubmittingSport}>
+                  {isSubmittingSport
+                    ? editingSport
+                      ? "Updating..."
+                      : "Adding..."
+                    : editingSport
+                      ? "Update Sport"
+                      : "Add Sport"}
+                </button>
               </div>
             </form>
           </div>

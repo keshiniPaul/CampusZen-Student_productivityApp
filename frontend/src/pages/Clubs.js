@@ -188,11 +188,13 @@ function Clubs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
+  const [isSubmittingClub, setIsSubmittingClub] = useState(false);
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
   const clubFieldRefs = useRef({});
   const clubImageInputRef = useRef(null);
+  const hasFetchedClubsRef = useRef(false);
   const [clubImagePreview, setClubImagePreview] = useState("");
 
   const getTodayDate = () => new Date().toISOString().split("T")[0];
@@ -296,6 +298,11 @@ function Clubs() {
 
   // Fetch clubs data from API
   useEffect(() => {
+    if (hasFetchedClubsRef.current) {
+      return;
+    }
+    hasFetchedClubsRef.current = true;
+
     const fetchClubs = async () => {
       try {
         console.log('Fetching clubs from API...');
@@ -604,6 +611,10 @@ function Clubs() {
   const handleClubFormSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmittingClub) {
+      return;
+    }
+
     if (!editingClub && !clubImagePreview) {
       alert("Please upload an image for the club/society.");
       return;
@@ -669,79 +680,85 @@ function Clubs() {
       image: clubImagePreview || editingClub?.image || "",
     };
 
-    if (editingClub) {
-      if (authToken) {
-        try {
-          await clubsAPI.updateClub(editingClub.id, payload, authToken);
-        } catch (error) {
-          console.error("API update club failed, using local update:", error);
-        }
-      }
+    setIsSubmittingClub(true);
 
-      setClubs((prev) => prev.map((item) => (item.id === editingClub.id ? { ...item, ...payload } : item)));
+    try {
+      if (editingClub) {
+        if (authToken) {
+          try {
+            await clubsAPI.updateClub(editingClub.id, payload, authToken);
+          } catch (error) {
+            console.error("API update club failed, using local update:", error);
+          }
+        }
+
+        setClubs((prev) => prev.map((item) => (item.id === editingClub.id ? { ...item, ...payload } : item)));
         const updatedClubs = clubs.map((item) => (item.id === editingClub.id ? { ...item, ...payload, currentMembers: item.currentMembers } : item));
         setClubs(updatedClubs);
         localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
-      setShowClubFormModal(false);
-      setEditingClub(null);
+        setShowClubFormModal(false);
+        setEditingClub(null);
         setClubFormErrors({});
         setClubFormTouched({});
         setClubSubmitAttempted(false);
-          setToastText("✅ Club updated successfully!");
-          setToastVisible(true);
-          setTimeout(() => setToastVisible(false), 3000);
-      return;
-    }
-
-    if (authToken) {
-      try {
-        const response = await clubsAPI.createClub(payload, authToken);
-        const created = response?.data;
-        if (created) {
-          setClubs((prev) => [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || payload.image || clubImg,
-              currentMembers: created.currentMembers || 0,
-            },
-            ...prev,
-          ]);
-          const updatedClubs = [
-            {
-              ...created,
-              id: created._id,
-              image: created.image || payload.image || clubImg,
-              currentMembers: created.currentMembers || 0,
-            },
-            ...clubs,
-          ];
-          localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
-          setShowClubFormModal(false);
-          setClubFormErrors({});
-          setClubFormTouched({});
-          setClubSubmitAttempted(false);
-          setToastText("✅ Club added successfully!");
-          setToastVisible(true);
-          setTimeout(() => setToastVisible(false), 3000);
-          return;
-        }
-      } catch (error) {
-        console.error("API create club failed, using local add:", error);
+        setToastText("✅ Club updated successfully!");
+        setToastVisible(true);
+        setTimeout(() => setToastVisible(false), 3000);
+        return;
       }
-    }
 
-    const newClub = { ...payload, id: `club-${Date.now()}`, image: payload.image || clubImg, currentMembers: 0 };
-    const updatedClubs = [newClub, ...clubs];
-    setClubs(updatedClubs);
-    localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
-    setShowClubFormModal(false);
-    setClubFormErrors({});
-    setClubFormTouched({});
-    setClubSubmitAttempted(false);
-    setToastText("✅ Club added successfully!");
-    setToastVisible(true);
-    setTimeout(() => setToastVisible(false), 3000);
+      if (authToken) {
+        try {
+          const response = await clubsAPI.createClub(payload, authToken);
+          const created = response?.data;
+          if (created) {
+            setClubs((prev) => [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || clubImg,
+                currentMembers: created.currentMembers || 0,
+              },
+              ...prev,
+            ]);
+            const updatedClubs = [
+              {
+                ...created,
+                id: created._id,
+                image: created.image || payload.image || clubImg,
+                currentMembers: created.currentMembers || 0,
+              },
+              ...clubs,
+            ];
+            localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+            setShowClubFormModal(false);
+            setClubFormErrors({});
+            setClubFormTouched({});
+            setClubSubmitAttempted(false);
+            setToastText("✅ Club added successfully!");
+            setToastVisible(true);
+            setTimeout(() => setToastVisible(false), 3000);
+            return;
+          }
+        } catch (error) {
+          console.error("API create club failed, using local add:", error);
+        }
+      }
+
+      const newClub = { ...payload, id: `club-${Date.now()}`, image: payload.image || clubImg, currentMembers: 0 };
+      const updatedClubs = [newClub, ...clubs];
+      setClubs(updatedClubs);
+      localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+      setShowClubFormModal(false);
+      setClubFormErrors({});
+      setClubFormTouched({});
+      setClubSubmitAttempted(false);
+      setToastText("✅ Club added successfully!");
+      setToastVisible(true);
+      setTimeout(() => setToastVisible(false), 3000);
+    } finally {
+      setIsSubmittingClub(false);
+    }
   };
 
   const scrollToTop = (event) => {
@@ -1326,7 +1343,15 @@ function Clubs() {
                   setClubFormTouched({});
                   setClubSubmitAttempted(false);
                 }}>Cancel</button>
-                <button type="submit" className="clubs__btn clubs__btn--primary">{editingClub ? "Update Club" : "Add Club"}</button>
+                <button type="submit" className="clubs__btn clubs__btn--primary" disabled={isSubmittingClub}>
+                  {isSubmittingClub
+                    ? editingClub
+                      ? "Updating..."
+                      : "Adding..."
+                    : editingClub
+                      ? "Update Club"
+                      : "Add Club"}
+                </button>
               </div>
             </form>
           </div>
