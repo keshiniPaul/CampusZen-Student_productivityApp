@@ -638,10 +638,6 @@ function ActivityDetails() {
                     For more details about this activity, please check the information on the left or contact the organizers.
                   </p>
                 </div>
-
-                <button type="button" className="activityDetails__addBtn" onClick={handleOpenModal}>
-                  + Add New Event
-                </button>
               </div>
             </aside>
           </div>
