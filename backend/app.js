@@ -5,6 +5,7 @@ const { notFound, errorHandler } = require("./middleware/errorHandler");
 const healthyHabitRoutes = require("./routes/HealthyHabitRoutes");
 const careerRoutes = require("./routes/careerRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
+const internshipRoutes = require("./routes/internshipRoutes");
 const app = express();
 const path = require("path");
 
@@ -19,6 +20,7 @@ app.use(requestLogger);
 app.use("/api/health/habits", healthyHabitRoutes);
 app.use("/api/careers", careerRoutes);
 app.use("/api/resumes", resumeRoutes);
+app.use("/api/internships", internshipRoutes);
 
 
 // Home route
