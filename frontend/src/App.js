@@ -22,6 +22,8 @@ import CareerGuidance from "./pages/CareerGuidance";
 import CareerResources from "./pages/CareerResources";
 import CareerManagement from "./pages/CareerManagement";
 import ResumeBuilder from "./pages/ResumeBuilder";
+import InternshipTracker from "./pages/InternshipTracker";
+import InternshipDetails from "./pages/InternshipDetails";
 
 
 // new pages for login
@@ -62,6 +64,8 @@ function App() {
         <Route path="/career/resources" element={<CareerResources />} />
         <Route path="/career/management" element={<CareerManagement />} />
         <Route path="/career/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/career/internship-tracker" element={<InternshipTracker />} />
+        <Route path="/career/internship-tracker/:id" element={<InternshipDetails />} />
 
 
         {/* Default */}

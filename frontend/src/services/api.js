@@ -515,7 +515,102 @@ export const careerAPI = {
   },
 };
 
-const api = { sportsAPI, eventAPI, clubsAPI, careerAPI };
+// Internship Application API endpoints
+export const internshipAPI = {
+  // Get all applications for current user
+  getAllApplications: async (token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/internships`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch applications');
+      return data;
+    } catch (error) {
+      console.error('Error fetching internship applications:', error);
+      throw error;
+    }
+  },
+
+  // Get single application by ID
+  getApplicationById: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/internships/${id}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch application');
+      return data;
+    } catch (error) {
+      console.error('Error fetching internship application:', error);
+      throw error;
+    }
+  },
+
+  // Create new application
+  createApplication: async (applicationData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/internships`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(applicationData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to create application');
+      return data;
+    } catch (error) {
+      console.error('Error creating internship application:', error);
+      throw error;
+    }
+  },
+
+  // Update application
+  updateApplication: async (id, applicationData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/internships/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(applicationData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to update application');
+      return data;
+    } catch (error) {
+      console.error('Error updating internship application:', error);
+      throw error;
+    }
+  },
+
+  // Delete application
+  deleteApplication: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/internships/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to delete application');
+      return data;
+    } catch (error) {
+      console.error('Error deleting internship application:', error);
+      throw error;
+    }
+  },
+};
+
+const api = { sportsAPI, eventAPI, clubsAPI, careerAPI, internshipAPI };
 
 
 export default api;
