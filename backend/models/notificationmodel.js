@@ -8,6 +8,9 @@ const notificationSchema = new mongoose.Schema(
     },
     sportName: {
       type: String,
+    },
+    title: {
+      type: String,
       required: true,
     },
     message: {
@@ -23,6 +26,20 @@ const notificationSchema = new mongoose.Schema(
     isRead: {
       type: Boolean,
       default: false,
+    },
+    recipient: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    global: {
+      type: Boolean,
+      default: false,
+    },
+    link: {
+      type: String,
+    },
+    referenceId: {
+      type: mongoose.Schema.Types.ObjectId,
     },
     recipients: {
       type: [mongoose.Schema.Types.ObjectId],

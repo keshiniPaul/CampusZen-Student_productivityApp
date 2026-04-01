@@ -1,4 +1,5 @@
 const InternshipApplication = require("../models/InternshipApplicationModel");
+const Notification = require("../models/notificationmodel");
 
 // Get all applications for a user
 exports.getApplications = async (req, res) => {
@@ -69,6 +70,12 @@ exports.updateApplication = async (req, res) => {
       notes 
     } = req.body;
     
+    const oldApplication = await InternshipApplication.findOne({ _id: req.params.id, user: userId });
+    
+    if (!oldApplication) {
+      return res.status(404).json({ message: "Application not found" });
+    }
+
     const updatedApplication = await InternshipApplication.findOneAndUpdate(
       { _id: req.params.id, user: userId },
       { 
@@ -83,8 +90,36 @@ exports.updateApplication = async (req, res) => {
       { new: true, runValidators: true }
     );
     
-    if (!updatedApplication) {
-      return res.status(404).json({ message: "Application not found" });
+    // Check if status changed or next date changed
+    if (updatedApplication) {
+      try {
+        if (oldApplication.status !== updatedApplication.status) {
+          await Notification.create({
+            title: `Application Status Update`,
+            message: `Your application for ${updatedApplication.roleTitle} at ${updatedApplication.companyName} is now: ${updatedApplication.status}.`,
+            type: "success",
+            recipient: userId,
+            link: "/dashboard/career",
+            referenceId: updatedApplication._id,
+          });
+        } else if (
+          updatedApplication.nextImportantDate &&
+          (!oldApplication.nextImportantDate ||
+            oldApplication.nextImportantDate.getTime() !== updatedApplication.nextImportantDate.getTime())
+        ) {
+          const dateStr = new Date(updatedApplication.nextImportantDate).toLocaleDateString();
+          await Notification.create({
+            title: `Upcoming Date Reminder`,
+            message: `You have an important date (${dateStr}) for ${updatedApplication.roleTitle} at ${updatedApplication.companyName}. Context: ${updatedApplication.nextDateContext || 'None'}`,
+            type: "warning",
+            recipient: userId,
+            link: "/dashboard/career",
+            referenceId: updatedApplication._id,
+          });
+        }
+      } catch (notifError) {
+        console.error("Failed to create notification:", notifError);
+      }
     }
     
     res.status(200).json(updatedApplication);

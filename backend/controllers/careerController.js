@@ -1,4 +1,5 @@
 const Career = require("../models/CareerModel");
+const Notification = require("../models/notificationmodel");
 
 // @desc    Get all careers
 // @route   GET /api/careers
@@ -58,6 +59,22 @@ const createCareer = async (req, res) => {
     });
     
     console.log("Career Created Successfully:", career._id);
+
+    // Create a global notification for everyone
+    try {
+      if (category === "Internship" || category === "Job") {
+        await Notification.create({
+          title: `New ${category} Posted: ${title}`,
+          message: `${company} is hiring for ${title} in ${location}. Check it out!`,
+          type: "info",
+          global: true,
+          link: "/dashboard/career",
+          referenceId: career._id,
+        });
+      }
+    } catch (notifError) {
+      console.error("Failed to create generic notification:", notifError);
+    }
 
     res.status(201).json({
       success: true,

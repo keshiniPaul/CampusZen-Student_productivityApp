@@ -610,7 +610,63 @@ export const internshipAPI = {
   },
 };
 
-const api = { sportsAPI, eventAPI, clubsAPI, careerAPI, internshipAPI };
+// Notification API endpoints
+export const notificationAPI = {
+  // Get all notifications for current user
+  getAllNotifications: async (token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch notifications');
+      return data;
+    } catch (error) {
+      console.error('Error fetching notifications:', error);
+      throw error;
+    }
+  },
+
+  // Mark notification as read
+  markAsRead: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to mark notification as read');
+      return data;
+    } catch (error) {
+      console.error('Error marking notification as read:', error);
+      throw error;
+    }
+  },
+
+  // Delete notification
+  deleteNotification: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to delete notification');
+      return data;
+    } catch (error) {
+      console.error('Error deleting notification:', error);
+      throw error;
+    }
+  },
+};
+
+const api = { sportsAPI, eventAPI, clubsAPI, careerAPI, internshipAPI, notificationAPI };
 
 
 export default api;

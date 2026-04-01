@@ -6,6 +6,7 @@ const healthyHabitRoutes = require("./routes/HealthyHabitRoutes");
 const careerRoutes = require("./routes/careerRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const internshipRoutes = require("./routes/internshipRoutes");
+const notificationRoutes = require("./routes/notificationRoutes");
 const app = express();
 const path = require("path");
 
@@ -21,6 +22,7 @@ app.use("/api/health/habits", healthyHabitRoutes);
 app.use("/api/careers", careerRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/internships", internshipRoutes);
+app.use("/api/notifications", notificationRoutes);
 
 
 // Home route

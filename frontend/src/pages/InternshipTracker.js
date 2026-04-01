@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import api, { internshipAPI } from "../services/api";
 import "./Career.css";
 import "./Home.css";
-import { internshipAPI } from "../services/api";
 import campusLogo from "../images/campus_logo.png";
 import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
@@ -16,6 +16,9 @@ function InternshipTracker() {
   const [toastVisible, setToastVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [isNotificationDropdownOpen, setIsNotificationDropdownOpen] = useState(false);
+
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -29,10 +32,37 @@ function InternshipTracker() {
   });
 
   const profileDropdownRef = useRef(null);
+  const notificationDropdownRef = useRef(null);
   const toastTimerRef = useRef(null);
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (token) {
+        const data = await api.notificationAPI.getAllNotifications(token);
+        setNotifications(data || []);
+      }
+    } catch (error) {
+      console.error("Failed to fetch notifications", error);
+    }
+  };
+
+  const markNotificationRead = async (id, link) => {
+    try {
+      const token = localStorage.getItem("token");
+      await api.notificationAPI.markAsRead(id, token);
+      setNotifications(notifications.map(n => n._id === id ? { ...n, isRead: true } : n));
+      setIsNotificationDropdownOpen(false);
+      if (link) {
+        navigate(link);
+      }
+    } catch (error) {
+      console.error("Failed to mark as read", error);
+    }
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -42,6 +72,7 @@ function InternshipTracker() {
     }
     setIsLoggedIn(true);
     fetchApplications();
+    fetchNotifications();
     // eslint-disable-next-line
   }, []);
 
@@ -49,6 +80,8 @@ function InternshipTracker() {
     const handleClickOutside = (e) => {
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target))
         setIsProfileDropdownOpen(false);
+      if (notificationDropdownRef.current && !notificationDropdownRef.current.contains(e.target))
+        setIsNotificationDropdownOpen(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -156,6 +189,53 @@ function InternshipTracker() {
             <a href="/career" className="nav__link--career-active" onClick={(e) => { e.preventDefault(); navigate("/career"); }}>Career</a>
             <a href="#study" onClick={(e) => { e.preventDefault(); showToast("Study section coming soon"); }}>Study</a>
             <div className="nav__cta">
+              {isLoggedIn && (
+                <div className="notification-dropdown-container" ref={notificationDropdownRef} style={{ position: "relative", marginRight: "1rem" }}>
+                  <button 
+                    className="header__notificationBtn" 
+                    aria-label="Notifications"
+                    onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
+                  >
+                    <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" />
+                      <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" />
+                    </svg>
+                    {notifications.filter(n => !n.isRead).length > 0 && (
+                      <span className="header__notificationBadge">{notifications.filter(n => !n.isRead).length}</span>
+                    )}
+                  </button>
+
+                  {isNotificationDropdownOpen && (
+                    <div className="profile-dropdown-menu" style={{ width: "300px", right: 0, padding: 0 }}>
+                      <div style={{ padding: "10px 15px", borderBottom: "1px solid #eee", fontWeight: "bold" }}>
+                        Notifications
+                      </div>
+                      <div style={{ maxHeight: "300px", overflowY: "auto", textAlign: "left" }}>
+                        {notifications.length === 0 ? (
+                          <div style={{ padding: "15px", textAlign: "center", color: "#666" }}>No notifications</div>
+                        ) : (
+                          notifications.map((notif) => (
+                            <div 
+                              key={notif._id} 
+                              onClick={() => markNotificationRead(notif._id, notif.link)}
+                              style={{ 
+                                padding: "10px 15px", 
+                                borderBottom: "1px solid #f5f5f5", 
+                                cursor: "pointer",
+                                backgroundColor: notif.isRead ? "transparent" : "#f0f8ff"
+                              }}
+                            >
+                              <div style={{ fontWeight: notif.isRead ? "normal" : "bold", fontSize: "14px" }}>{notif.title}</div>
+                              <div style={{ fontSize: "12px", color: "#666", marginTop: "4px" }}>{notif.message}</div>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
               {isLoggedIn && (
                 <div className="profile-dropdown" ref={profileDropdownRef}>
                   <button className="profile-icon-btn" onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}>👤</button>
