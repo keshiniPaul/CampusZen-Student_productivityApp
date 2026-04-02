@@ -24,6 +24,8 @@ const initialEventsData = [
     date: "2026-03-22",
     venue: "SLIIT, Dupatha",
     image: wiramaya1Image,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "lantharuma",
@@ -33,6 +35,8 @@ const initialEventsData = [
     date: "2026-04-10",
     venue: "SLIIT, Wala",
     image: lantharumaImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "convacation",
@@ -42,6 +46,8 @@ const initialEventsData = [
     date: "2026-06-28",
     venue: "SLIIT, Campus Auditorium",
     image: convacationImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "career-day",
@@ -51,6 +57,30 @@ const initialEventsData = [
     date: "2026-04-05",
     venue: "SLIIT, Main Building",
     image: careerdayImage,
+    registrationRequired: true,
+    registrationLink: "https://forms.gle/career-day-registration",
+  },
+  {
+    id: "codefest",
+    title: "CodeFest 2026",
+    shortDescription: "Competitive programming and hackathon event for all students.",
+    category: "Event",
+    date: "2026-05-12",
+    venue: "SLIIT, Computing Labs",
+    image: opendayImage,
+    registrationRequired: true,
+    registrationLink: "https://forms.gle/codefest-registration",
+  },
+  {
+    id: "womens-day",
+    title: "Women's Day Celebration",
+    shortDescription: "An inclusive campus celebration with talks, performances, and awareness sessions.",
+    category: "Community",
+    date: "2026-03-08",
+    venue: "SLIIT, Main Auditorium",
+    image: ganthersImage,
+    registrationRequired: true,
+    registrationLink: "https://forms.gle/womens-day-registration",
   },
   {
     id: "open-day",
@@ -60,6 +90,8 @@ const initialEventsData = [
     date: "2026-04-15",
     venue: "SLIIT, Campus Auditorium",
     image: opendayImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "ganthera",
@@ -69,6 +101,8 @@ const initialEventsData = [
     date: "2026-04-20",
     venue: "SLIIT, wala",
     image: ganthersImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
 ];
 
@@ -80,7 +114,15 @@ const loadStoredEvents = () => {
     }
 
     const parsedEvents = JSON.parse(storedEvents);
-    return Array.isArray(parsedEvents) && parsedEvents.length > 0 ? parsedEvents : initialEventsData;
+    if (!Array.isArray(parsedEvents) || parsedEvents.length === 0) {
+      return initialEventsData;
+    }
+
+    return parsedEvents.map((event) => ({
+      ...event,
+      registrationRequired: Boolean(event.registrationRequired),
+      registrationLink: typeof event.registrationLink === "string" ? event.registrationLink : "",
+    }));
   } catch (error) {
     console.error("Failed to read stored events:", error);
     return initialEventsData;
@@ -132,6 +174,8 @@ function Event() {
     date: "",
     venue: "",
     image: "",
+    registrationRequired: false,
+    registrationLink: "",
   });
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
@@ -177,6 +221,19 @@ function Event() {
       case "image":
         if (!value) return "Please select an event image.";
         return "";
+      case "registrationLink": {
+        if (!formData.registrationRequired) return "";
+        if (!trimmedValue) return "Please provide the registration form link.";
+        try {
+          const url = new URL(trimmedValue);
+          if (!["http:", "https:"].includes(url.protocol)) {
+            return "Registration link must start with http:// or https://.";
+          }
+          return "";
+        } catch (error) {
+          return "Please enter a valid registration link.";
+        }
+      }
       default:
         return "";
     }
@@ -190,6 +247,7 @@ function Event() {
       date: validateField("date", values.date),
       venue: validateField("venue", values.venue),
       image: validateField("image", values.image),
+      registrationLink: validateField("registrationLink", values.registrationLink),
     };
   };
 
@@ -281,6 +339,8 @@ function Event() {
       date: "",
       venue: "",
       image: "",
+      registrationRequired: false,
+      registrationLink: "",
     });
     setFormErrors({});
     setFormTouched({});
@@ -302,6 +362,8 @@ function Event() {
       date: event.date,
       venue: event.venue,
       image: event.image,
+      registrationRequired: Boolean(event.registrationRequired),
+      registrationLink: event.registrationLink || "",
     });
     setFormErrors({});
     setFormTouched({});
@@ -340,9 +402,18 @@ function Event() {
       date: true,
       venue: true,
       image: true,
+      registrationLink: formData.registrationRequired,
     });
 
-    const fieldOrder = ["title", "shortDescription", "category", "date", "venue", "image"];
+    const fieldOrder = [
+      "title",
+      "shortDescription",
+      "category",
+      "date",
+      "venue",
+      "image",
+      ...(formData.registrationRequired ? ["registrationLink"] : []),
+    ];
     const firstErrorField = fieldOrder.find((fieldName) => nextErrors[fieldName]);
     if (firstErrorField) {
       const firstInvalidField = fieldRefs.current[firstErrorField];
@@ -394,15 +465,33 @@ function Event() {
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
+      const normalizedValue =
+        name === "registrationRequired" ? value === "true" : value;
+
       const nextValues = {
         ...prev,
-        [name]: value,
+        [name]: normalizedValue,
       };
+
+      if (name === "registrationRequired" && !normalizedValue) {
+        nextValues.registrationLink = "";
+      }
 
       if (formTouched[name] || submitAttempted) {
         setFormErrors((prevErrors) => ({
           ...prevErrors,
           [name]: validateField(name, nextValues[name]),
+        }));
+      }
+
+      if (name === "registrationRequired") {
+        setFormTouched((prevTouched) => ({
+          ...prevTouched,
+          registrationLink: normalizedValue ? prevTouched.registrationLink : false,
+        }));
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          registrationLink: validateField("registrationLink", nextValues.registrationLink),
         }));
       }
 
@@ -723,6 +812,16 @@ function Event() {
                   </div>
                 </div>
                 <p className="event__description">{event.shortDescription}</p>
+                {event.registrationRequired && event.registrationLink && (
+                  <a
+                    href={event.registrationLink}
+                    className="event__registerBtn"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Register Now
+                  </a>
+                )}
                 <Link 
                   to={`/activity/${event.id}`} 
                   className="event__detailsBtn"
@@ -901,6 +1000,48 @@ function Event() {
                   </div>
                 )}
                 {shouldShowError("image") && <p className="form__error">{formErrors.image}</p>}
+              </div>
+
+              <div className="form__row">
+                <div className="form__group">
+                  <label htmlFor="registrationRequired" className="form__label">
+                    Registration Required?
+                  </label>
+                  <select
+                    id="registrationRequired"
+                    name="registrationRequired"
+                    className="form__input"
+                    value={String(formData.registrationRequired)}
+                    onChange={handleFormChange}
+                  >
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                  </select>
+                </div>
+
+                {formData.registrationRequired && (
+                  <div className="form__group">
+                    <label htmlFor="registrationLink" className="form__label">
+                      Registration Form Link *
+                    </label>
+                    <input
+                      type="url"
+                      id="registrationLink"
+                      name="registrationLink"
+                      className={`form__input ${shouldShowError("registrationLink") ? "form__input--error" : ""}`.trim()}
+                      value={formData.registrationLink}
+                      onChange={handleFormChange}
+                      onBlur={handleFieldBlur}
+                      ref={(element) => {
+                        fieldRefs.current.registrationLink = element;
+                      }}
+                      placeholder="https://forms.gle/your-form-link"
+                    />
+                    {shouldShowError("registrationLink") && (
+                      <p className="form__error">{formErrors.registrationLink}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="modal__actions">

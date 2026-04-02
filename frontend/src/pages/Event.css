@@ -347,6 +347,27 @@
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
 }
 
+.event__registerBtn {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 11px 20px;
+  background: linear-gradient(135deg, #22a86f, #168a5a);
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(22, 138, 90, 0.28);
+}
+
+.event__registerBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 16px rgba(22, 138, 90, 0.35);
+}
+
 .event__detailsBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
