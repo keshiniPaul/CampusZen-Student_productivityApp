@@ -1,5 +1,42 @@
 const Notification = require("../models/notificationmodel");
 
+// Create a notification
+exports.createNotification = async (req, res) => {
+  try {
+    const {
+      title,
+      message,
+      type = "info",
+      global = false,
+      recipient,
+      recipients,
+      link,
+      referenceId,
+    } = req.body;
+
+    if (!title || !message) {
+      return res.status(400).json({ message: "Title and message are required" });
+    }
+
+    const notification = await Notification.create({
+      title,
+      message,
+      type,
+      global: Boolean(global),
+      recipient,
+      recipients: Array.isArray(recipients) ? recipients : [],
+      link,
+      referenceId,
+      createdBy: req.user?.id,
+    });
+
+    res.status(201).json(notification);
+  } catch (error) {
+    console.error("Create Notification Error:", error);
+    res.status(500).json({ message: "Error creating notification" });
+  }
+};
+
 // Get notifications for the logged in user
 exports.getNotifications = async (req, res) => {
   try {

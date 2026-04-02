@@ -13,6 +13,7 @@ import lantharumaImage from "../images/lantharuma.png";
 import opendayImage from "../images/openday.png";
 import careerdayImage from "../images/careerday.png";
 import convacationImage from "../images/convacation.png";
+import api from "../services/api";
 
 // Initial events data
 const initialEventsData = [
@@ -61,28 +62,6 @@ const initialEventsData = [
     registrationLink: "https://forms.gle/career-day-registration",
   },
   {
-    id: "codefest",
-    title: "CodeFest 2026",
-    shortDescription: "Competitive programming and hackathon event for all students.",
-    category: "Event",
-    date: "2026-05-12",
-    venue: "SLIIT, Computing Labs",
-    image: opendayImage,
-    registrationRequired: true,
-    registrationLink: "https://forms.gle/codefest-registration",
-  },
-  {
-    id: "womens-day",
-    title: "Women's Day Celebration",
-    shortDescription: "An inclusive campus celebration with talks, performances, and awareness sessions.",
-    category: "Community",
-    date: "2026-03-08",
-    venue: "SLIIT, Main Auditorium",
-    image: ganthersImage,
-    registrationRequired: true,
-    registrationLink: "https://forms.gle/womens-day-registration",
-  },
-  {
     id: "open-day",
     title: "Open Day",
     shortDescription: "Campus open day for prospective students and parents to visit.",
@@ -129,8 +108,21 @@ const loadStoredEvents = () => {
   }
 };
 
-const addActivityNotification = ({ title, message, category }) => {
+const addActivityNotification = async ({ title, message, category, token }) => {
   try {
+    if (token) {
+      await api.notificationAPI.createNotification(
+        {
+          title,
+          message,
+          type: category === "event" ? "info" : "warning",
+          global: true,
+        },
+        token
+      );
+      return;
+    }
+
     const existing = JSON.parse(localStorage.getItem("campuszone_notifications") || "[]");
     const next = [
       {
@@ -152,6 +144,7 @@ const addActivityNotification = ({ title, message, category }) => {
 function Event() {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const token = localStorage.getItem("token");
   const displayName = currentUser?.fullName || currentUser?.email || "User";
   const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -389,7 +382,7 @@ function Event() {
     setTimeout(() => setToastVisible(false), 3000);
   };
 
-  const handleSubmitEvent = (e) => {
+  const handleSubmitEvent = async (e) => {
     e.preventDefault();
 
     const nextErrors = validateForm(formData);
@@ -445,10 +438,11 @@ function Event() {
       };
         const updatedEvents = [newEvent, ...events];
         setEvents(updatedEvents);
-        addActivityNotification({
+        await addActivityNotification({
           title: `New event added: ${newEvent.title}`,
           message: `${newEvent.title} has been added to the event list.`,
           category: "event",
+          token,
         });
         setToastText("✅ Event added successfully!");
         setToastVisible(true);
