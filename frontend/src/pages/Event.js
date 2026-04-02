@@ -72,6 +72,41 @@ const initialEventsData = [
   },
 ];
 
+const loadStoredEvents = () => {
+  try {
+    const storedEvents = localStorage.getItem("campuszone_events");
+    if (!storedEvents) {
+      return initialEventsData;
+    }
+
+    const parsedEvents = JSON.parse(storedEvents);
+    return Array.isArray(parsedEvents) && parsedEvents.length > 0 ? parsedEvents : initialEventsData;
+  } catch (error) {
+    console.error("Failed to read stored events:", error);
+    return initialEventsData;
+  }
+};
+
+const addActivityNotification = ({ title, message, category }) => {
+  try {
+    const existing = JSON.parse(localStorage.getItem("campuszone_notifications") || "[]");
+    const next = [
+      {
+        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        title,
+        message,
+        category,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      },
+      ...(Array.isArray(existing) ? existing : []),
+    ].slice(0, 100);
+    localStorage.setItem("campuszone_notifications", JSON.stringify(next));
+  } catch (error) {
+    console.error("Failed to save notification:", error);
+  }
+};
+
 function Event() {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -79,7 +114,9 @@ function Event() {
   const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [events, setEvents] = useState(initialEventsData);
+  const [events, setEvents] = useState(loadStoredEvents);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -165,6 +202,7 @@ function Event() {
       if (event.key === "Escape") {
         setIsNavOpen(false);
         setIsProfileOpen(false);
+        setShowNotifications(false);
         setShowModal(false);
         setDeleteConfirm(null);
       }
@@ -187,6 +225,48 @@ function Event() {
       document.removeEventListener("click", onDocumentClick);
     };
   }, []);
+
+  useEffect(() => {
+    const now = new Date();
+    const todayOnly = new Date(now.toDateString());
+    const generatedNotifications = [];
+
+    events.forEach((event) => {
+      const eventDate = new Date(event.date);
+      const eventOnly = new Date(eventDate.toDateString());
+      const msDiff = eventOnly.getTime() - todayOnly.getTime();
+      const dayDiff = Math.round(msDiff / (1000 * 60 * 60 * 24));
+
+      if (dayDiff === 0) {
+        generatedNotifications.push({
+          id: `today-${event.id}`,
+          type: "success",
+          message: `${event.title} is happening today!`,
+          event: event.title,
+        });
+      } else if (dayDiff === 1) {
+        generatedNotifications.push({
+          id: `tomorrow-${event.id}`,
+          type: "warning",
+          message: `${event.title} starts tomorrow.`,
+          event: event.title,
+        });
+      } else if (dayDiff > 1 && dayDiff <= 3) {
+        generatedNotifications.push({
+          id: `soon-${event.id}`,
+          type: "warning",
+          message: `${event.title} is coming in ${dayDiff} days.`,
+          event: event.title,
+        });
+      }
+    });
+
+    setNotifications(generatedNotifications);
+  }, [events]);
+
+  useEffect(() => {
+    localStorage.setItem("campuszone_events", JSON.stringify(events));
+  }, [events]);
 
   const handleAddEvent = () => {
     if (!isAdmin) {
@@ -239,15 +319,12 @@ function Event() {
   };
 
   const confirmDelete = () => {
-    setEvents(events.filter((event) => event.id !== deleteConfirm));
+    const updatedEvents = events.filter((event) => event.id !== deleteConfirm);
+    setEvents(updatedEvents);
     setDeleteConfirm(null);
-      const updatedEvents = events.filter((event) => event.id !== deleteConfirm);
-      setEvents(updatedEvents);
-      localStorage.setItem("campuszone_events", JSON.stringify(updatedEvents));
-      setToastText("✅ Event deleted successfully!");
-      setToastVisible(true);
-      setTimeout(() => setToastVisible(false), 3000);
-      setDeleteConfirm(null);
+    setToastText("✅ Event deleted successfully!");
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 3000);
   };
 
   const handleSubmitEvent = (e) => {
@@ -286,7 +363,6 @@ function Event() {
           : event
         );
         setEvents(updatedEvents);
-        localStorage.setItem("campuszone_events", JSON.stringify(updatedEvents));
         setToastText("✅ Event updated successfully!");
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 3000);
@@ -298,7 +374,11 @@ function Event() {
       };
         const updatedEvents = [newEvent, ...events];
         setEvents(updatedEvents);
-        localStorage.setItem("campuszone_events", JSON.stringify(updatedEvents));
+        addActivityNotification({
+          title: `New event added: ${newEvent.title}`,
+          message: `${newEvent.title} has been added to the event list.`,
+          category: "event",
+        });
         setToastText("✅ Event added successfully!");
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 3000);
@@ -480,23 +560,43 @@ function Event() {
             </a>
           </div>
 
-          <button className="header__notificationBtn" aria-label="Notifications">
-        <div
-          className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
-          id="toast"
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {toastText}
-        </div>
-            <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
-              <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
-            </svg>
-            <span className="header__notificationBadge">3</span>
+          <button
+            className="header__notificationBtn"
+            aria-label="Notifications"
+            onClick={() => setShowNotifications((prev) => !prev)}
+          >
+            🔔
+            {notifications.length > 0 && (
+              <span className="header__notificationBadge">{notifications.length}</span>
+            )}
           </button>
+
+          {showNotifications && (
+            <div className="notifications__dropdown">
+              <div className="notifications__header">
+                <h3>Notifications</h3>
+                <button onClick={() => setShowNotifications(false)}>×</button>
+              </div>
+              <div className="notifications__list">
+                {notifications.length === 0 && (
+                  <p className="notifications__empty">No event notifications right now.</p>
+                )}
+                {notifications.map((notif) => (
+                  <div key={notif.id} className={`notification__item notification__item--${notif.type}`}>
+                    <div className="notification__icon">
+                      {notif.type === "success" && "🔔"}
+                      {notif.type === "warning" && "⚠️"}
+                      {notif.type === "urgent" && "🚨"}
+                    </div>
+                    <div className="notification__content">
+                      <p className="notification__message">{notif.message}</p>
+                      <span className="notification__event">{notif.event}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="header__profileDropdown" ref={profileRef}>
             <button
@@ -640,6 +740,16 @@ function Event() {
           </div>
         )}
       </main>
+
+      <div
+        className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
+        id="toast"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {toastText}
+      </div>
 
       {/* Add/Edit Event Modal */}
       {showModal && (

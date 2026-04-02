@@ -152,6 +152,62 @@ const initialClubsData = [
   },
 ];
 
+const normalizeClubKey = (club) =>
+  String(club?.id || club?._id || club?.name || "")
+    .trim()
+    .toLowerCase();
+
+const loadStoredClubs = () => {
+  try {
+    const storedClubs = localStorage.getItem("campuszone_clubs");
+    if (!storedClubs) {
+      return initialClubsData;
+    }
+
+    const parsedClubs = JSON.parse(storedClubs);
+    return Array.isArray(parsedClubs) && parsedClubs.length > 0 ? parsedClubs : initialClubsData;
+  } catch (error) {
+    console.error("Failed to read stored clubs:", error);
+    return initialClubsData;
+  }
+};
+
+const mergeClubs = (baseClubs, incomingClubs) => {
+  const mergedMap = new Map();
+
+  baseClubs.forEach((club) => {
+    mergedMap.set(normalizeClubKey(club), club);
+  });
+
+  incomingClubs.forEach((club) => {
+    const key = normalizeClubKey(club);
+    const existing = mergedMap.get(key);
+    mergedMap.set(key, existing ? { ...existing, ...club } : club);
+  });
+
+  return Array.from(mergedMap.values());
+};
+
+const addActivityNotification = ({ title, message, category }) => {
+  try {
+    const existing = JSON.parse(localStorage.getItem("campuszone_notifications") || "[]");
+    const next = [
+      {
+        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        title,
+        message,
+        category,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      },
+      ...(Array.isArray(existing) ? existing : []),
+    ].slice(0, 100);
+    localStorage.setItem("campuszone_notifications", JSON.stringify(next));
+  } catch (error) {
+    console.error("Failed to save notification:", error);
+  }
+};
+
 function Clubs() {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -160,7 +216,7 @@ function Clubs() {
   const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [clubs, setClubs] = useState(initialClubsData);
+  const [clubs, setClubs] = useState(loadStoredClubs);
   const [selectedClub, setSelectedClub] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showClubFormModal, setShowClubFormModal] = useState(false);
@@ -335,7 +391,7 @@ function Clubs() {
             };
           });
           console.log('API clubs loaded:', mappedClubs.length);
-          setClubs(mappedClubs);
+          setClubs((prev) => mergeClubs(prev, mappedClubs));
         } else {
           // API returned no data, keep initial data
           console.log('API returned no data, keeping initial clubs data');
@@ -355,6 +411,10 @@ function Clubs() {
     setError(null);
     fetchClubs();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("campuszone_clubs", JSON.stringify(clubs));
+  }, [clubs]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -731,6 +791,11 @@ function Clubs() {
               ...clubs,
             ];
             localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+            addActivityNotification({
+              title: `New club added: ${created.name || payload.name}`,
+              message: `${created.name || payload.name} has been added to clubs and societies.`,
+              category: "club",
+            });
             setShowClubFormModal(false);
             setClubFormErrors({});
             setClubFormTouched({});
@@ -749,6 +814,11 @@ function Clubs() {
       const updatedClubs = [newClub, ...clubs];
       setClubs(updatedClubs);
       localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+      addActivityNotification({
+        title: `New club added: ${newClub.name}`,
+        message: `${newClub.name} has been added to clubs and societies.`,
+        category: "club",
+      });
       setShowClubFormModal(false);
       setClubFormErrors({});
       setClubFormTouched({});
