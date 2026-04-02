@@ -15,15 +15,48 @@ function Login() {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({});
   const [role, setRole] = useState(roleFromPath);
   
   const [toast, setToast] = useState({ visible: false, message: "" });
 
+  const validate = (values) => {
+    const nextErrors = {};
+
+    if (!values.email.trim()) {
+      nextErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    if (!values.password) {
+      nextErrors.password = "Password is required.";
+    } else if (values.password.length < 6) {
+      nextErrors.password = "Password must be at least 6 characters.";
+    }
+
+    return nextErrors;
+  };
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const nextErrors = validate({ ...formData, [name]: value });
+    setErrors((prev) => ({
+      ...prev,
+      [name]: nextErrors[name] || "",
+    }));
   };
 
   const showToast = (message) => {
@@ -38,6 +71,13 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const nextErrors = validate(formData);
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
 
     try {
       const endpoint = role === "admin" ? "login/admin" : "login/student";
@@ -117,17 +157,21 @@ function Login() {
                 type="email"
                 name="email"
                 placeholder="University Email"
-                required
                 onChange={handleChange}
+                onBlur={handleBlur}
+                value={formData.email}
               />
+              {errors.email && <p className="form__error">{errors.email}</p>}
 
               <input
                 type="password"
                 name="password"
                 placeholder="Password"
-                required
                 onChange={handleChange}
+                onBlur={handleBlur}
+                value={formData.password}
               />
+              {errors.password && <p className="form__error">{errors.password}</p>}
 
               <button type="submit" className="btn btn--primary btn--lg">
                 Login
