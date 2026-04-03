@@ -166,6 +166,62 @@ const initialSportsData = [
   },
 ];
 
+const normalizeSportKey = (sport) =>
+  String(sport?.id || sport?._id || sport?.name || "")
+    .trim()
+    .toLowerCase();
+
+const loadStoredSports = () => {
+  try {
+    const storedSports = localStorage.getItem("campuszone_sports");
+    if (!storedSports) {
+      return initialSportsData;
+    }
+
+    const parsedSports = JSON.parse(storedSports);
+    return Array.isArray(parsedSports) && parsedSports.length > 0 ? parsedSports : initialSportsData;
+  } catch (error) {
+    console.error("Failed to read stored sports:", error);
+    return initialSportsData;
+  }
+};
+
+const mergeSports = (baseSports, incomingSports) => {
+  const mergedMap = new Map();
+
+  baseSports.forEach((sport) => {
+    mergedMap.set(normalizeSportKey(sport), sport);
+  });
+
+  incomingSports.forEach((sport) => {
+    const key = normalizeSportKey(sport);
+    const existing = mergedMap.get(key);
+    mergedMap.set(key, existing ? { ...existing, ...sport } : sport);
+  });
+
+  return Array.from(mergedMap.values());
+};
+
+const addActivityNotification = ({ title, message, category }) => {
+  try {
+    const existing = JSON.parse(localStorage.getItem("campuszone_notifications") || "[]");
+    const next = [
+      {
+        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        title,
+        message,
+        category,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      },
+      ...(Array.isArray(existing) ? existing : []),
+    ].slice(0, 100);
+    localStorage.setItem("campuszone_notifications", JSON.stringify(next));
+  } catch (error) {
+    console.error("Failed to save notification:", error);
+  }
+};
+
 function Sports() {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
@@ -174,7 +230,7 @@ function Sports() {
   const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [sports, setSports] = useState(initialSportsData);
+  const [sports, setSports] = useState(loadStoredSports);
   const [selectedSport, setSelectedSport] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showSportFormModal, setShowSportFormModal] = useState(false);
@@ -259,7 +315,7 @@ function Sports() {
             };
           });
           console.log('API sports loaded:', mappedSports.length);
-          setSports(mappedSports);
+          setSports((prev) => mergeSports(prev, mappedSports));
         } else {
           // API returned no data, keep initial data
           console.log('API returned no data, keeping initial sports data');
@@ -280,6 +336,10 @@ function Sports() {
     setError(null);
     fetchSports();
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("campuszone_sports", JSON.stringify(sports));
+  }, [sports]);
 
   useEffect(() => {
     const onKeyDown = (event) => {
@@ -320,6 +380,8 @@ function Sports() {
       const closeDate = new Date(sport.registrationClose);
       const twoDaysBefore = new Date(closeDate);
       twoDaysBefore.setDate(closeDate.getDate() - 2);
+      const twoDaysBeforeOpen = new Date(openDate);
+      twoDaysBeforeOpen.setDate(openDate.getDate() - 2);
 
       // Registration opening today
       if (today.toDateString() === openDate.toDateString()) {
@@ -327,6 +389,18 @@ function Sports() {
           id: `open-${sport.id}`,
           type: "success",
           message: `${sport.name} registration is now OPEN!`,
+          sport: sport.name,
+          date: today,
+        });
+      }
+
+      // Registration opening soon
+      if (today >= twoDaysBeforeOpen && today < openDate) {
+        const daysUntilOpen = Math.ceil((openDate - today) / (1000 * 60 * 60 * 24));
+        newNotifications.push({
+          id: `opening-${sport.id}`,
+          type: "warning",
+          message: `${sport.name} registration opens in ${daysUntilOpen} day${daysUntilOpen > 1 ? "s" : ""}.`,
           sport: sport.name,
           date: today,
         });
@@ -775,6 +849,11 @@ function Sports() {
               ...sports,
             ];
             localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+            addActivityNotification({
+              title: `New sport added: ${created.name || payload.name}`,
+              message: `${created.name || payload.name} has been added to the sports list.`,
+              category: "sport",
+            });
             setShowSportFormModal(false);
             resetSportForm();
             setToastText("✅ Sport added successfully!");
@@ -799,6 +878,11 @@ function Sports() {
       const updatedSports = [newSport, ...sports];
       setSports(updatedSports);
       localStorage.setItem("campuszone_sports", JSON.stringify(updatedSports));
+      addActivityNotification({
+        title: `New sport added: ${newSport.name}`,
+        message: `${newSport.name} has been added to the sports list.`,
+        category: "sport",
+      });
       setShowSportFormModal(false);
       resetSportForm();
       setToastText("✅ Sport added successfully!");
@@ -915,23 +999,22 @@ function Sports() {
             aria-label="Notifications"
             onClick={() => setShowNotifications(!showNotifications)}
           >
-            <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
-              <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
-            </svg>
+            🔔
             {notifications.length > 0 && (
               <span className="header__notificationBadge">{notifications.length}</span>
             )}
           </button>
 
-          {showNotifications && notifications.length > 0 && (
+          {showNotifications && (
             <div className="notifications__dropdown">
               <div className="notifications__header">
                 <h3>Notifications</h3>
                 <button onClick={() => setShowNotifications(false)}>×</button>
               </div>
               <div className="notifications__list">
+                {notifications.length === 0 && (
+                  <p className="notifications__empty">No sports notifications right now.</p>
+                )}
                 {notifications.map((notif) => (
                   <div key={notif.id} className={`notification__item notification__item--${notif.type}`}>
                     <div className="notification__icon">

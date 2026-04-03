@@ -10,6 +10,7 @@ import youtubeIcon from "../images/youtube.png";
 import eventIcon from "../images/event.png";
 import sportIcon from "../images/sport.png";
 import clubIcon from "../images/club.png";
+import api from "../services/api";
 
 const categories = [
   {
@@ -38,15 +39,76 @@ function EventDashboard() {
   const displayName = currentUser?.fullName || currentUser?.email || "User";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [notificationsError, setNotificationsError] = useState("");
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
+  const notificationsRef = useRef(null);
+
+  const token = localStorage.getItem("token");
+
+  const normalizeNotifications = (items) =>
+    (Array.isArray(items) ? items : []).map((item) => ({
+      id: item._id || item.id,
+      title: item.title || "Notification",
+      message: item.message || "",
+      category: item.category || item.type || "event",
+      priority: item.priority || "low",
+      isRead: Boolean(item.isRead),
+      createdAt: item.createdAt || item.created_at || new Date().toISOString(),
+    }));
+
+  const loadLocalNotifications = () => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("campuszone_notifications") || "[]");
+      return normalizeNotifications(stored);
+    } catch (error) {
+      return [];
+    }
+  };
+
+  const mergeNotifications = (apiItems, localItems) => {
+    const map = new Map();
+
+    [...localItems, ...apiItems].forEach((item) => {
+      const key = String(item.id || `${item.title}-${item.createdAt}`);
+      if (!map.has(key)) {
+        map.set(key, item);
+      }
+    });
+
+    return Array.from(map.values()).sort(
+      (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+    );
+  };
+
+  const fetchNotifications = async () => {
+    const localNotifications = loadLocalNotifications();
+
+    if (!token) {
+      setNotifications(localNotifications);
+      return;
+    }
+
+    try {
+      setNotificationsError("");
+      const data = await api.notificationAPI.getAllNotifications(token);
+      const normalizedApi = normalizeNotifications(data?.data || data || []);
+      setNotifications(mergeNotifications(normalizedApi, localNotifications));
+    } catch (error) {
+      setNotifications(localNotifications);
+      setNotificationsError("Showing local notifications only.");
+    }
+  };
 
   useEffect(() => {
     const onKeyDown = (event) => {
       if (event.key === "Escape") {
         setIsNavOpen(false);
         setIsProfileOpen(false);
+        setIsNotificationsOpen(false);
       }
     };
 
@@ -56,8 +118,11 @@ function EventDashboard() {
       const clickedInsideNav =
         navLinksRef.current.contains(target) || navToggleRef.current.contains(target);
       const clickedInsideProfile = profileRef.current && profileRef.current.contains(target);
+      const clickedInsideNotifications =
+        notificationsRef.current && notificationsRef.current.contains(target);
       if (!clickedInsideNav) setIsNavOpen(false);
       if (!clickedInsideProfile) setIsProfileOpen(false);
+      if (!clickedInsideNotifications) setIsNotificationsOpen(false);
     };
 
     document.addEventListener("keydown", onKeyDown);
@@ -66,6 +131,13 @@ function EventDashboard() {
       document.removeEventListener("keydown", onKeyDown);
       document.removeEventListener("click", onDocumentClick);
     };
+  }, []);
+
+  useEffect(() => {
+    fetchNotifications();
+    const intervalId = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(intervalId);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const scrollToTop = (event) => {
@@ -147,14 +219,54 @@ function EventDashboard() {
             </a>
           </div>
 
-          <button className="header__notificationBtn" aria-label="Notifications">
-            <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
-              <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
-            </svg>
-            <span className="header__notificationBadge">3</span>
-          </button>
+          <div className="eventDashboard__notificationWrap" ref={notificationsRef}>
+            <button
+              className="header__notificationBtn"
+              aria-label="Notifications"
+              onClick={() => setIsNotificationsOpen((prev) => !prev)}
+              type="button"
+            >
+              🔔
+              {notifications.filter((item) => !item.isRead).length > 0 && (
+                <span className="header__notificationBadge">
+                  {notifications.filter((item) => !item.isRead).length}
+                </span>
+              )}
+            </button>
+
+            {isNotificationsOpen && (
+              <div className="eventDashboard__notificationDropdown">
+                <div className="eventDashboard__notificationHeader">
+                  <h3>Notifications</h3>
+                  <span>{notifications.length} total</span>
+                </div>
+
+                {notificationsError ? (
+                  <p className="eventDashboard__notificationEmpty">{notificationsError}</p>
+                ) : notifications.length === 0 ? (
+                  <p className="eventDashboard__notificationEmpty">No notifications yet.</p>
+                ) : (
+                  <div className="eventDashboard__notificationList">
+                    {notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        className={`eventDashboard__notificationItem eventDashboard__notificationItem--${notification.category} ${notification.isRead ? "is-read" : "is-unread"}`}
+                      >
+                        <div className="eventDashboard__notificationBadgeLabel">
+                          {notification.category === "event" ? "Event" : notification.category === "sport" ? "Sport" : "Club & Society"}
+                        </div>
+                        <div className="eventDashboard__notificationBody">
+                          <strong>{notification.title}</strong>
+                          <p>{notification.message}</p>
+                          <span>{new Date(notification.createdAt).toLocaleString()}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
 
           <div className="header__profileDropdown" ref={profileRef}>
             <button

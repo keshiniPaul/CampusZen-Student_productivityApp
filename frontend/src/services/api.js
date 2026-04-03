@@ -612,6 +612,26 @@ export const internshipAPI = {
 
 // Notification API endpoints
 export const notificationAPI = {
+  // Create notification
+  createNotification: async (notificationData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/notifications`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(notificationData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to create notification');
+      return data;
+    } catch (error) {
+      console.error('Error creating notification:', error);
+      throw error;
+    }
+  },
+
   // Get all notifications for current user
   getAllNotifications: async (token) => {
     try {

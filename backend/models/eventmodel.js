@@ -31,6 +31,15 @@ const eventSchema = new mongoose.Schema(
       type: String,
       default: "default-event.png",
     },
+    registrationRequired: {
+      type: Boolean,
+      default: false,
+    },
+    registrationLink: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
