@@ -13,6 +13,7 @@ import lantharumaImage from "../images/lantharuma.png";
 import opendayImage from "../images/openday.png";
 import careerdayImage from "../images/careerday.png";
 import convacationImage from "../images/convacation.png";
+import api from "../services/api";
 
 // Initial events data
 const initialEventsData = [
@@ -24,6 +25,8 @@ const initialEventsData = [
     date: "2026-03-22",
     venue: "SLIIT, Dupatha",
     image: wiramaya1Image,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "lantharuma",
@@ -33,6 +36,8 @@ const initialEventsData = [
     date: "2026-04-10",
     venue: "SLIIT, Wala",
     image: lantharumaImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "convacation",
@@ -42,6 +47,8 @@ const initialEventsData = [
     date: "2026-06-28",
     venue: "SLIIT, Campus Auditorium",
     image: convacationImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "career-day",
@@ -51,6 +58,8 @@ const initialEventsData = [
     date: "2026-04-05",
     venue: "SLIIT, Main Building",
     image: careerdayImage,
+    registrationRequired: true,
+    registrationLink: "https://forms.gle/career-day-registration",
   },
   {
     id: "open-day",
@@ -60,6 +69,8 @@ const initialEventsData = [
     date: "2026-04-15",
     venue: "SLIIT, Campus Auditorium",
     image: opendayImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
   {
     id: "ganthera",
@@ -69,17 +80,78 @@ const initialEventsData = [
     date: "2026-04-20",
     venue: "SLIIT, wala",
     image: ganthersImage,
+    registrationRequired: false,
+    registrationLink: "",
   },
 ];
+
+const loadStoredEvents = () => {
+  try {
+    const storedEvents = localStorage.getItem("campuszone_events");
+    if (!storedEvents) {
+      return initialEventsData;
+    }
+
+    const parsedEvents = JSON.parse(storedEvents);
+    if (!Array.isArray(parsedEvents) || parsedEvents.length === 0) {
+      return initialEventsData;
+    }
+
+    return parsedEvents.map((event) => ({
+      ...event,
+      registrationRequired: Boolean(event.registrationRequired),
+      registrationLink: typeof event.registrationLink === "string" ? event.registrationLink : "",
+    }));
+  } catch (error) {
+    console.error("Failed to read stored events:", error);
+    return initialEventsData;
+  }
+};
+
+const addActivityNotification = async ({ title, message, category, token }) => {
+  try {
+    if (token) {
+      await api.notificationAPI.createNotification(
+        {
+          title,
+          message,
+          type: category === "event" ? "info" : "warning",
+          global: true,
+        },
+        token
+      );
+      return;
+    }
+
+    const existing = JSON.parse(localStorage.getItem("campuszone_notifications") || "[]");
+    const next = [
+      {
+        id: `local-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        title,
+        message,
+        category,
+        isRead: false,
+        createdAt: new Date().toISOString(),
+      },
+      ...(Array.isArray(existing) ? existing : []),
+    ].slice(0, 100);
+    localStorage.setItem("campuszone_notifications", JSON.stringify(next));
+  } catch (error) {
+    console.error("Failed to save notification:", error);
+  }
+};
 
 function Event() {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
+  const token = localStorage.getItem("token");
   const displayName = currentUser?.fullName || currentUser?.email || "User";
   const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [events, setEvents] = useState(initialEventsData);
+  const [events, setEvents] = useState(loadStoredEvents);
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifications, setShowNotifications] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [deleteConfirm, setDeleteConfirm] = useState(null);
@@ -95,6 +167,8 @@ function Event() {
     date: "",
     venue: "",
     image: "",
+    registrationRequired: false,
+    registrationLink: "",
   });
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
@@ -140,6 +214,19 @@ function Event() {
       case "image":
         if (!value) return "Please select an event image.";
         return "";
+      case "registrationLink": {
+        if (!formData.registrationRequired) return "";
+        if (!trimmedValue) return "Please provide the registration form link.";
+        try {
+          const url = new URL(trimmedValue);
+          if (!["http:", "https:"].includes(url.protocol)) {
+            return "Registration link must start with http:// or https://.";
+          }
+          return "";
+        } catch (error) {
+          return "Please enter a valid registration link.";
+        }
+      }
       default:
         return "";
     }
@@ -153,6 +240,7 @@ function Event() {
       date: validateField("date", values.date),
       venue: validateField("venue", values.venue),
       image: validateField("image", values.image),
+      registrationLink: validateField("registrationLink", values.registrationLink),
     };
   };
 
@@ -165,6 +253,7 @@ function Event() {
       if (event.key === "Escape") {
         setIsNavOpen(false);
         setIsProfileOpen(false);
+        setShowNotifications(false);
         setShowModal(false);
         setDeleteConfirm(null);
       }
@@ -188,6 +277,48 @@ function Event() {
     };
   }, []);
 
+  useEffect(() => {
+    const now = new Date();
+    const todayOnly = new Date(now.toDateString());
+    const generatedNotifications = [];
+
+    events.forEach((event) => {
+      const eventDate = new Date(event.date);
+      const eventOnly = new Date(eventDate.toDateString());
+      const msDiff = eventOnly.getTime() - todayOnly.getTime();
+      const dayDiff = Math.round(msDiff / (1000 * 60 * 60 * 24));
+
+      if (dayDiff === 0) {
+        generatedNotifications.push({
+          id: `today-${event.id}`,
+          type: "success",
+          message: `${event.title} is happening today!`,
+          event: event.title,
+        });
+      } else if (dayDiff === 1) {
+        generatedNotifications.push({
+          id: `tomorrow-${event.id}`,
+          type: "warning",
+          message: `${event.title} starts tomorrow.`,
+          event: event.title,
+        });
+      } else if (dayDiff > 1 && dayDiff <= 3) {
+        generatedNotifications.push({
+          id: `soon-${event.id}`,
+          type: "warning",
+          message: `${event.title} is coming in ${dayDiff} days.`,
+          event: event.title,
+        });
+      }
+    });
+
+    setNotifications(generatedNotifications);
+  }, [events]);
+
+  useEffect(() => {
+    localStorage.setItem("campuszone_events", JSON.stringify(events));
+  }, [events]);
+
   const handleAddEvent = () => {
     if (!isAdmin) {
       alert("Only administrators can add events.");
@@ -201,6 +332,8 @@ function Event() {
       date: "",
       venue: "",
       image: "",
+      registrationRequired: false,
+      registrationLink: "",
     });
     setFormErrors({});
     setFormTouched({});
@@ -222,6 +355,8 @@ function Event() {
       date: event.date,
       venue: event.venue,
       image: event.image,
+      registrationRequired: Boolean(event.registrationRequired),
+      registrationLink: event.registrationLink || "",
     });
     setFormErrors({});
     setFormTouched({});
@@ -239,18 +374,15 @@ function Event() {
   };
 
   const confirmDelete = () => {
-    setEvents(events.filter((event) => event.id !== deleteConfirm));
+    const updatedEvents = events.filter((event) => event.id !== deleteConfirm);
+    setEvents(updatedEvents);
     setDeleteConfirm(null);
-      const updatedEvents = events.filter((event) => event.id !== deleteConfirm);
-      setEvents(updatedEvents);
-      localStorage.setItem("campuszone_events", JSON.stringify(updatedEvents));
-      setToastText("✅ Event deleted successfully!");
-      setToastVisible(true);
-      setTimeout(() => setToastVisible(false), 3000);
-      setDeleteConfirm(null);
+    setToastText("✅ Event deleted successfully!");
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 3000);
   };
 
-  const handleSubmitEvent = (e) => {
+  const handleSubmitEvent = async (e) => {
     e.preventDefault();
 
     const nextErrors = validateForm(formData);
@@ -263,9 +395,18 @@ function Event() {
       date: true,
       venue: true,
       image: true,
+      registrationLink: formData.registrationRequired,
     });
 
-    const fieldOrder = ["title", "shortDescription", "category", "date", "venue", "image"];
+    const fieldOrder = [
+      "title",
+      "shortDescription",
+      "category",
+      "date",
+      "venue",
+      "image",
+      ...(formData.registrationRequired ? ["registrationLink"] : []),
+    ];
     const firstErrorField = fieldOrder.find((fieldName) => nextErrors[fieldName]);
     if (firstErrorField) {
       const firstInvalidField = fieldRefs.current[firstErrorField];
@@ -286,7 +427,6 @@ function Event() {
           : event
         );
         setEvents(updatedEvents);
-        localStorage.setItem("campuszone_events", JSON.stringify(updatedEvents));
         setToastText("✅ Event updated successfully!");
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 3000);
@@ -298,7 +438,12 @@ function Event() {
       };
         const updatedEvents = [newEvent, ...events];
         setEvents(updatedEvents);
-        localStorage.setItem("campuszone_events", JSON.stringify(updatedEvents));
+        await addActivityNotification({
+          title: `New event added: ${newEvent.title}`,
+          message: `${newEvent.title} has been added to the event list.`,
+          category: "event",
+          token,
+        });
         setToastText("✅ Event added successfully!");
         setToastVisible(true);
         setTimeout(() => setToastVisible(false), 3000);
@@ -314,15 +459,33 @@ function Event() {
   const handleFormChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => {
+      const normalizedValue =
+        name === "registrationRequired" ? value === "true" : value;
+
       const nextValues = {
         ...prev,
-        [name]: value,
+        [name]: normalizedValue,
       };
+
+      if (name === "registrationRequired" && !normalizedValue) {
+        nextValues.registrationLink = "";
+      }
 
       if (formTouched[name] || submitAttempted) {
         setFormErrors((prevErrors) => ({
           ...prevErrors,
           [name]: validateField(name, nextValues[name]),
+        }));
+      }
+
+      if (name === "registrationRequired") {
+        setFormTouched((prevTouched) => ({
+          ...prevTouched,
+          registrationLink: normalizedValue ? prevTouched.registrationLink : false,
+        }));
+        setFormErrors((prevErrors) => ({
+          ...prevErrors,
+          registrationLink: validateField("registrationLink", nextValues.registrationLink),
         }));
       }
 
@@ -480,23 +643,43 @@ function Event() {
             </a>
           </div>
 
-          <button className="header__notificationBtn" aria-label="Notifications">
-        <div
-          className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
-          id="toast"
-          role="status"
-          aria-live="polite"
-          aria-atomic="true"
-        >
-          {toastText}
-        </div>
-            <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
-              <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
-            </svg>
-            <span className="header__notificationBadge">3</span>
+          <button
+            className="header__notificationBtn"
+            aria-label="Notifications"
+            onClick={() => setShowNotifications((prev) => !prev)}
+          >
+            🔔
+            {notifications.length > 0 && (
+              <span className="header__notificationBadge">{notifications.length}</span>
+            )}
           </button>
+
+          {showNotifications && (
+            <div className="notifications__dropdown">
+              <div className="notifications__header">
+                <h3>Notifications</h3>
+                <button onClick={() => setShowNotifications(false)}>×</button>
+              </div>
+              <div className="notifications__list">
+                {notifications.length === 0 && (
+                  <p className="notifications__empty">No event notifications right now.</p>
+                )}
+                {notifications.map((notif) => (
+                  <div key={notif.id} className={`notification__item notification__item--${notif.type}`}>
+                    <div className="notification__icon">
+                      {notif.type === "success" && "🔔"}
+                      {notif.type === "warning" && "⚠️"}
+                      {notif.type === "urgent" && "🚨"}
+                    </div>
+                    <div className="notification__content">
+                      <p className="notification__message">{notif.message}</p>
+                      <span className="notification__event">{notif.event}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="header__profileDropdown" ref={profileRef}>
             <button
@@ -623,6 +806,16 @@ function Event() {
                   </div>
                 </div>
                 <p className="event__description">{event.shortDescription}</p>
+                {event.registrationRequired && event.registrationLink && (
+                  <a
+                    href={event.registrationLink}
+                    className="event__registerBtn"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Register Now
+                  </a>
+                )}
                 <Link 
                   to={`/activity/${event.id}`} 
                   className="event__detailsBtn"
@@ -640,6 +833,16 @@ function Event() {
           </div>
         )}
       </main>
+
+      <div
+        className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
+        id="toast"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {toastText}
+      </div>
 
       {/* Add/Edit Event Modal */}
       {showModal && (
@@ -791,6 +994,48 @@ function Event() {
                   </div>
                 )}
                 {shouldShowError("image") && <p className="form__error">{formErrors.image}</p>}
+              </div>
+
+              <div className="form__row">
+                <div className="form__group">
+                  <label htmlFor="registrationRequired" className="form__label">
+                    Registration Required?
+                  </label>
+                  <select
+                    id="registrationRequired"
+                    name="registrationRequired"
+                    className="form__input"
+                    value={String(formData.registrationRequired)}
+                    onChange={handleFormChange}
+                  >
+                    <option value="false">No</option>
+                    <option value="true">Yes</option>
+                  </select>
+                </div>
+
+                {formData.registrationRequired && (
+                  <div className="form__group">
+                    <label htmlFor="registrationLink" className="form__label">
+                      Registration Form Link *
+                    </label>
+                    <input
+                      type="url"
+                      id="registrationLink"
+                      name="registrationLink"
+                      className={`form__input ${shouldShowError("registrationLink") ? "form__input--error" : ""}`.trim()}
+                      value={formData.registrationLink}
+                      onChange={handleFormChange}
+                      onBlur={handleFieldBlur}
+                      ref={(element) => {
+                        fieldRefs.current.registrationLink = element;
+                      }}
+                      placeholder="https://forms.gle/your-form-link"
+                    />
+                    {shouldShowError("registrationLink") && (
+                      <p className="form__error">{formErrors.registrationLink}</p>
+                    )}
+                  </div>
+                )}
               </div>
 
               <div className="modal__actions">

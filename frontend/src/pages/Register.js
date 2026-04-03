@@ -17,20 +17,80 @@ function Register() {
     confirmPassword: "",
     adminKey: "",
   });
+  const [errors, setErrors] = useState({});
   const [role, setRole] = useState(roleFromPath);
 
+  const validate = (values, currentRole = role) => {
+    const nextErrors = {};
+
+    if (!values.fullName.trim()) {
+      nextErrors.fullName = "Full name is required.";
+    } else if (values.fullName.trim().length < 3) {
+      nextErrors.fullName = "Full name must be at least 3 characters.";
+    }
+
+    if (!values.email.trim()) {
+      nextErrors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values.email.trim())) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    if (!values.password) {
+      nextErrors.password = "Password is required.";
+    } else if (values.password.length < 6) {
+      nextErrors.password = "Password must be at least 6 characters.";
+    }
+
+    if (!values.confirmPassword) {
+      nextErrors.confirmPassword = "Please confirm your password.";
+    } else if (values.password !== values.confirmPassword) {
+      nextErrors.confirmPassword = "Passwords do not match.";
+    }
+
+    if (currentRole === "admin" && !values.adminKey.trim()) {
+      nextErrors.adminKey = "Admin registration key is required.";
+    }
+
+    return nextErrors;
+  };
+
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      [name]: "",
+    }));
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    const nextErrors = validate({ ...formData, [name]: value });
+    setErrors((prev) => ({
+      ...prev,
+      [name]: nextErrors[name] || "",
+    }));
+  };
+
+  const handleRoleChange = (nextRole) => {
+    setRole(nextRole);
+    setErrors({});
+    setFormData((prev) => ({
+      ...prev,
+      adminKey: nextRole === "admin" ? prev.adminKey : "",
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match");
+    const nextErrors = validate(formData, role);
+    setErrors(nextErrors);
+
+    if (Object.keys(nextErrors).length > 0) {
       return;
     }
 
@@ -95,14 +155,14 @@ function Register() {
               <button
                 type="button"
                 className={`btn btn--ghost register__roleBtn ${role === "student" ? "is-active" : ""}`.trim()}
-                onClick={() => setRole("student")}
+                onClick={() => handleRoleChange("student")}
               >
                 Student Register
               </button>
               <button
                 type="button"
                 className={`btn btn--ghost register__roleBtn ${role === "admin" ? "is-active" : ""}`.trim()}
-                onClick={() => setRole("admin")}
+                onClick={() => handleRoleChange("admin")}
               >
                 Admin Register
               </button>
@@ -113,43 +173,53 @@ function Register() {
                 type="text"
                 name="fullName"
                 placeholder="Full Name"
-                required
                 onChange={handleChange}
+                onBlur={handleBlur}
+                value={formData.fullName}
               />
+              {errors.fullName && <p className="form__error">{errors.fullName}</p>}
 
               <input
                 type="email"
                 name="email"
                 placeholder="University Email"
-                required
                 onChange={handleChange}
+                onBlur={handleBlur}
+                value={formData.email}
               />
+              {errors.email && <p className="form__error">{errors.email}</p>}
 
               <input
                 type="password"
                 name="password"
                 placeholder="Password"
-                required
                 onChange={handleChange}
+                onBlur={handleBlur}
+                value={formData.password}
               />
+              {errors.password && <p className="form__error">{errors.password}</p>}
 
               <input
                 type="password"
                 name="confirmPassword"
                 placeholder="Confirm Password"
-                required
                 onChange={handleChange}
+                onBlur={handleBlur}
+                value={formData.confirmPassword}
               />
+              {errors.confirmPassword && <p className="form__error">{errors.confirmPassword}</p>}
 
               {role === "admin" && (
                 <input
                   type="password"
                   name="adminKey"
                   placeholder="Admin Registration Key"
-                  required
                   onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={formData.adminKey}
                 />
               )}
+              {errors.adminKey && <p className="form__error">{errors.adminKey}</p>}
 
               <button type="submit" className="btn btn--primary btn--lg">
                 Register

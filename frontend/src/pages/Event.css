@@ -347,9 +347,125 @@
   box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
 }
 
+.event__registerBtn {
+  display: block;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 11px 20px;
+  background: linear-gradient(135deg, #22a86f, #168a5a);
+  color: #ffffff;
+  text-align: center;
+  text-decoration: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 12px rgba(22, 138, 90, 0.28);
+}
+
+.event__registerBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 16px rgba(22, 138, 90, 0.35);
+}
+
 .event__detailsBtn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(74, 144, 226, 0.4);
+}
+
+/* Header notification dropdown */
+.notifications__dropdown {
+  position: absolute;
+  top: 72px;
+  right: 120px;
+  width: 340px;
+  max-height: 380px;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #d7e9f7;
+  border-radius: 12px;
+  box-shadow: 0 16px 34px rgba(16, 42, 66, 0.2);
+  z-index: 1200;
+}
+
+.notifications__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px;
+  border-bottom: 1px solid #e6eef4;
+}
+
+.notifications__header h3 {
+  margin: 0;
+  font-size: 15px;
+  color: #0c2a40;
+}
+
+.notifications__header button {
+  border: none;
+  background: #ecf4fa;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  cursor: pointer;
+}
+
+.notifications__list {
+  max-height: 320px;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.notifications__empty {
+  margin: 0;
+  padding: 10px;
+  color: #5d7688;
+  font-size: 14px;
+}
+
+.notification__item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  border: 1px solid #e2edf5;
+  background: #f9fcff;
+}
+
+.notification__item--success {
+  border-left: 4px solid #2e9e5b;
+}
+
+.notification__item--warning {
+  border-left: 4px solid #f2a100;
+}
+
+.notification__item--urgent {
+  border-left: 4px solid #e34e4e;
+}
+
+.notification__icon {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.notification__content {
+  flex: 1;
+}
+
+.notification__message {
+  margin: 0 0 4px;
+  color: #13344a;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.notification__event {
+  font-size: 12px;
+  color: #5b7384;
 }
 
 /* Responsive adjustments */

@@ -73,6 +73,14 @@
   box-shadow: 0 0 0 3px var(--ring);
 }
 
+.form__error {
+  margin: -6px 0 0;
+  text-align: left;
+  color: #b91c1c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
 .register__login {
   margin-top: 18px;
   font-size: 14px;

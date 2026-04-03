@@ -613,6 +613,13 @@
   overflow-y: auto;
 }
 
+.notifications__empty {
+  margin: 0;
+  padding: 16px 20px;
+  color: #64748b;
+  font-size: 14px;
+}
+
 .notification__item {
   display: flex;
   gap: 12px;
