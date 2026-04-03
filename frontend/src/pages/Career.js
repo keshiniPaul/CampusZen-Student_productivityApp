@@ -218,8 +218,8 @@ function Career() {
             <div className="nav__cta">
               {isLoggedIn && (
                 <div className="notification-dropdown-container" ref={notificationDropdownRef} style={{ position: "relative" }}>
-                  <button 
-                    className="header__notificationBtn" 
+                  <button
+                    className="header__notificationBtn"
                     aria-label="Notifications"
                     onClick={() => setIsNotificationDropdownOpen(!isNotificationDropdownOpen)}
                   >
@@ -243,12 +243,12 @@ function Career() {
                           <div style={{ padding: "15px", textAlign: "center", color: "#666" }}>No notifications</div>
                         ) : (
                           notifications.map((notif) => (
-                            <div 
-                              key={notif._id} 
+                            <div
+                              key={notif._id}
                               onClick={() => markNotificationRead(notif._id, notif.link)}
-                              style={{ 
-                                padding: "10px 15px", 
-                                borderBottom: "1px solid #f5f5f5", 
+                              style={{
+                                padding: "10px 15px",
+                                borderBottom: "1px solid #f5f5f5",
                                 cursor: "pointer",
                                 backgroundColor: notif.isRead ? "transparent" : "#f0f8ff"
                               }}
@@ -426,11 +426,11 @@ function Career() {
               </div>
               <div className="post__body">
                 <h3 className="post__title">Resources</h3>
-                {!isAdmin && (
+                {/* {!isAdmin && (
                   <p className="post__text">
                     Access CV templates, interview guides, skill assessments, and career planning tools.
                   </p>
-                )}
+                )} */}
                 <a
                   className={`post__link ${isAdmin ? "post__link--admin" : ""}`}
                   href="/career/resources"

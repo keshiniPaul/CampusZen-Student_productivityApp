@@ -7,22 +7,25 @@ const careerRoutes = require("./routes/careerRoutes");
 const resumeRoutes = require("./routes/resumeRoutes");
 const internshipRoutes = require("./routes/internshipRoutes");
 const notificationRoutes = require("./routes/notificationRoutes");
+const resourceRoutes = require("./routes/resourceRoutes");
 const app = express();
 const path = require("path");
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+app.use(express.json({ limit: "25mb" }));
+app.use(express.urlencoded({ extended: true, limit: "25mb" }));
 
-// Serve static images
+// Serve static files
 app.use("/images", express.static(path.join(__dirname, "images")));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use(requestLogger);
 app.use("/api/health/habits", healthyHabitRoutes);
 app.use("/api/careers", careerRoutes);
 app.use("/api/resumes", resumeRoutes);
 app.use("/api/internships", internshipRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/resources", resourceRoutes);
 
 
 // Home route

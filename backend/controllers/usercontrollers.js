@@ -11,6 +11,7 @@ const buildAuthPayload = (user) => ({
   fullName: user.fullName,
   email: user.email,
   role: user.role,
+  skills: user.skills || [],
 });
 
 const createToken = (user) =>

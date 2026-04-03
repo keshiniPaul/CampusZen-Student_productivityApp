@@ -666,7 +666,141 @@ export const notificationAPI = {
   },
 };
 
-const api = { sportsAPI, eventAPI, clubsAPI, careerAPI, internshipAPI, notificationAPI };
+// Resources API endpoints
+export const resourcesAPI = {
+  // Get all resources (supports search, type, category, recommend, userId)
+  getAllResources: async (params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${API_BASE_URL}/resources${queryString ? `?${queryString}` : ''}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch resources');
+      return data;
+    } catch (error) {
+      console.error('Error fetching resources:', error);
+      throw error;
+    }
+  },
+
+  getResourceById: async (id) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/${id}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch resource');
+      return data;
+    } catch (error) {
+      console.error('Error fetching resource:', error);
+      throw error;
+    }
+  },
+
+  // formData is a FormData object (multipart) — do NOT set Content-Type header
+  createResource: async (formData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to create resource');
+      return data;
+    } catch (error) {
+      console.error('Error creating resource:', error);
+      throw error;
+    }
+  },
+
+  updateResource: async (id, formData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to update resource');
+      return data;
+    } catch (error) {
+      console.error('Error updating resource:', error);
+      throw error;
+    }
+  },
+
+  deleteResource: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to delete resource');
+      return data;
+    } catch (error) {
+      console.error('Error deleting resource:', error);
+      throw error;
+    }
+  },
+
+  saveResource: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/save/${id}`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to save resource');
+      return data;
+    } catch (error) {
+      console.error('Error saving resource:', error);
+      throw error;
+    }
+  },
+
+  unsaveResource: async (id, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/save/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to unsave resource');
+      return data;
+    } catch (error) {
+      console.error('Error unsaving resource:', error);
+      throw error;
+    }
+  },
+
+  getSavedResources: async (token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/resources/saved`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch saved resources');
+      return data;
+    } catch (error) {
+      console.error('Error fetching saved resources:', error);
+      throw error;
+    }
+  },
+};
+
+const api = { sportsAPI, eventAPI, clubsAPI, careerAPI, internshipAPI, notificationAPI, resourcesAPI };
 
 
 export default api;
