@@ -426,11 +426,11 @@ function Career() {
               </div>
               <div className="post__body">
                 <h3 className="post__title">Resources</h3>
-                {/* {!isAdmin && (
+                {!isAdmin && (
                   <p className="post__text">
                     Access CV templates, interview guides, skill assessments, and career planning tools.
                   </p>
-                )} */}
+                )}
                 <a
                   className={`post__link ${isAdmin ? "post__link--admin" : ""}`}
                   href="/career/resources"

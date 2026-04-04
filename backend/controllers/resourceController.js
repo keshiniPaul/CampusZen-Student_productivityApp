@@ -1,5 +1,6 @@
 const Resource = require("../models/ResourceModel");
 const User = require("../models/usermodels");
+const Notification = require("../models/notificationmodel");
 
 // Score a resource by how many of its tags overlap with user skills
 const scoreBySkills = (resource, skills = []) => {
@@ -74,10 +75,10 @@ exports.createResource = async (req, res) => {
   try {
     const { title, description, type, category, tags, link } = req.body;
 
-    if (!title || !description || !req.file) {
+    if (!title || !description) {
       return res.status(400).json({
         success: false,
-        message: "Please provide title, description and a file",
+        message: "Please provide title and description",
       });
     }
 
@@ -87,8 +88,16 @@ exports.createResource = async (req, res) => {
       ? tags.split(",").map((t) => t.trim()).filter(Boolean)
       : [];
 
-    // Save the file URL in MongoDB (e.g., /uploads/filename.pdf)
-    const fileUrl = `/uploads/${req.file.filename}`;
+    let fileUrl = "";
+    let fileName = "";
+    let fileType = "";
+
+    if (req.file) {
+      // Save the file URL in MongoDB (e.g., /uploads/filename.pdf)
+      fileUrl = `/uploads/${req.file.filename}`;
+      fileName = req.file.originalname;
+      fileType = req.file.mimetype;
+    }
 
     const resource = await Resource.create({
       title,
@@ -98,8 +107,20 @@ exports.createResource = async (req, res) => {
       tags: parsedTags,
       link: link || "",
       fileUrl,
-      fileName: req.file.originalname,
-      fileType: req.file.mimetype,
+      fileName,
+      fileType,
+      createdBy: req.user.id,
+    });
+
+    // Create a global notification for students about the new resource
+    await Notification.create({
+      title: "New Career Resource Available",
+      message: `A new ${resource.type} titled "${resource.title}" has been added. Check it out!`,
+      type: "info",
+      global: true,
+      link: `/career/resources?id=${resource._id}`,
+      // Optionally link a referenceId, though not strictly required here
+      referenceId: resource._id,
       createdBy: req.user.id,
     });
 

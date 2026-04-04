@@ -14,7 +14,6 @@ const ResourceSchema = new mongoose.Schema(
     },
     fileUrl: {
       type: String,
-      required: [true, "File URL is required"],
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
