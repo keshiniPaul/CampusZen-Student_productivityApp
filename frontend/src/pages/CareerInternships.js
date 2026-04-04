@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import "./Career.css";
 import "./Home.css";
 import { careerAPI } from "../services/api";
@@ -13,7 +13,9 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:5000";
 
 function CareerInternships() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isNavOpen, setIsNavOpen] = useState(false);
+  
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -28,6 +30,21 @@ function CareerInternships() {
   const [formData, setFormData] = useState({
     title: "", description: "", company: "", location: "", duration: "", color: "#667eea", link: "#", image: null, category: "internship"
   });
+
+  // Handle auto-opening resource/internship from notification
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const targetId = searchParams.get("id");
+    if (targetId && careers.length > 0) {
+      const match = careers.find((c) => c._id === targetId);
+      if (match && selectedCareer?._id !== targetId) {
+        setSelectedCareer(match);
+        setShowExploreModal(true);
+        // Clear param to avoid re-opening
+        navigate(location.pathname, { replace: true });
+      }
+    }
+  }, [location.search, careers, navigate, location.pathname, selectedCareer]);
 
   const profileDropdownRef = useRef(null);
   const toastTimerRef = useRef(null);

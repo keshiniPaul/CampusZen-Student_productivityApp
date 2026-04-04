@@ -62,13 +62,22 @@ const createCareer = async (req, res) => {
 
     // Create a global notification for everyone
     try {
-      if (category === "Internship" || category === "Job") {
+      if (category.toLowerCase() === "internship") {
         await Notification.create({
-          title: `New ${category} Posted: ${title}`,
+          title: `New Internship Posted: ${title}`,
           message: `${company} is hiring for ${title} in ${location}. Check it out!`,
           type: "info",
           global: true,
-          link: "/dashboard/career",
+          link: `/career/internships?id=${career._id}`,
+          referenceId: career._id,
+        });
+      } else if (category.toLowerCase() === "job") {
+        await Notification.create({
+          title: `New Job Opportunity: ${title}`,
+          message: `${company} is hiring for ${title} in ${location}.`,
+          type: "info",
+          global: true,
+          link: `/career/opportunities?id=${career._id}`,
           referenceId: career._id,
         });
       }

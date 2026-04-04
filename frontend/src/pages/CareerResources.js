@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import api from "../services/api";
 import "./Career.css";
 import "./Home.css";
@@ -14,6 +14,7 @@ const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:5000";
 
 function CareerResources() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [toastText, setToastText] = useState("");
   const [toastVisible, setToastVisible] = useState(false);
@@ -43,6 +44,15 @@ function CareerResources() {
   const [recommended, setRecommended] = useState([]);
   const [skills, setSkills] = useState([]); // user skills
   const [newSkill, setNewSkill] = useState("");
+
+  // Debounce search
+  const [searchDebounced, setSearchDebounced] = useState("");
+  useEffect(() => {
+    const t = setTimeout(() => {
+      setSearchDebounced(searchTerm);
+    }, 500);
+    return () => clearTimeout(t);
+  }, [searchTerm]);
 
   const handleAddSkill = () => {
     if (newSkill.trim() && !skills.includes(newSkill.trim())) {
@@ -76,7 +86,7 @@ function CareerResources() {
       fetchSavedResources();
     }
     // eslint-disable-next-line
-  }, [typeFilter, categoryFilter, searchTerm]); // re-fetch when filters change (we handled search frontend or backend depending on scale, we'll do backend)
+  }, [typeFilter, categoryFilter, searchDebounced]); // re-fetch when filters or debounced search change
 
   useEffect(() => {
     const h = (e) => { if (profileDropdownRef.current && !profileDropdownRef.current.contains(e.target)) setIsProfileDropdownOpen(false); };
@@ -127,14 +137,19 @@ function CareerResources() {
     } catch (err) { console.error(err); }
   };
 
-  // Debounce search
-  const [searchDebounced, setSearchDebounced] = useState("");
+  // Handle auto-opening resource from notification
   useEffect(() => {
-    const t = setTimeout(() => {
-      setSearchDebounced(searchTerm);
-    }, 500);
-    return () => clearTimeout(t);
-  }, [searchTerm]);
+    const searchParams = new URLSearchParams(location.search);
+    const targetId = searchParams.get("id");
+    if (targetId && resources.length > 0) {
+      const resourceToOpen = resources.find((r) => r._id === targetId);
+      if (resourceToOpen && detailModal?._id !== targetId) {
+        setDetailModal(resourceToOpen);
+        // Clear the URL to prevent reopening
+        navigate("/career/resources", { replace: true });
+      }
+    }
+  }, [location.search, resources, navigate]);
 
   const showToast = (msg) => { setToastText(msg); setToastVisible(true); if (toastTimerRef.current) clearTimeout(toastTimerRef.current); toastTimerRef.current = setTimeout(() => setToastVisible(false), 2200); };
   const scrollToTop = (e) => { e.preventDefault(); window.scrollTo({ top: 0, behavior: "smooth" }); setIsNavOpen(false); };
