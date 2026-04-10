@@ -1252,3 +1252,75 @@
   background: linear-gradient(135deg, #1fbfd7, #3a7bc8);
   box-shadow: 0 15px 30px rgba(58, 123, 200, 0.25);
 }
+
+/* Compact spacing tune-up */
+.habits-hero {
+  padding: 4.4rem 0 5.4rem;
+}
+
+.habits-hero__subtitle {
+  margin-bottom: 1.6rem;
+}
+
+.habits-hero__stats {
+  gap: 1.8rem;
+  margin-top: 1.2rem;
+}
+
+.habits-tabs__nav {
+  gap: 0.65rem;
+  padding: 0.7rem 0;
+}
+
+.habits-tabs__btn {
+  padding: 0.62rem 1.2rem;
+}
+
+.habits-section {
+  padding: 2rem 0 3rem;
+}
+
+.habits-card {
+  border-radius: 18px;
+  padding: 1.5rem;
+}
+
+.habits-card__header {
+  margin-bottom: 1.4rem;
+}
+
+.goals-form {
+  gap: 1.25rem;
+}
+
+.goals-grid {
+  gap: 1.25rem;
+}
+
+.goals-summary {
+  margin-top: 1.2rem;
+}
+
+.goals-summary__grid {
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.goals-form__actions {
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 768px) {
+  .habits-hero {
+    padding: 3.4rem 0 4.1rem;
+  }
+
+  .habits-section {
+    padding: 1.3rem 0 2rem;
+  }
+
+  .habits-card {
+    padding: 1rem;
+  }
+}
+

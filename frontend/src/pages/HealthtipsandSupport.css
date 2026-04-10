@@ -800,3 +800,92 @@
   background: linear-gradient(145deg, #1eb8dd, #3a7bc8);
   border-color: transparent;
 }
+
+/* Compact spacing tune-up */
+.tips-hero {
+  padding: 4.4rem 0 5.2rem;
+}
+
+.tips-hero__subtitle {
+  margin-bottom: 1.6rem;
+}
+
+.tips-hero__stats {
+  gap: 1.8rem;
+  margin-top: 1.2rem;
+}
+
+.tips-filters {
+  padding: 1rem 0;
+}
+
+.tips-filters__wrapper {
+  gap: 0.9rem;
+}
+
+.tips-content {
+  padding: 2rem 0 3rem;
+}
+
+.tips-grid {
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.25rem;
+}
+
+.tips-card {
+  border-radius: 16px;
+}
+
+.tips-card__header,
+.tips-card__body {
+  padding: 1rem;
+}
+
+.tips-card__list {
+  gap: 0.8rem;
+}
+
+.tips-card__item {
+  padding: 0.6rem;
+}
+
+.tips-card__footer {
+  padding: 0.85rem 1rem;
+}
+
+.tips-no-results {
+  padding: 2.5rem 1rem;
+}
+
+.tips-emergency {
+  padding: 1.4rem 0 2.2rem;
+}
+
+.tips-emergency__content {
+  padding: 1.2rem;
+  gap: 1.2rem;
+}
+
+.tips-emergency__actions {
+  gap: 0.7rem;
+}
+
+.tips-emergency__phone,
+.tips-emergency__chat {
+  padding: 0.75rem 1rem;
+}
+
+@media (max-width: 768px) {
+  .tips-hero {
+    padding: 3.4rem 0 4rem;
+  }
+
+  .tips-content {
+    padding: 1.3rem 0 2rem;
+  }
+
+  .tips-grid {
+    gap: 0.95rem;
+  }
+}
+
