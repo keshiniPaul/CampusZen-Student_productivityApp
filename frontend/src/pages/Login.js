@@ -189,18 +189,6 @@ function Login() {
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container footer__inner">
-          <div>
-            <div className="footer__name">CampusZone</div>
-            <div className="footer__small">
-              Student Productivity Platform
-            </div>
-          </div>
-        </div>
-      </footer>
-
       {/* Toast Notification */}
       <div className={`toast ${toast.visible ? "is-visible" : ""}`}>
         {toast.message}

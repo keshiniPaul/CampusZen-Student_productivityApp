@@ -754,3 +754,49 @@
     font-size: 0.85rem;
   }
 }
+
+/* Modern refresh */
+.tips-hero {
+  background:
+    linear-gradient(120deg, rgba(7, 31, 51, 0.75), rgba(58, 123, 200, 0.52)),
+    url("https://images.unsplash.com/photo-1516302752625-fcc3c50ae61f?auto=format&fit=crop&w=1800&q=80") center/cover;
+  padding: 5.4rem 0 7.2rem;
+}
+
+.tips-hero__badge {
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.tips-filters {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.tips-content {
+  background:
+    radial-gradient(700px 320px at 10% 0%, rgba(74, 158, 255, 0.15), transparent 55%),
+    #f7fcff;
+}
+
+.tips-card {
+  border: 1px solid rgba(2, 30, 55, 0.08);
+  box-shadow: 0 15px 34px rgba(2, 30, 55, 0.1);
+}
+
+.tips-card__header {
+  background: linear-gradient(145deg, rgba(235, 248, 255, 0.8), rgba(255, 255, 255, 1));
+}
+
+.tips-card__item {
+  border: 1px solid rgba(2, 30, 55, 0.06);
+  background: #f5fbff;
+}
+
+.tips-card__item:hover {
+  border-color: rgba(74, 158, 255, 0.28);
+}
+
+.tips-categories__btn.active {
+  background: linear-gradient(145deg, #1eb8dd, #3a7bc8);
+  border-color: transparent;
+}

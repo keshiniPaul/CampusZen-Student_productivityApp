@@ -3,7 +3,9 @@ import { useNavigate } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
 import "./Register.css";
 import campusLogo from "../images/campus_logo.png";
-import registerImg from "../images/resources.jpg";
+
+const REGISTER_IMAGE_URL =
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1200&q=80";
 
 function Register() {
   const navigate = useNavigate();
@@ -147,7 +149,7 @@ function Register() {
       <main className="register">
         <div className="container register__container">
           <div className="register__image-wrapper">
-             <img src={registerImg} alt="Join CampusZone" className="register__image" />
+            <img src={REGISTER_IMAGE_URL} alt="Students collaborating on campus" className="register__image" />
           </div>
           <div className="register__card">
             <h2>Create Your Account</h2>
@@ -236,18 +238,6 @@ function Register() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container footer__inner">
-          <div>
-            <div className="footer__name">CampusZone</div>
-            <div className="footer__small">
-              Student Productivity Platform
-            </div>
-          </div>
-        </div>
-      </footer>
     </>
   );
 }
