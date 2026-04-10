@@ -1439,3 +1439,292 @@ img {
 	background: rgba(2, 30, 55, 0.08);
 	margin: 4px 0;
 }
+
+/* Sky light blue theme boost */
+:root {
+	--sky-50: #f4fcff;
+	--sky-100: #e8f8ff;
+	--sky-200: #cfefff;
+	--sky-300: #9fe3ff;
+	--sky-400: #64cdff;
+	--sky-500: #2db9f2;
+	--card: rgba(240, 250, 255, .84);
+	--card-strong: rgba(247, 253, 255, .95);
+}
+
+body {
+	background:
+		radial-gradient(1200px 760px at 8% 0%, rgba(207, 239, 255, .85), transparent 58%),
+		radial-gradient(980px 680px at 92% 12%, rgba(159, 227, 255, .62), transparent 56%),
+		linear-gradient(180deg, #f4fcff 0%, #ffffff 45%, #f8fdff 100%);
+}
+
+.topbar {
+	background: rgba(236, 248, 255, .82);
+	border-bottom: 1px solid rgba(45, 185, 242, .22);
+}
+
+.nav__links a:hover {
+	background: rgba(159, 227, 255, .32);
+}
+
+.hero__subtitle,
+.hero__bullets,
+.section__desc,
+.post__text,
+.card__text {
+	color: rgba(11, 35, 55, .74);
+}
+
+.heroCard,
+.deviceCard,
+.card,
+.post,
+.gallery__item {
+	border-color: rgba(45, 185, 242, .22);
+	box-shadow: 0 16px 46px rgba(45, 185, 242, .14);
+}
+
+.heroCard__float {
+	background: rgba(245, 252, 255, .94);
+	border: 1px solid rgba(45, 185, 242, .2);
+}
+
+.section--soft {
+	background: linear-gradient(180deg, rgba(232, 248, 255, .78), rgba(245, 252, 255, .96));
+	border-top: 1px solid rgba(45, 185, 242, .18);
+	border-bottom: 1px solid rgba(45, 185, 242, .16);
+}
+
+.card__icon,
+.cta__cardIcon {
+	background: linear-gradient(145deg, rgba(247, 253, 255, .98), rgba(214, 242, 255, .92));
+	border-color: rgba(45, 185, 242, .22);
+}
+
+.tag {
+	background: rgba(8, 44, 70, .42);
+	border: 1px solid rgba(255, 255, 255, .62);
+}
+
+.cta__card {
+	background: rgba(235, 248, 255, .42);
+	border: 1px solid rgba(255, 255, 255, .5);
+}
+
+.footer {
+	background: linear-gradient(180deg, #1f3850 0%, #1b3248 100%);
+}
+
+.footer__feedback,
+.toTop {
+	background: linear-gradient(135deg, #9fe3ff, #2db9f2);
+}
+
+.footer__socials a:hover {
+	background: rgba(159, 227, 255, .4);
+}
+
+/* Premium hero + cta motion pass */
+.hero {
+	position: relative;
+	isolation: isolate;
+}
+
+.hero::before,
+.hero::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	z-index: 0;
+	border-radius: 999px;
+	filter: blur(2px);
+	opacity: .7;
+	animation: skyFloat 14s ease-in-out infinite;
+}
+
+.hero::before {
+	width: 420px;
+	height: 420px;
+	left: -150px;
+	top: -110px;
+	background: radial-gradient(circle at 35% 35%, rgba(159, 227, 255, .48), rgba(159, 227, 255, 0) 62%);
+}
+
+.hero::after {
+	width: 380px;
+	height: 380px;
+	right: -120px;
+	top: 40px;
+	background: radial-gradient(circle at 40% 40%, rgba(100, 205, 255, .42), rgba(100, 205, 255, 0) 64%);
+	animation-delay: -6s;
+}
+
+.hero__content {
+	position: relative;
+	z-index: 1;
+}
+
+.heroCard,
+.deviceCard {
+	background: linear-gradient(155deg, rgba(255, 255, 255, .58), rgba(239, 250, 255, .5));
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, .62);
+	box-shadow:
+		0 22px 50px rgba(45, 185, 242, .2),
+		0 2px 0 rgba(255, 255, 255, .45) inset;
+}
+
+.heroCard::after {
+	content: "";
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(120deg, rgba(255, 255, 255, .32), rgba(255, 255, 255, 0) 46%);
+	pointer-events: none;
+}
+
+.heroCard__float {
+	box-shadow: 0 14px 30px rgba(45, 185, 242, .22);
+	backdrop-filter: blur(10px);
+}
+
+.section--cta {
+	position: relative;
+	overflow: hidden;
+	background:
+		linear-gradient(125deg, rgba(159, 227, 255, .96), rgba(45, 185, 242, .95)),
+		linear-gradient(180deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, 0));
+}
+
+.section--cta::before,
+.section--cta::after {
+	content: "";
+	position: absolute;
+	pointer-events: none;
+	border-radius: 999px;
+	filter: blur(1px);
+	opacity: .55;
+	animation: skyPulse 10s ease-in-out infinite;
+}
+
+.section--cta::before {
+	width: 420px;
+	height: 420px;
+	left: -180px;
+	top: -180px;
+	background: radial-gradient(circle, rgba(255, 255, 255, .44), rgba(255, 255, 255, 0) 64%);
+}
+
+.section--cta::after {
+	width: 360px;
+	height: 360px;
+	right: -150px;
+	bottom: -140px;
+	background: radial-gradient(circle, rgba(220, 246, 255, .64), rgba(220, 246, 255, 0) 62%);
+	animation-delay: -4s;
+}
+
+.cta,
+.cta__text,
+.cta__card {
+	position: relative;
+	z-index: 1;
+}
+
+.cta__card {
+	background: linear-gradient(150deg, rgba(255, 255, 255, .52), rgba(234, 248, 255, .36));
+	backdrop-filter: blur(10px);
+	-webkit-backdrop-filter: blur(10px);
+	border: 1px solid rgba(255, 255, 255, .58);
+	box-shadow:
+		0 18px 38px rgba(26, 86, 124, .2),
+		0 1px 0 rgba(255, 255, 255, .46) inset;
+}
+
+.cta__actions .btn {
+	box-shadow: 0 14px 28px rgba(26, 86, 124, .2);
+}
+
+@keyframes skyFloat {
+	0%,
+	100% {
+		transform: translate3d(0, 0, 0) scale(1);
+	}
+	50% {
+		transform: translate3d(0, -14px, 0) scale(1.04);
+	}
+}
+
+@keyframes skyPulse {
+	0%,
+	100% {
+		opacity: .48;
+		transform: scale(1);
+	}
+	50% {
+		opacity: .72;
+		transform: scale(1.06);
+	}
+}
+
+@media (max-width: 760px) {
+	.hero::before,
+	.hero::after,
+	.section--cta::before,
+	.section--cta::after {
+		opacity: .45;
+	}
+}
+
+/* CTA style: clean white rectangle */
+.section--cta {
+	background: #e9eef3;
+	border-top: 1px solid #d7e1ea;
+	border-bottom: 1px solid #d7e1ea;
+	overflow: visible;
+}
+
+.section--cta::before,
+.section--cta::after {
+	display: none;
+}
+
+.cta__title,
+.cta__desc {
+	color: #142234;
+}
+
+.section--cta .btn--dark {
+	background: linear-gradient(135deg, #0f2740, #1b3550);
+	color: #ffffff;
+	border-color: rgba(15, 39, 64, 0.25);
+	box-shadow: 0 10px 24px rgba(10, 32, 52, 0.28);
+}
+
+.section--cta .btn--ghostOnDark {
+	background: #f7fbff;
+	color: #3a4a5a;
+	border-color: #dbe6f0;
+	box-shadow: none;
+}
+
+.section--cta .btn--ghostOnDark:hover {
+	background: #eef5fb;
+	color: #1f2f3f;
+}
+
+.cta__card {
+	background: #ffffff;
+	border: 1px solid #e3eaf1;
+	border-radius: 28px;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
+	box-shadow: 0 8px 24px rgba(14, 36, 58, 0.08);
+}
+
+.cta__cardIcon {
+	background: #eef7ff;
+	border: 1px solid #cfe4f6;
+}
+
