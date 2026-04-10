@@ -334,3 +334,75 @@
   border-radius: 18px;
   box-shadow: 0 18px 45px rgba(245, 87, 108, 0.24);
 }
+
+/* Compact spacing tune-up */
+.hero--health {
+  padding: 4.4rem 0 3.8rem;
+  margin-bottom: 1.8rem;
+}
+
+.hero__stats {
+  gap: 1.4rem;
+  margin-top: 1.2rem;
+}
+
+.posts--health {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.2rem;
+  margin-top: 1.8rem;
+}
+
+.post__media {
+  height: 200px;
+}
+
+.post__body {
+  padding: 1.1rem;
+}
+
+.post__title {
+  margin-bottom: 0.55rem;
+}
+
+.post__text {
+  margin-bottom: 0.8rem;
+  line-height: 1.5;
+}
+
+.post__features {
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.health-emergency {
+  padding: 1.6rem;
+  margin-top: 2.2rem;
+}
+
+.health-emergency__text {
+  margin-bottom: 1rem;
+}
+
+.health-emergency__phone {
+  padding: 0.8rem 1.3rem;
+}
+
+@media (max-width: 768px) {
+  .hero--health {
+    padding: 3.3rem 0 2.8rem;
+  }
+
+  .hero__subtitle {
+    margin-bottom: 1.2rem;
+  }
+
+  .post__body {
+    padding: 0.95rem;
+  }
+
+  .health-emergency {
+    padding: 1.1rem;
+    margin-top: 1.4rem;
+  }
+}
+

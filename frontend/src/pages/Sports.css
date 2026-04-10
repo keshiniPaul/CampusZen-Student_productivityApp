@@ -1010,6 +1010,80 @@
   border: 1px solid #dbe3ef;
 }
 
+/* Modern refresh */
+.sports {
+  position: relative;
+  background:
+    radial-gradient(980px 420px at 10% 0%, rgba(32, 191, 219, 0.24), transparent 56%),
+    radial-gradient(780px 340px at 90% 12%, rgba(143, 224, 255, 0.3), transparent 60%),
+    #f7fcff;
+}
+
+.sports__header {
+  padding: 28px;
+  border-radius: 24px;
+  margin-bottom: 26px;
+  background:
+    linear-gradient(124deg, rgba(5, 30, 48, 0.8), rgba(20, 126, 176, 0.5)),
+    url("https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1800&q=80") center/cover;
+  box-shadow: 0 22px 52px rgba(2, 30, 55, 0.22);
+}
+
+.sports__title,
+.sports__subtitle,
+.sports__backBtn {
+  color: #ffffff;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+}
+
+.sports__backBtn:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+.sports__card {
+  border-radius: 18px;
+  border: 1px solid rgba(2, 30, 55, 0.08);
+  box-shadow: 0 15px 34px rgba(2, 30, 55, 0.11);
+}
+
+.sports__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 46px rgba(2, 30, 55, 0.18);
+  border-color: rgba(59, 130, 246, 0.28);
+}
+
+.sports__cardImage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(6, 23, 38, 0.04) 44%, rgba(6, 23, 38, 0.26) 100%);
+}
+
+.sports__cardBadges,
+.sports__adminActions {
+  z-index: 2;
+}
+
+.sports__meta,
+.sports__capacitySection {
+  background: linear-gradient(145deg, #f8fcff, #f0f8ff);
+  border: 1px solid rgba(37, 182, 255, 0.14);
+}
+
+.topbar .nav .nav__cta {
+  position: relative;
+}
+
+.topbar .nav .nav__cta .notifications__dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(380px, calc(100vw - 28px));
+  max-height: 430px;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
   .sports {
@@ -1040,7 +1114,7 @@
   }
 
   .sports__card {
-    padding: 24px;
+    padding: 0;
   }
 
   .sports__actions {
@@ -1056,5 +1130,72 @@
   .modal__content--large {
     max-width: 100%;
     margin: 0 10px;
+  }
+}
+
+/* Compact spacing tune-up */
+.sports {
+  padding: 88px 0 42px;
+}
+
+.sports__header {
+  margin-bottom: 22px;
+  padding: 22px;
+  border-radius: 18px;
+  gap: 14px;
+}
+
+.sports__searchWrap {
+  margin-bottom: 18px;
+}
+
+.sports__grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.sports__cardImage {
+  height: 188px;
+}
+
+.sports__content {
+  padding: 18px;
+}
+
+.sports__description {
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.sports__meta {
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.sports__capacitySection {
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.sports__actions {
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .sports {
+    padding: 78px 0 28px;
+  }
+
+  .sports__header {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .sports__grid {
+    gap: 14px;
+  }
+
+  .sports__content {
+    padding: 14px;
   }
 }

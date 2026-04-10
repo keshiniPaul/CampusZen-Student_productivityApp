@@ -1228,6 +1228,84 @@
 	background: linear-gradient(135deg, var(--sky-300), var(--sky-500));
 }
 
+/* Modern refresh */
+.clubs {
+  position: relative;
+  background:
+    radial-gradient(980px 420px at 8% 0%, rgba(61, 214, 255, 0.22), transparent 54%),
+    radial-gradient(760px 340px at 92% 10%, rgba(163, 236, 255, 0.26), transparent 60%),
+    #f6fcff;
+}
+
+.clubs__header {
+  padding: 28px;
+  border-radius: 24px;
+  background:
+    linear-gradient(125deg, rgba(6, 26, 39, 0.78), rgba(18, 117, 155, 0.52)),
+    url("https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1800&q=80") center/cover;
+  box-shadow: 0 20px 48px rgba(3, 34, 52, 0.24);
+}
+
+.clubs__title,
+.clubs__subtitle,
+.clubs__backBtn {
+  color: #ffffff;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+}
+
+.clubs__backBtn:hover {
+  background-color: rgba(255, 255, 255, 0.16);
+}
+
+.clubs__searchBar {
+  border: 1px solid rgba(2, 30, 55, 0.09);
+  box-shadow: 0 14px 30px rgba(2, 30, 55, 0.11);
+}
+
+.clubs__card {
+  border-radius: 18px;
+  border: 1px solid rgba(2, 30, 55, 0.08);
+  box-shadow: 0 14px 32px rgba(2, 30, 55, 0.12);
+}
+
+.clubs__card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 24px 46px rgba(2, 30, 55, 0.19);
+  border-color: rgba(37, 182, 255, 0.32);
+}
+
+.clubs__cardImage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(7, 21, 34, 0.04) 46%, rgba(7, 21, 34, 0.3) 100%);
+}
+
+.clubs__cardBadges,
+.clubs__adminActions {
+  z-index: 2;
+}
+
+.clubs__meta,
+.clubs__capacitySection {
+  background: linear-gradient(145deg, #f8fcff, #eef8ff);
+  border: 1px solid rgba(37, 182, 255, 0.14);
+}
+
+.topbar .nav .nav__cta {
+  position: relative;
+}
+
+.topbar .nav .nav__cta .notifications__dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: min(380px, calc(100vw - 28px));
+  max-height: 430px;
+}
+
 .toast{
 	position: fixed;
 	left: 50%;
@@ -1289,5 +1367,71 @@
 	.footer__heading{ font-size: 38px; }
 	.footer__contact{ font-size: 18px; }
 	.footer__bottom .footer__inner{ justify-content: center; }
+}
+
+/* Compact spacing tune-up */
+.clubs {
+  padding: 88px 0 42px;
+}
+
+.clubs__header {
+  margin-bottom: 22px;
+  padding: 22px;
+  border-radius: 18px;
+  gap: 14px;
+}
+
+.clubs__searchWrap {
+  margin-bottom: 18px;
+}
+
+.clubs__grid {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.clubs__cardImage {
+  height: 188px;
+}
+
+.clubs__content {
+  padding: 18px;
+}
+
+.clubs__description {
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+
+.clubs__meta {
+  margin-bottom: 14px;
+  padding: 12px;
+}
+
+.clubs__capacitySection {
+  margin-bottom: 14px;
+}
+
+.clubs__actions {
+  gap: 10px;
+}
+
+@media (max-width: 768px) {
+  .clubs {
+    padding: 78px 0 28px;
+  }
+
+  .clubs__header {
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .clubs__grid {
+    gap: 14px;
+  }
+
+  .clubs__content {
+    padding: 14px;
+  }
 }
 
