@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useLocation, useParams, useNavigate } from "react-router-dom";
 import "./ActivityDetails.css";
 import "../pages/Home.css";
 import campusLogo from "../images/campus_logo.png";
@@ -157,6 +157,38 @@ const activitiesData = {
 
 const FIELD_ORDER = ["title", "description", "category", "date", "venue", "image"];
 
+const getStoredEventById = (eventId) => {
+  try {
+    const storedEvents = JSON.parse(localStorage.getItem("campuszone_events") || "[]");
+    if (!Array.isArray(storedEvents)) {
+      return null;
+    }
+
+    return storedEvents.find((event) => event.id === eventId) || null;
+  } catch (error) {
+    console.error("Failed to read stored events:", error);
+    return null;
+  }
+};
+
+const normalizeActivity = (activity) => {
+  if (!activity) {
+    return null;
+  }
+
+  return {
+    ...activity,
+    shortDescription: activity.shortDescription || activity.description || "",
+    description: activity.description || activity.shortDescription || "",
+    time: activity.time || "To be announced",
+    date: activity.date || "",
+    venue: activity.venue || "",
+    image: activity.image || "",
+    category: activity.category || "Event",
+    isNew: Boolean(activity.isNew),
+  };
+};
+
 const validateField = (fieldName, value, formValues) => {
   const trimmedValue = typeof value === "string" ? value.trim() : value;
 
@@ -213,6 +245,7 @@ function FieldError({ message }) {
 
 function ActivityDetails() {
   const { activityType } = useParams();
+  const location = useLocation();
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
   const displayName = currentUser?.fullName || currentUser?.email || "User";
@@ -242,15 +275,18 @@ function ActivityDetails() {
   const fieldRefs = useRef({});
 
   useEffect(() => {
-    const data =
-      activitiesData[activityType] || activitiesData["event"];
+    const locationActivity = normalizeActivity(location.state?.activity);
+    const storedActivity = normalizeActivity(getStoredEventById(activityType));
+    const fallbackActivity = normalizeActivity(activitiesData[activityType] || activitiesData.event);
+    const data = locationActivity || storedActivity || fallbackActivity;
+
     setActivity(data);
 
     // Show new activity banner if activity is new
     if (data.isNew) {
       setShowNewActivityBanner(true);
     }
-  }, [activityType]);
+  }, [activityType, location.state]);
 
   useEffect(() => {
     if (!isModalOpen) return;
@@ -333,6 +369,15 @@ function ActivityDetails() {
   const shouldShowError = (fieldName) => {
     return Boolean((touched[fieldName] || submitAttempted) && errors[fieldName]);
   };
+
+  const formattedDate = activity?.date
+    ? new Date(activity.date).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "Date to be announced";
 
   const handleCloseModal = () => {
     if (successTimerRef.current) {
@@ -528,12 +573,7 @@ function ActivityDetails() {
                   </div>
                   <div className="activityDetails__infoContent">
                     <span className="activityDetails__label">DATE</span>
-                    <p className="activityDetails__value">{new Date(activity.date).toLocaleDateString("en-US", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}</p>
+                    <p className="activityDetails__value">{formattedDate}</p>
                   </div>
                 </div>
 
@@ -563,33 +603,35 @@ function ActivityDetails() {
                   </div>
                 </div>
 
-                <div className="activityDetails__infoCard">
-                  <div className="activityDetails__iconWrapper activityDetails__iconWrapper--capacity">
-                    <svg className="activityDetails__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M18 7.16C17.94 7.15 17.87 7.15 17.81 7.16C16.43 7.11 15.33 5.98 15.33 4.58C15.33 3.15 16.48 2 17.91 2C19.34 2 20.49 3.16 20.49 4.58C20.48 5.98 19.38 7.11 18 7.16Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M16.97 14.44C18.34 14.67 19.85 14.43 20.91 13.72C22.32 12.78 22.32 11.24 20.91 10.3C19.84 9.59 18.31 9.35 16.94 9.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M5.97 7.16C6.03 7.15 6.1 7.15 6.16 7.16C7.54 7.11 8.64 5.98 8.64 4.58C8.64 3.15 7.49 2 6.06 2C4.63 2 3.48 3.16 3.48 4.58C3.49 5.98 4.59 7.11 5.97 7.16Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M7 14.44C5.63 14.67 4.12 14.43 3.06 13.72C1.65 12.78 1.65 11.24 3.06 10.3C4.13 9.59 5.66 9.35 7.03 9.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M12 14.63C11.94 14.62 11.87 14.62 11.81 14.63C10.43 14.58 9.33 13.45 9.33 12.05C9.33 10.62 10.48 9.47 11.91 9.47C13.34 9.47 14.49 10.63 14.49 12.05C14.48 13.45 13.38 14.59 12 14.63Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      <path d="M9.09 17.78C7.68 18.72 7.68 20.26 9.09 21.2C10.69 22.27 13.31 22.27 14.91 21.2C16.32 20.26 16.32 18.72 14.91 17.78C13.32 16.72 10.69 16.72 9.09 17.78Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    </svg>
-                  </div>
-                  <div className="activityDetails__infoContent">
-                    <span className="activityDetails__label">CAPACITY</span>
-                    <p className="activityDetails__value">{activity.registered} / {activity.capacity} attendees</p>
-                    <div className="activityDetails__progressBar">
-                      <div 
-                        className="activityDetails__progress"
-                        style={{ width: `${(activity.registered / activity.capacity) * 100}%` }}
-                      ></div>
+                {typeof activity.registered === "number" && typeof activity.capacity === "number" && (
+                  <div className="activityDetails__infoCard">
+                    <div className="activityDetails__iconWrapper activityDetails__iconWrapper--capacity">
+                      <svg className="activityDetails__icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M18 7.16C17.94 7.15 17.87 7.15 17.81 7.16C16.43 7.11 15.33 5.98 15.33 4.58C15.33 3.15 16.48 2 17.91 2C19.34 2 20.49 3.16 20.49 4.58C20.48 5.98 19.38 7.11 18 7.16Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M16.97 14.44C18.34 14.67 19.85 14.43 20.91 13.72C22.32 12.78 22.32 11.24 20.91 10.3C19.84 9.59 18.31 9.35 16.94 9.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M5.97 7.16C6.03 7.15 6.1 7.15 6.16 7.16C7.54 7.11 8.64 5.98 8.64 4.58C8.64 3.15 7.49 2 6.06 2C4.63 2 3.48 3.16 3.48 4.58C3.49 5.98 4.59 7.11 5.97 7.16Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M7 14.44C5.63 14.67 4.12 14.43 3.06 13.72C1.65 12.78 1.65 11.24 3.06 10.3C4.13 9.59 5.66 9.35 7.03 9.59" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M12 14.63C11.94 14.62 11.87 14.62 11.81 14.63C10.43 14.58 9.33 13.45 9.33 12.05C9.33 10.62 10.48 9.47 11.91 9.47C13.34 9.47 14.49 10.63 14.49 12.05C14.48 13.45 13.38 14.59 12 14.63Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                        <path d="M9.09 17.78C7.68 18.72 7.68 20.26 9.09 21.2C10.69 22.27 13.31 22.27 14.91 21.2C16.32 20.26 16.32 18.72 14.91 17.78C13.32 16.72 10.69 16.72 9.09 17.78Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </div>
+                    <div className="activityDetails__infoContent">
+                      <span className="activityDetails__label">CAPACITY</span>
+                      <p className="activityDetails__value">{activity.registered} / {activity.capacity} attendees</p>
+                      <div className="activityDetails__progressBar">
+                        <div 
+                          className="activityDetails__progress"
+                          style={{ width: `${(activity.registered / activity.capacity) * 100}%` }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
 
               <div className="activityDetails__descriptionSection">
                 <h2 className="activityDetails__sectionTitle">About This Activity</h2>
-                <p className="activityDetails__description">{activity.description}</p>
+                <p className="activityDetails__description">{activity.description || activity.shortDescription}</p>
               </div>
 
               {(showClosedMessage || showSuccessMessage) && (

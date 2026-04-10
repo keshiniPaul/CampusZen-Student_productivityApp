@@ -427,7 +427,7 @@ function Event() {
       // Update existing event
         const updatedEvents = events.map((event) =>
         event.id === editingEvent.id
-          ? { ...event, ...formData }
+          ? { ...event, ...formData, description: formData.shortDescription }
           : event
         );
         setEvents(updatedEvents);
@@ -438,6 +438,7 @@ function Event() {
       // Add new event
       const newEvent = {
         ...formData,
+        description: formData.shortDescription,
         id: `event-${Date.now()}`,
       };
         const updatedEvents = [newEvent, ...events];
@@ -854,6 +855,12 @@ function Event() {
                 <Link 
                   to={`/activity/${event.id}`} 
                   className="event__detailsBtn"
+                  state={{
+                    activity: {
+                      ...event,
+                      description: event.description || event.shortDescription,
+                    },
+                  }}
                 >
                   View Details
                 </Link>
