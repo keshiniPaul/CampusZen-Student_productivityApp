@@ -263,6 +263,9 @@ function Health() {
       <section className="hero hero--health">
         <div className="container hero__container">
           <div className="hero__content">
+            <button className="back-to-dashboard" onClick={() => navigate(isLoggedIn ? "/dashboard" : "/")}>
+              <span>←</span> Back to Welcome Dashboard
+            </button>
             <h1 className="hero__title">Student Health & Wellbeing</h1>
             <p className="hero__subtitle">
               Your comprehensive wellness hub for physical and mental health support

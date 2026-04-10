@@ -178,7 +178,7 @@ function LoginDashboard() {
 
   const goToStudy = (e) => {
     e.preventDefault();
-    navigate("/study");
+    alert("Study section coming soon");
     setIsNavOpen(false);
   };
 

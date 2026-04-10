@@ -295,6 +295,9 @@ function EventDashboard() {
       </div>
 
       <section className="eventDashboard__hero container">
+        <button className="back-to-dashboard" onClick={() => navigate(token ? "/dashboard" : "/")}>
+          <span>←</span> Back to Welcome Dashboard
+        </button>
         <div className="eventDashboard__pill">CampusZone Events</div>
         <h1 className="eventDashboard__title">Event Dashboard</h1>
         <p className="eventDashboard__subtitle">
