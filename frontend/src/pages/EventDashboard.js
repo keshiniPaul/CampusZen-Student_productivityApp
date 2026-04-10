@@ -35,8 +35,6 @@ const categories = [
 
 function EventDashboard() {
   const navigate = useNavigate();
-  const currentUser = JSON.parse(localStorage.getItem("user") || "null");
-  const displayName = currentUser?.fullName || currentUser?.email || "User";
   const [isNavOpen, setIsNavOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -152,6 +150,22 @@ function EventDashboard() {
     setIsNavOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsProfileOpen(false);
+    navigate("/");
+  };
+
+  const goToDashboard = () => {
+    setIsProfileOpen(false);
+    navigate("/dashboard");
+  };
+
+  const goToProfile = () => {
+    setIsProfileOpen(false);
+    navigate("/profile");
+  };
+
   const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -219,71 +233,87 @@ function EventDashboard() {
             </a>
           </div>
 
-          <div className="eventDashboard__notificationWrap" ref={notificationsRef}>
-            <button
-              className="header__notificationBtn"
-              aria-label="Notifications"
-              onClick={() => setIsNotificationsOpen((prev) => !prev)}
-              type="button"
-            >
-              🔔
-              {notifications.filter((item) => !item.isRead).length > 0 && (
-                <span className="header__notificationBadge">
-                  {notifications.filter((item) => !item.isRead).length}
-                </span>
-              )}
-            </button>
-
-            {isNotificationsOpen && (
-              <div className="eventDashboard__notificationDropdown">
-                <div className="eventDashboard__notificationHeader">
-                  <h3>Notifications</h3>
-                  <span>{notifications.length} total</span>
-                </div>
-
-                {notificationsError ? (
-                  <p className="eventDashboard__notificationEmpty">{notificationsError}</p>
-                ) : notifications.length === 0 ? (
-                  <p className="eventDashboard__notificationEmpty">No notifications yet.</p>
-                ) : (
-                  <div className="eventDashboard__notificationList">
-                    {notifications.map((notification) => (
-                      <div
-                        key={notification.id}
-                        className={`eventDashboard__notificationItem eventDashboard__notificationItem--${notification.category} ${notification.isRead ? "is-read" : "is-unread"}`}
-                      >
-                        <div className="eventDashboard__notificationBadgeLabel">
-                          {notification.category === "event" ? "Event" : notification.category === "sport" ? "Sport" : "Club & Society"}
-                        </div>
-                        <div className="eventDashboard__notificationBody">
-                          <strong>{notification.title}</strong>
-                          <p>{notification.message}</p>
-                          <span>{new Date(notification.createdAt).toLocaleString()}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+          <div className="nav__cta">
+            <div className="eventDashboard__notificationWrap" ref={notificationsRef}>
+              <button
+                className="header__notificationBtn"
+                aria-label="Notifications"
+                onClick={() => setIsNotificationsOpen((prev) => !prev)}
+                type="button"
+              >
+                <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
+                  <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
+                </svg>
+                {notifications.filter((item) => !item.isRead).length > 0 && (
+                  <span className="header__notificationBadge">
+                    {notifications.filter((item) => !item.isRead).length}
+                  </span>
                 )}
-              </div>
-            )}
-          </div>
+              </button>
 
-          <div className="header__profileDropdown" ref={profileRef}>
-            <button
-              className="header__profileBtn"
-              onClick={() => setIsProfileOpen((prev) => !prev)}
-              aria-expanded={isProfileOpen}
-            >
-              <span className="header__profileText">{displayName}</span>
-              <span className="header__profileArrow" aria-hidden="true">▼</span>
-            </button>
-            {isProfileOpen && (
-              <div className="header__profileMenu">
-                <a href="#profile" className="header__profileMenuItem">Profile</a>
-                <a href="#password change" className="header__profileMenuItem">Password Change</a>
-                <a href="#logout" className="header__profileMenuItem header__profileMenuItem--danger">Logout</a>
-              </div>
-            )}
+              {isNotificationsOpen && (
+                <div className="eventDashboard__notificationDropdown">
+                  <div className="eventDashboard__notificationHeader">
+                    <h3>Notifications</h3>
+                    <span>{notifications.length} total</span>
+                  </div>
+
+                  {notificationsError ? (
+                    <p className="eventDashboard__notificationEmpty">{notificationsError}</p>
+                  ) : notifications.length === 0 ? (
+                    <p className="eventDashboard__notificationEmpty">No notifications yet.</p>
+                  ) : (
+                    <div className="eventDashboard__notificationList">
+                      {notifications.map((notification) => (
+                        <div
+                          key={notification.id}
+                          className={`eventDashboard__notificationItem eventDashboard__notificationItem--${notification.category} ${notification.isRead ? "is-read" : "is-unread"}`}
+                        >
+                          <div className="eventDashboard__notificationBadgeLabel">
+                            {notification.category === "event" ? "Event" : notification.category === "sport" ? "Sport" : "Club & Society"}
+                          </div>
+                          <div className="eventDashboard__notificationBody">
+                            <strong>{notification.title}</strong>
+                            <p>{notification.message}</p>
+                            <span>{new Date(notification.createdAt).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="profile-dropdown" ref={profileRef}>
+              <button
+                className="profile-icon-btn"
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                aria-label="Profile menu"
+              >
+                👤
+              </button>
+
+              {isProfileOpen && (
+                <div className="profile-dropdown-menu">
+                  <button onClick={goToProfile} className="dropdown-item" type="button">
+                    <span className="dropdown-icon">👤</span>
+                    My Profile
+                  </button>
+                  <button onClick={goToDashboard} className="dropdown-item" type="button">
+                    <span className="dropdown-icon">📊</span>
+                    Dashboard
+                  </button>
+                  <div className="dropdown-divider"></div>
+                  <button onClick={handleLogout} className="dropdown-item logout" type="button">
+                    <span className="dropdown-icon">🚪</span>
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
       </header>
@@ -295,6 +325,9 @@ function EventDashboard() {
       </div>
 
       <section className="eventDashboard__hero container">
+        <button className="back-to-dashboard" onClick={() => navigate(token ? "/dashboard" : "/")}>
+          <span>←</span> Back to Welcome Dashboard
+        </button>
         <div className="eventDashboard__pill">CampusZone Events</div>
         <h1 className="eventDashboard__title">Event Dashboard</h1>
         <p className="eventDashboard__subtitle">

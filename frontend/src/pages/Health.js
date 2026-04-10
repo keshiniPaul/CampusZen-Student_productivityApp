@@ -6,9 +6,13 @@ import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
-import wellbeingImg from "../images/wellbeingimg.jpg";
-import guidedHealthTipsImg from "../images/guidedhealthtips.jpg";
-import healthyHabitsImg from "../images/healthyhabitsimg.jpg";
+
+const wellbeingImg =
+  "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80";
+const guidedHealthTipsImg =
+  "https://images.unsplash.com/photo-1493836512294-502baa1986e2?auto=format&fit=crop&w=1200&q=80";
+const healthyHabitsImg =
+  "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80";
 
 function Health() {
   const navigate = useNavigate();
@@ -263,6 +267,9 @@ function Health() {
       <section className="hero hero--health">
         <div className="container hero__container">
           <div className="hero__content">
+            <button className="back-to-dashboard" onClick={() => navigate(isLoggedIn ? "/dashboard" : "/")}>
+              <span>←</span> Back to Welcome Dashboard
+            </button>
             <h1 className="hero__title">Student Health & Wellbeing</h1>
             <p className="hero__subtitle">
               Your comprehensive wellness hub for physical and mental health support
