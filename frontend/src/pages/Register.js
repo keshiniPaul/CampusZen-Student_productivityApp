@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Link, useLocation } from "react-router-dom";
 import "./Register.css";
 import campusLogo from "../images/campus_logo.png";
+import registerImg from "../images/resources.jpg";
 
 function Register() {
   const navigate = useNavigate();
@@ -145,6 +146,9 @@ function Register() {
       {/* Register Section */}
       <main className="register">
         <div className="container register__container">
+          <div className="register__image-wrapper">
+             <img src={registerImg} alt="Join CampusZone" className="register__image" />
+          </div>
           <div className="register__card">
             <h2>Create Your Account</h2>
             <p className="register__subtitle">
