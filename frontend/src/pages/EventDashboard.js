@@ -40,6 +40,9 @@ function EventDashboard() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [notificationsError, setNotificationsError] = useState("");
+  const [userEcas, setUserEcas] = useState([]);
+  const [showEcaModal, setShowEcaModal] = useState(false);
+  const [newEca, setNewEca] = useState({ title: "", category: "event", role: "Participant" });
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileRef = useRef(null);
@@ -137,6 +140,26 @@ function EventDashboard() {
     return () => clearInterval(intervalId);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    try {
+      const stored = JSON.parse(localStorage.getItem("campuszone_user_ecas") || "[]");
+      setUserEcas(stored);
+    } catch {
+      setUserEcas([]);
+    }
+  }, []);
+
+  const handleAddEca = (e) => {
+    e.preventDefault();
+    if (!newEca.title) return;
+    const added = { ...newEca, id: Date.now() };
+    const nextList = [added, ...userEcas].slice(0, 50); // Keep max 50
+    setUserEcas(nextList);
+    localStorage.setItem("campuszone_user_ecas", JSON.stringify(nextList));
+    setShowEcaModal(false);
+    setNewEca({ title: "", category: "event", role: "Participant" });
+  };
 
   const scrollToTop = (event) => {
     event.preventDefault();
@@ -377,6 +400,104 @@ function EventDashboard() {
           </article>
         ))}
       </section>
+
+      {/* Extra-Curricular Activity (ECA) Tracker Component */}
+      <section className="eventDashboard__tracker container">
+        <div className="ecaTracker">
+          <div className="ecaTracker__header">
+            <div>
+              <h2 className="ecaTracker__title">My ECA Portfolio</h2>
+              <p className="ecaTracker__subtitle">Track your campus involvement and registrations.</p>
+            </div>
+            <button className="ecaTracker__addBtn" onClick={() => setShowEcaModal(true)}>
+              + Log Activity
+            </button>
+          </div>
+
+          <div className="ecaTracker__metrics">
+            <div className="ecaMetric">
+              <span className="ecaMetric__value">{userEcas.length}</span>
+              <span className="ecaMetric__label">Total Activities</span>
+            </div>
+            <div className="ecaMetric">
+              <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'club').length}</span>
+              <span className="ecaMetric__label">Clubs Joined</span>
+            </div>
+            <div className="ecaMetric">
+              <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'sport').length}</span>
+              <span className="ecaMetric__label">Sports Teams</span>
+            </div>
+            <div className="ecaMetric">
+              <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'event').length}</span>
+              <span className="ecaMetric__label">Events</span>
+            </div>
+          </div>
+
+          <div className="ecaTracker__roster">
+            {userEcas.length === 0 ? (
+              <p className="ecaTracker__empty">You haven't logged any activities yet. Click "Log Activity" to start building your portfolio.</p>
+            ) : (
+              <div className="ecaTracker__grid">
+                {userEcas.map((eca) => (
+                  <div className={`ecaCard ecaCard--${eca.category}`} key={eca.id}>
+                    <div className="ecaCard__icon">
+                      {eca.category === 'event' ? '📅' : eca.category === 'sport' ? '🏅' : '🤝'}
+                    </div>
+                    <div className="ecaCard__content">
+                      <h4>{eca.title}</h4>
+                      <span className="ecaCard__role">{eca.role}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* ECA Logging Modal */}
+        {showEcaModal && (
+          <div className="ecaModal">
+            <div className="ecaModal__overlay" onClick={() => setShowEcaModal(false)}></div>
+            <div className="ecaModal__content">
+              <h3>Log New Activity</h3>
+              <form onSubmit={handleAddEca}>
+                <div className="formGroup">
+                  <label>Activity Title</label>
+                  <input 
+                    type="text" 
+                    required 
+                    placeholder="e.g. Chess Club, Hackathon..." 
+                    value={newEca.title}
+                    onChange={(e) => setNewEca({...newEca, title: e.target.value})}
+                  />
+                </div>
+                <div className="formGroup">
+                  <label>Category</label>
+                  <select value={newEca.category} onChange={(e) => setNewEca({...newEca, category: e.target.value})}>
+                    <option value="event">Event</option>
+                    <option value="sport">Sport</option>
+                    <option value="club">Club/Society</option>
+                  </select>
+                </div>
+                <div className="formGroup">
+                  <label>Your Role</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Participant, Player, President" 
+                    value={newEca.role}
+                    onChange={(e) => setNewEca({...newEca, role: e.target.value})}
+                  />
+                </div>
+                <div className="ecaModal__actions">
+                  <button type="button" className="ecaModal__cancel" onClick={() => setShowEcaModal(false)}>Cancel</button>
+                  <button type="submit" className="ecaModal__save">Save Activity</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+      </section>
+
       </main>
 
       <footer className="footer">

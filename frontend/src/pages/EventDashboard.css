@@ -680,3 +680,251 @@
   }
 }
 
+/* =========================================
+   ECA Portfolio & Tracker UI
+========================================= */
+
+.eventDashboard__tracker {
+  margin-top: 40px;
+}
+
+.ecaTracker {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  border-radius: 24px;
+  padding: 30px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.05);
+}
+
+.ecaTracker__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.ecaTracker__title {
+  margin: 0;
+  font-size: 26px;
+  color: var(--ink-900);
+}
+
+.ecaTracker__subtitle {
+  margin: 4px 0 0;
+  color: var(--event-muted);
+  font-size: 15px;
+}
+
+.ecaTracker__addBtn {
+  background: linear-gradient(135deg, var(--sky-500), #0099ff);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 999px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(37, 182, 255, 0.3);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.ecaTracker__addBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(37, 182, 255, 0.4);
+}
+
+.ecaTracker__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.ecaMetric {
+  background: #fff;
+  padding: 20px;
+  border-radius: 18px;
+  text-align: center;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.03);
+  border: 1px solid rgba(0,0,0,0.02);
+}
+
+.ecaMetric__value {
+  display: block;
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--sky-500);
+  line-height: 1;
+  margin-bottom: 6px;
+}
+
+.ecaMetric__label {
+  font-size: 13px;
+  color: var(--event-muted);
+  font-weight: 700;
+}
+
+.ecaTracker__empty {
+  text-align: center;
+  padding: 40px;
+  background: rgba(255,255,255,0.4);
+  border-radius: 16px;
+  border: 2px dashed rgba(37, 182, 255, 0.2);
+  color: var(--event-muted);
+}
+
+.ecaTracker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.ecaCard {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: #fff;
+  padding: 16px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  transition: transform 0.2s;
+}
+
+.ecaCard:hover {
+  transform: translateY(-3px);
+}
+
+.ecaCard__icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--sky-50);
+  border-radius: 12px;
+  font-size: 24px;
+}
+
+.ecaCard__content h4 {
+  margin: 0 0 4px;
+  color: var(--ink-900);
+  font-size: 16px;
+}
+
+.ecaCard__role {
+  font-size: 13px;
+  color: var(--sky-500);
+  font-weight: 600;
+  background: var(--sky-50);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+/* ECA Tracking Modal */
+.ecaModal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ecaModal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+}
+
+.ecaModal__content {
+  position: relative;
+  background: #fff;
+  width: 90%;
+  max-width: 420px;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  animation: slideUp 0.3s ease-out;
+}
+
+.ecaModal__content h3 {
+  margin: 0 0 20px;
+  font-size: 20px;
+  color: var(--ink-900);
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.formGroup label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--ink-800);
+}
+
+.formGroup input,
+.formGroup select {
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: #f9f9f9;
+  font-size: 14px;
+  outline: none;
+  transition: border 0.2s;
+}
+
+.formGroup input:focus,
+.formGroup select:focus {
+  border-color: var(--sky-500);
+  background: #fff;
+}
+
+.ecaModal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.ecaModal__cancel {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  background: #f0f0f0;
+  color: #555;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ecaModal__save {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  background: var(--sky-500);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .ecaTracker__metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ecaTracker__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+}
+

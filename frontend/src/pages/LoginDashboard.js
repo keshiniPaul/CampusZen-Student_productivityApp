@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import "./Home.css"; // Import the same CSS as Home page
 import "./LoginDashboard.css";
 import campusLogo from "../images/campus_logo.png";
@@ -67,6 +67,8 @@ function LoginDashboard() {
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [isNotificationsLoading, setIsNotificationsLoading] = useState(false);
   const [notificationsError, setNotificationsError] = useState("");
+  const [activeFilter, setActiveFilter] = useState("All");
+  const [dashboardEvents, setDashboardEvents] = useState([]);
   
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
@@ -137,6 +139,22 @@ function LoginDashboard() {
 
   useEffect(() => {
     loadNotifications();
+    try {
+      const stored = localStorage.getItem("campuszone_events");
+      if (stored) {
+        let eventsArr = JSON.parse(stored);
+        if (Array.isArray(eventsArr)) {
+          // Sort events by date ascending and filter out very old ones
+          const upcoming = eventsArr
+            .filter(e => new Date(e.date) >= new Date(new Date().setHours(0,0,0,0)))
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(0, 5); // Just show top 5 upcoming
+          setDashboardEvents(upcoming);
+        }
+      }
+    } catch (e) {
+      console.error(e);
+    }
   }, []);
 
   // Close dropdown when clicking outside
@@ -503,7 +521,7 @@ function LoginDashboard() {
                 </p>
                 <div className="dashboardWelcome__chips" aria-label="Quick status">
                   <span>6 Modules</span>
-                  <span>3 New Updates</span>
+                  <span>{dashboardEvents.length} Upcoming Events</span>
                   <span>{monthLabel}</span>
                 </div>
               </div>
@@ -521,8 +539,58 @@ function LoginDashboard() {
               </div>
             </div>
 
+            {/* Unified Timeline Section */}
+            {dashboardEvents.length > 0 && (
+              <div className="dashboardTimeline">
+                <div className="dashboardTimeline__header">
+                  <h2 className="dashboardTimeline__title">Upcoming in "My Campus Space"</h2>
+                  <Link to="/events" className="dashboardTimeline__viewAll">View Calendar &rarr;</Link>
+                </div>
+                <div className="dashboardTimeline__scroll">
+                  {dashboardEvents.map((ev, index) => {
+                    const d = new Date(ev.date);
+                    const isToday = d.toDateString() === new Date().toDateString();
+                    return (
+                      <div className="timelineEventCard" key={ev.id || index}>
+                        <div className="timelineEventCard__date">
+                          <strong>{d.getDate()}</strong>
+                          <span>{d.toLocaleString('en-US', { month: 'short' })}</span>
+                        </div>
+                        <div className="timelineEventCard__content">
+                          {isToday && <span className="timelineEventCard__badge">Today</span>}
+                          <h4>{ev.title}</h4>
+                          <p>{ev.venue}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Advanced Animated Filters */}
+            <div className="dashboardFilters">
+              {['All', 'Essentials', 'Growth', 'Lifestyle'].map(filter => (
+                <button 
+                  key={filter}
+                  className={`dashboardFilterBtn ${activeFilter === filter ? 'is-active' : ''}`}
+                  onClick={() => setActiveFilter(filter)}
+                >
+                  {filter}
+                </button>
+              ))}
+            </div>
+
             <div className="dashboardWelcome__grid">
-              {dashboardCards.map((card) => {
+              {dashboardCards
+                .filter(card => {
+                  if (activeFilter === "All") return true;
+                  if (activeFilter === "Essentials" && ["overview", "study", "resources"].includes(card.key)) return true;
+                  if (activeFilter === "Growth" && ["events", "career"].includes(card.key)) return true;
+                  if (activeFilter === "Lifestyle" && ["health"].includes(card.key)) return true;
+                  return false;
+                })
+                .map((card, index) => {
                 const onOpen =
                   card.key === "overview"
                     ? goToOverview
@@ -537,7 +605,12 @@ function LoginDashboard() {
                     : goToResources;
 
                 return (
-                  <article className="dashboardCard" key={card.key} onClick={onOpen}>
+                  <article 
+                    className="dashboardCard dashboardCard--animated" 
+                    key={card.key} 
+                    onClick={onOpen}
+                    style={{ animationDelay: `${index * 0.05}s` }}
+                  >
                     <div className="dashboardCard__media">
                       <img src={card.image} alt={card.title} loading="lazy" />
                       <span className="dashboardCard__badge">{card.badge}</span>
