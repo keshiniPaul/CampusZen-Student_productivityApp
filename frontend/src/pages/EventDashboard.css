@@ -327,6 +327,10 @@
   border-left: 4px solid #7c3aed;
 }
 
+.eventDashboard__notificationItem--career {
+  border-left: 4px solid #f59e0b;
+}
+
 .eventDashboard__notificationBadgeLabel {
   min-width: 88px;
   text-align: center;
@@ -349,6 +353,10 @@
 
 .eventDashboard__notificationItem--club .eventDashboard__notificationBadgeLabel {
   background: #7c3aed;
+}
+
+.eventDashboard__notificationItem--career .eventDashboard__notificationBadgeLabel {
+  background: #f59e0b;
 }
 
 .eventDashboard__notificationBody {

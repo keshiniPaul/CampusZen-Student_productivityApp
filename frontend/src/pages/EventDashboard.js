@@ -51,15 +51,34 @@ function EventDashboard() {
   const token = localStorage.getItem("token");
 
   const normalizeNotifications = (items) =>
-    (Array.isArray(items) ? items : []).map((item) => ({
-      id: item._id || item.id,
-      title: item.title || "Notification",
-      message: item.message || "",
-      category: item.category || item.type || "event",
-      priority: item.priority || "low",
-      isRead: Boolean(item.isRead),
-      createdAt: item.createdAt || item.created_at || new Date().toISOString(),
-    }));
+    (Array.isArray(items) ? items : []).map((item) => {
+      let rawCat = String(item.category || item.type || "event").toLowerCase();
+      let titleLower = String(item.title).toLowerCase();
+      
+      let finalCat = "event";
+      if (rawCat === "sport" || titleLower.includes("sport") || titleLower.includes("tournament")) finalCat = "sport";
+      else if (rawCat === "club" || titleLower.includes("club") || titleLower.includes("society")) finalCat = "club";
+      else if (rawCat === "career" || titleLower.includes("internship") || titleLower.includes("career")) finalCat = "career";
+      else if (rawCat === "event" || titleLower.includes("event")) finalCat = "event";
+      else if (["sport", "club", "career", "event"].includes(rawCat)) finalCat = rawCat;
+
+      return {
+        id: item._id || item.id,
+        title: item.title || "Notification",
+        message: item.message || "",
+        category: finalCat,
+        priority: item.priority || "low",
+        isRead: Boolean(item.isRead),
+        createdAt: item.createdAt || item.created_at || new Date().toISOString(),
+      };
+    });
+
+  const getCategoryLabel = (cat) => {
+    if (cat === "sport") return "Sport";
+    if (cat === "club") return "Club & Society";
+    if (cat === "career") return "Career";
+    return "Event";
+  };
 
   const loadLocalNotifications = () => {
     try {
@@ -216,9 +235,9 @@ function EventDashboard() {
       <header className="topbar" id="top">
         <nav className="nav container">
           <Link className="brand" to="/" aria-label="CampusZone Home" onClick={scrollToTop}>
-            <img 
-              className="brand__logo--img" 
-              src={campusLogo} 
+            <img
+              className="brand__logo--img"
+              src={campusLogo}
               alt="CampusZone Logo"
             />
           </Link>
@@ -265,9 +284,9 @@ function EventDashboard() {
                 type="button"
               >
                 <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
-                  <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
+                  <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" />
+                  <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" />
                 </svg>
                 {notifications.filter((item) => !item.isRead).length > 0 && (
                   <span className="header__notificationBadge">
@@ -295,7 +314,7 @@ function EventDashboard() {
                           className={`eventDashboard__notificationItem eventDashboard__notificationItem--${notification.category} ${notification.isRead ? "is-read" : "is-unread"}`}
                         >
                           <div className="eventDashboard__notificationBadgeLabel">
-                            {notification.category === "event" ? "Event" : notification.category === "sport" ? "Sport" : "Club & Society"}
+                            {getCategoryLabel(notification.category)}
                           </div>
                           <div className="eventDashboard__notificationBody">
                             <strong>{notification.title}</strong>
@@ -342,161 +361,161 @@ function EventDashboard() {
       </header>
 
       <main className="eventDashboard">
-      <div className="eventDashboard__bg" aria-hidden="true">
-        <div className="eventDashboard__blob eventDashboard__blob--one"></div>
-        <div className="eventDashboard__blob eventDashboard__blob--two"></div>
-      </div>
-
-      <section className="eventDashboard__hero container">
-        <button className="back-to-dashboard" onClick={() => navigate(token ? "/dashboard" : "/")}>
-          <span>←</span> Back to Welcome Dashboard
-        </button>
-        <div className="eventDashboard__pill">CampusZone Events</div>
-        <h1 className="eventDashboard__title">Event Dashboard</h1>
-        <p className="eventDashboard__subtitle">
-          Explore student life with quick access to events, sports, and club &amp; society activities.
-        </p>
-
-      </section>
-
-      <section className="eventDashboard__grid container" aria-label="Event categories">
-        {categories.map((category) => (
-          <article className="eventCard" key={category.title}>
-            <div className="eventCard__media">
-              <img className="eventCard__photo" src={category.image} alt={category.title} />
-              <span className="eventCard__tag">{category.tag}</span>
-            </div>
-            <div className="eventCard__content">
-              <h2 className="eventCard__title">{category.title}</h2>
-              <p className="eventCard__text">{category.description}</p>
-              <div className="eventDashboard__actions eventCard__actions">
-                {category.title === "Event" && (
-                  <Link 
-                    className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
-                    to="/events/list"
-                  >
-                    View Details
-                  </Link>
-                )}
-                {category.title === "Sports" && (
-                  <Link 
-                    className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
-                    to="/sports"
-                    onClick={() => console.log('Navigating to /sports')}
-                  >
-                    View Details
-                  </Link>
-                )}
-                {category.title === "Club & Society" && (
-                  <Link 
-                    className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn" 
-                    to="/clubs"
-                  >
-                    View Details
-                  </Link>
-                )}
-              </div>
-            </div>
-          </article>
-        ))}
-      </section>
-
-      {/* Extra-Curricular Activity (ECA) Tracker Component */}
-      <section className="eventDashboard__tracker container">
-        <div className="ecaTracker">
-          <div className="ecaTracker__header">
-            <div>
-              <h2 className="ecaTracker__title">My ECA Portfolio</h2>
-              <p className="ecaTracker__subtitle">Track your campus involvement and registrations.</p>
-            </div>
-            <button className="ecaTracker__addBtn" onClick={() => setShowEcaModal(true)}>
-              + Log Activity
-            </button>
-          </div>
-
-          <div className="ecaTracker__metrics">
-            <div className="ecaMetric">
-              <span className="ecaMetric__value">{userEcas.length}</span>
-              <span className="ecaMetric__label">Total Activities</span>
-            </div>
-            <div className="ecaMetric">
-              <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'club').length}</span>
-              <span className="ecaMetric__label">Clubs Joined</span>
-            </div>
-            <div className="ecaMetric">
-              <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'sport').length}</span>
-              <span className="ecaMetric__label">Sports Teams</span>
-            </div>
-            <div className="ecaMetric">
-              <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'event').length}</span>
-              <span className="ecaMetric__label">Events</span>
-            </div>
-          </div>
-
-          <div className="ecaTracker__roster">
-            {userEcas.length === 0 ? (
-              <p className="ecaTracker__empty">You haven't logged any activities yet. Click "Log Activity" to start building your portfolio.</p>
-            ) : (
-              <div className="ecaTracker__grid">
-                {userEcas.map((eca) => (
-                  <div className={`ecaCard ecaCard--${eca.category}`} key={eca.id}>
-                    <div className="ecaCard__icon">
-                      {eca.category === 'event' ? '📅' : eca.category === 'sport' ? '🏅' : '🤝'}
-                    </div>
-                    <div className="ecaCard__content">
-                      <h4>{eca.title}</h4>
-                      <span className="ecaCard__role">{eca.role}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+        <div className="eventDashboard__bg" aria-hidden="true">
+          <div className="eventDashboard__blob eventDashboard__blob--one"></div>
+          <div className="eventDashboard__blob eventDashboard__blob--two"></div>
         </div>
 
-        {/* ECA Logging Modal */}
-        {showEcaModal && (
-          <div className="ecaModal">
-            <div className="ecaModal__overlay" onClick={() => setShowEcaModal(false)}></div>
-            <div className="ecaModal__content">
-              <h3>Log New Activity</h3>
-              <form onSubmit={handleAddEca}>
-                <div className="formGroup">
-                  <label>Activity Title</label>
-                  <input 
-                    type="text" 
-                    required 
-                    placeholder="e.g. Chess Club, Hackathon..." 
-                    value={newEca.title}
-                    onChange={(e) => setNewEca({...newEca, title: e.target.value})}
-                  />
+        <section className="eventDashboard__hero container">
+          <button className="back-to-dashboard" onClick={() => navigate(token ? "/dashboard" : "/")}>
+            <span>←</span> Back to Welcome Dashboard
+          </button>
+          <div className="eventDashboard__pill">CampusZone Events</div>
+          <h1 className="eventDashboard__title">Event Dashboard</h1>
+          <p className="eventDashboard__subtitle">
+            Explore student life with quick access to events, sports, and club &amp; society activities.
+          </p>
+
+        </section>
+
+        <section className="eventDashboard__grid container" aria-label="Event categories">
+          {categories.map((category) => (
+            <article className="eventCard" key={category.title}>
+              <div className="eventCard__media">
+                <img className="eventCard__photo" src={category.image} alt={category.title} />
+                <span className="eventCard__tag">{category.tag}</span>
+              </div>
+              <div className="eventCard__content">
+                <h2 className="eventCard__title">{category.title}</h2>
+                <p className="eventCard__text">{category.description}</p>
+                <div className="eventDashboard__actions eventCard__actions">
+                  {category.title === "Event" && (
+                    <Link
+                      className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn"
+                      to="/events/list"
+                    >
+                      View Details
+                    </Link>
+                  )}
+                  {category.title === "Sports" && (
+                    <Link
+                      className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn"
+                      to="/sports"
+                      onClick={() => console.log('Navigating to /sports')}
+                    >
+                      View Details
+                    </Link>
+                  )}
+                  {category.title === "Club & Society" && (
+                    <Link
+                      className="eventDashboard__btn eventDashboard__btn--primary eventCard__btn"
+                      to="/clubs"
+                    >
+                      View Details
+                    </Link>
+                  )}
                 </div>
-                <div className="formGroup">
-                  <label>Category</label>
-                  <select value={newEca.category} onChange={(e) => setNewEca({...newEca, category: e.target.value})}>
-                    <option value="event">Event</option>
-                    <option value="sport">Sport</option>
-                    <option value="club">Club/Society</option>
-                  </select>
+              </div>
+            </article>
+          ))}
+        </section>
+
+        {/* Extra-Curricular Activity (ECA) Tracker Component */}
+        <section className="eventDashboard__tracker container">
+          <div className="ecaTracker">
+            <div className="ecaTracker__header">
+              <div>
+                <h2 className="ecaTracker__title">My ECA Portfolio</h2>
+                <p className="ecaTracker__subtitle">Track your campus involvement and registrations.</p>
+              </div>
+              <button className="ecaTracker__addBtn" onClick={() => setShowEcaModal(true)}>
+                + Log Activity
+              </button>
+            </div>
+
+            <div className="ecaTracker__metrics">
+              <div className="ecaMetric">
+                <span className="ecaMetric__value">{userEcas.length}</span>
+                <span className="ecaMetric__label">Total Activities</span>
+              </div>
+              <div className="ecaMetric">
+                <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'club').length}</span>
+                <span className="ecaMetric__label">Clubs Joined</span>
+              </div>
+              <div className="ecaMetric">
+                <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'sport').length}</span>
+                <span className="ecaMetric__label">Sports Teams</span>
+              </div>
+              <div className="ecaMetric">
+                <span className="ecaMetric__value">{userEcas.filter(e => e.category === 'event').length}</span>
+                <span className="ecaMetric__label">Events</span>
+              </div>
+            </div>
+
+            <div className="ecaTracker__roster">
+              {userEcas.length === 0 ? (
+                <p className="ecaTracker__empty">You haven't logged any activities yet. Click "Log Activity" to start building your portfolio.</p>
+              ) : (
+                <div className="ecaTracker__grid">
+                  {userEcas.map((eca) => (
+                    <div className={`ecaCard ecaCard--${eca.category}`} key={eca.id}>
+                      <div className="ecaCard__icon">
+                        {eca.category === 'event' ? '📅' : eca.category === 'sport' ? '🏅' : '🤝'}
+                      </div>
+                      <div className="ecaCard__content">
+                        <h4>{eca.title}</h4>
+                        <span className="ecaCard__role">{eca.role}</span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="formGroup">
-                  <label>Your Role</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. Participant, Player, President" 
-                    value={newEca.role}
-                    onChange={(e) => setNewEca({...newEca, role: e.target.value})}
-                  />
-                </div>
-                <div className="ecaModal__actions">
-                  <button type="button" className="ecaModal__cancel" onClick={() => setShowEcaModal(false)}>Cancel</button>
-                  <button type="submit" className="ecaModal__save">Save Activity</button>
-                </div>
-              </form>
+              )}
             </div>
           </div>
-        )}
-      </section>
+
+          {/* ECA Logging Modal */}
+          {showEcaModal && (
+            <div className="ecaModal">
+              <div className="ecaModal__overlay" onClick={() => setShowEcaModal(false)}></div>
+              <div className="ecaModal__content">
+                <h3>Log New Activity</h3>
+                <form onSubmit={handleAddEca}>
+                  <div className="formGroup">
+                    <label>Activity Title</label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Chess Club, Hackathon..."
+                      value={newEca.title}
+                      onChange={(e) => setNewEca({ ...newEca, title: e.target.value })}
+                    />
+                  </div>
+                  <div className="formGroup">
+                    <label>Category</label>
+                    <select value={newEca.category} onChange={(e) => setNewEca({ ...newEca, category: e.target.value })}>
+                      <option value="event">Event</option>
+                      <option value="sport">Sport</option>
+                      <option value="club">Club/Society</option>
+                    </select>
+                  </div>
+                  <div className="formGroup">
+                    <label>Your Role</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Participant, Player, President"
+                      value={newEca.role}
+                      onChange={(e) => setNewEca({ ...newEca, role: e.target.value })}
+                    />
+                  </div>
+                  <div className="ecaModal__actions">
+                    <button type="button" className="ecaModal__cancel" onClick={() => setShowEcaModal(false)}>Cancel</button>
+                    <button type="submit" className="ecaModal__save">Save Activity</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </section>
 
       </main>
 
