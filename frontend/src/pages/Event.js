@@ -876,6 +876,28 @@ function Event() {
         )}
       </main>
 
+      {/* Sponsors Section */}
+      <section className="event__sponsors container">
+        <h2 className="event__sponsorsTitle">Our Proud Sponsors</h2>
+        <div className="event__sponsorsGrid">
+          <div className="event__sponsorCard event__sponsor--boc">
+            <span>BOC Bank</span>
+          </div>
+          <div className="event__sponsorCard event__sponsor--dialog">
+            <span>Dialog</span>
+          </div>
+          <div className="event__sponsorCard event__sponsor--elephant">
+            <span>Elephant House</span>
+          </div>
+          <div className="event__sponsorCard event__sponsor--ifs">
+            <span>IFS</span>
+          </div>
+          <div className="event__sponsorCard event__sponsor--odel">
+            <span>ODEL</span>
+          </div>
+        </div>
+      </section>
+
       <div
         className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
         id="toast"
