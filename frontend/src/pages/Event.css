@@ -945,3 +945,102 @@
   }
 }
 
+/* Sponsors Section */
+.event__sponsors {
+  margin-top: 60px;
+  margin-bottom: 40px;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 12px 32px rgba(13, 53, 82, 0.05);
+  text-align: center;
+}
+
+.event__sponsorsTitle {
+  font-size: 28px;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin: 0 0 30px 0;
+}
+
+.event__sponsorsGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  justify-content: center;
+}
+
+.event__sponsorCard {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 180px;
+  height: 80px;
+  background: white;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 18px;
+  color: #1a1a1a;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.event__sponsorCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+}
+
+.event__sponsor--boc {
+  color: #f39c12;
+}
+.event__sponsor--boc:hover {
+  border-color: #f39c12;
+}
+
+.event__sponsor--dialog {
+  color: #e74c3c;
+}
+.event__sponsor--dialog:hover {
+  border-color: #e74c3c;
+}
+
+.event__sponsor--elephant {
+  color: #27ae60;
+  font-style: italic;
+}
+.event__sponsor--elephant:hover {
+  border-color: #27ae60;
+}
+
+.event__sponsor--ifs {
+  color: #8e44ad;
+  font-family: monospace;
+  font-size: 24px;
+}
+.event__sponsor--ifs:hover {
+  border-color: #8e44ad;
+}
+
+.event__sponsor--odel {
+  color: #e67e22;
+  letter-spacing: 2px;
+}
+.event__sponsor--odel:hover {
+  border-color: #e67e22;
+}
+
+@media (max-width: 768px) {
+  .event__sponsors {
+    padding: 30px 20px;
+  }
+  .event__sponsorCard {
+    width: 140px;
+    height: 70px;
+    font-size: 16px;
+  }
+}
+

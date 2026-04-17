@@ -288,7 +288,7 @@ function Sports() {
       try {
         console.log('Fetching sports from API...');
         const response = await sportsAPI.getAllSports();
-        
+
         if (response.success && response.data && response.data.length > 0) {
           // Map backend data to match frontend format
           const mappedSports = response.data.map((sport) => {
@@ -555,7 +555,7 @@ function Sports() {
 
   const handleRegister = (sport) => {
     const statusInfo = getRegistrationStatus(sport);
-    
+
     if (statusInfo.disabled) {
       alert(`Registration is ${statusInfo.status}. Cannot register at this time.`);
       return;
@@ -969,9 +969,9 @@ function Sports() {
       <header className="topbar" id="top">
         <nav className="nav container">
           <Link className="brand" to="/" aria-label="CampusZone Home" onClick={scrollToTop}>
-            <img 
-              className="brand__logo--img" 
-              src={campusLogo} 
+            <img
+              className="brand__logo--img"
+              src={campusLogo}
               alt="CampusZone Logo"
             />
           </Link>
@@ -1010,15 +1010,15 @@ function Sports() {
           </div>
 
           <div className="nav__cta">
-            <button 
-              className="header__notificationBtn" 
+            <button
+              className="header__notificationBtn"
               aria-label="Notifications"
               onClick={() => setShowNotifications(!showNotifications)}
             >
               <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
-                <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
+                <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" />
+                <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" />
               </svg>
               {notifications.length > 0 && (
                 <span className="header__notificationBadge">{notifications.length}</span>
@@ -1159,127 +1159,127 @@ function Sports() {
         ) : filteredSports.length > 0 ? (
           <div className="sports__grid container">
             {filteredSports.map((sport) => {
-            const statusInfo = getRegistrationStatus(sport);
-            const filledPercentage = (sport.registered / sport.maxCapacity) * 100;
+              const statusInfo = getRegistrationStatus(sport);
+              const filledPercentage = (sport.registered / sport.maxCapacity) * 100;
 
-            return (
-              <article key={sport.id} className="sports__card">
-                <div className="sports__cardImage">
-                  {isAdmin && (
-                    <div className="sports__adminActions">
-                      <button
-                        className="sports__actionBtn sports__actionBtn--edit"
-                        onClick={() => handleEditSport(sport)}
-                        title="Update Sport"
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </button>
-                      <button
-                        className="sports__actionBtn sports__actionBtn--delete"
-                        onClick={() => handleDeleteSport(sport.id)}
-                        title="Delete Sport"
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M21 5.98001C17.67 5.65001 14.32 5.48001 10.98 5.48001C9 5.48001 7.02 5.58001 5.04 5.78001L3 5.98001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M18.85 9.14001L18.2 19.21C18.09 20.78 18 22 15.21 22H8.79002C6.00002 22 5.91002 20.78 5.80002 19.21L5.15002 9.14001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                        </svg>
-                      </button>
-                    </div>
-                  )}
-                  <img src={sport.image} alt={sport.name} className="sports__image" />
-                  <div className="sports__cardBadges">
-                    <span className="sports__categoryBadge">{sport.category}</span>
-                    <span className={`sports__status ${statusInfo.class}`}>
-                      {statusInfo.status}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="sports__content">
-                  <h2 className="sports__name">{sport.name}</h2>
-                  <p className="sports__description">{sport.description}</p>
-
-                  <div className="sports__meta">
-                    <div className="sports__metaItem">
-                      <svg className="sports__metaIcon" viewBox="0 0 24 24" fill="none">
-                        <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <div className="sports__metaText">
-                        <span className="sports__metaLabel">Opens:</span>
-                        <span className="sports__metaValue">
-                          {new Date(sport.registrationOpen).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </span>
+              return (
+                <article key={sport.id} className="sports__card">
+                  <div className="sports__cardImage">
+                    {isAdmin && (
+                      <div className="sports__adminActions">
+                        <button
+                          className="sports__actionBtn sports__actionBtn--edit"
+                          onClick={() => handleEditSport(sport)}
+                          title="Update Sport"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
+                        <button
+                          className="sports__actionBtn sports__actionBtn--delete"
+                          onClick={() => handleDeleteSport(sport.id)}
+                          title="Delete Sport"
+                        >
+                          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M21 5.98001C17.67 5.65001 14.32 5.48001 10.98 5.48001C9 5.48001 7.02 5.58001 5.04 5.78001L3 5.98001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M18.85 9.14001L18.2 19.21C18.09 20.78 18 22 15.21 22H8.79002C6.00002 22 5.91002 20.78 5.80002 19.21L5.15002 9.14001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        </button>
                       </div>
-                    </div>
-
-                    <div className="sports__metaItem">
-                      <svg className="sports__metaIcon" viewBox="0 0 24 24" fill="none">
-                        <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                      <div className="sports__metaText">
-                        <span className="sports__metaLabel">Closes:</span>
-                        <span className="sports__metaValue">
-                          {new Date(sport.registrationClose).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
-                        </span>
-                      </div>
-                    </div>
-
-                    <div className="sports__metaItem sports__metaItem--full">
-                      <svg className="sports__metaIcon" viewBox="0 0 24 24" fill="none">
-                        <path d="M12 13.43C13.7231 13.43 15.12 12.0331 15.12 10.31C15.12 8.58687 13.7231 7.19 12 7.19C10.2769 7.19 8.88 8.58687 8.88 10.31C8.88 12.0331 10.2769 13.43 12 13.43Z" stroke="currentColor" strokeWidth="1.5"/>
-                        <path d="M3.62 8.49C5.59 -0.169998 18.42 -0.159998 20.38 8.5C21.53 13.58 18.37 17.88 15.6 20.54C13.59 22.48 10.41 22.48 8.39 20.54C5.63 17.88 2.47 13.57 3.62 8.49Z" stroke="currentColor" strokeWidth="1.5"/>
-                      </svg>
-                      <div className="sports__metaText">
-                        <span className="sports__metaLabel">Venue:</span>
-                        <span className="sports__metaValue">{sport.venue}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="sports__capacitySection">
-                    <div className="sports__capacityHeader">
-                      <span className="sports__capacityLabel">Registered</span>
-                      <span className="sports__capacityValue">
-                        {sport.registered} / {sport.maxCapacity}
+                    )}
+                    <img src={sport.image} alt={sport.name} className="sports__image" />
+                    <div className="sports__cardBadges">
+                      <span className="sports__categoryBadge">{sport.category}</span>
+                      <span className={`sports__status ${statusInfo.class}`}>
+                        {statusInfo.status}
                       </span>
                     </div>
-                    <div className="sports__progressBar">
-                      <div 
-                        className="sports__progress"
-                        style={{ 
-                          width: `${filledPercentage}%`,
-                          backgroundColor: filledPercentage >= 90 ? '#e74c3c' : filledPercentage >= 70 ? '#f39c12' : '#27ae60'
-                        }}
-                      ></div>
-                    </div>
                   </div>
 
-                  <div className="sports__actions">
-                    <button
-                      className="sports__btn sports__btn--secondary"
-                      onClick={() => handleViewDetails(sport)}
-                    >
-                      View Details
-                    </button>
-                    <button
-                      className={`sports__btn sports__btn--primary ${statusInfo.disabled ? 'sports__btn--disabled' : ''}`}
-                      onClick={() => handleRegister(sport)}
-                      disabled={statusInfo.disabled}
-                    >
-                      {statusInfo.status === "FULL" ? "Registration Full" : 
-                       statusInfo.status === "CLOSED" ? "Registration Closed" :
-                       statusInfo.status === "COMING SOON" ? "Coming Soon" : "Register Now"}
-                    </button>
+                  <div className="sports__content">
+                    <h2 className="sports__name">{sport.name}</h2>
+                    <p className="sports__description">{sport.description}</p>
+
+                    <div className="sports__meta">
+                      <div className="sports__metaItem">
+                        <svg className="sports__metaIcon" viewBox="0 0 24 24" fill="none">
+                          <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <div className="sports__metaText">
+                          <span className="sports__metaLabel">Opens:</span>
+                          <span className="sports__metaValue">
+                            {new Date(sport.registrationOpen).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="sports__metaItem">
+                        <svg className="sports__metaIcon" viewBox="0 0 24 24" fill="none">
+                          <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                        <div className="sports__metaText">
+                          <span className="sports__metaLabel">Closes:</span>
+                          <span className="sports__metaValue">
+                            {new Date(sport.registrationClose).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="sports__metaItem sports__metaItem--full">
+                        <svg className="sports__metaIcon" viewBox="0 0 24 24" fill="none">
+                          <path d="M12 13.43C13.7231 13.43 15.12 12.0331 15.12 10.31C15.12 8.58687 13.7231 7.19 12 7.19C10.2769 7.19 8.88 8.58687 8.88 10.31C8.88 12.0331 10.2769 13.43 12 13.43Z" stroke="currentColor" strokeWidth="1.5" />
+                          <path d="M3.62 8.49C5.59 -0.169998 18.42 -0.159998 20.38 8.5C21.53 13.58 18.37 17.88 15.6 20.54C13.59 22.48 10.41 22.48 8.39 20.54C5.63 17.88 2.47 13.57 3.62 8.49Z" stroke="currentColor" strokeWidth="1.5" />
+                        </svg>
+                        <div className="sports__metaText">
+                          <span className="sports__metaLabel">Venue:</span>
+                          <span className="sports__metaValue">{sport.venue}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="sports__capacitySection">
+                      <div className="sports__capacityHeader">
+                        <span className="sports__capacityLabel">Registered</span>
+                        <span className="sports__capacityValue">
+                          {sport.registered} / {sport.maxCapacity}
+                        </span>
+                      </div>
+                      <div className="sports__progressBar">
+                        <div
+                          className="sports__progress"
+                          style={{
+                            width: `${filledPercentage}%`,
+                            backgroundColor: filledPercentage >= 90 ? '#e74c3c' : filledPercentage >= 70 ? '#f39c12' : '#27ae60'
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+
+                    <div className="sports__actions">
+                      <button
+                        className="sports__btn sports__btn--secondary"
+                        onClick={() => handleViewDetails(sport)}
+                      >
+                        View Details
+                      </button>
+                      <button
+                        className={`sports__btn sports__btn--primary ${statusInfo.disabled ? 'sports__btn--disabled' : ''}`}
+                        onClick={() => handleRegister(sport)}
+                        disabled={statusInfo.disabled}
+                      >
+                        {statusInfo.status === "FULL" ? "Registration Full" :
+                          statusInfo.status === "CLOSED" ? "Registration Closed" :
+                            statusInfo.status === "COMING SOON" ? "Coming Soon" : "Register Now"}
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </article>
-            );
-          })}
-        </div>
+                </article>
+              );
+            })}
+          </div>
         ) : (
           <div className="sports__empty container">
             <p className="sports__emptyTitle">No sports matched your search</p>
@@ -1312,15 +1312,15 @@ function Sports() {
               </div>
 
               <div className="sportsForm__field">
-                <input 
+                <input
                   ref={(el) => (sportFieldRefs.current.name = el)}
-                  name="name" 
-                  value={sportFormData.name} 
-                  onChange={handleSportFormChange} 
+                  name="name"
+                  value={sportFormData.name}
+                  onChange={handleSportFormChange}
                   onBlur={handleSportFormBlur}
-                  placeholder="Sport name" 
+                  placeholder="Sport name"
                   className={shouldShowSportError("name") ? "sportsForm__input--error" : ""}
-                  required 
+                  required
                 />
                 {shouldShowSportError("name") && (
                   <span className="sportsForm__error">{sportFormErrors.name}</span>
@@ -1328,10 +1328,10 @@ function Sports() {
               </div>
 
               <div className="sportsForm__field">
-                <select 
+                <select
                   ref={(el) => (sportFieldRefs.current.category = el)}
-                  name="category" 
-                  value={sportFormData.category} 
+                  name="category"
+                  value={sportFormData.category}
                   onChange={handleSportFormChange}
                   onBlur={handleSportFormBlur}
                   className={shouldShowSportError("category") ? "sportsForm__input--error" : ""}
@@ -1345,15 +1345,15 @@ function Sports() {
               </div>
 
               <div className="sportsForm__field">
-                <textarea 
+                <textarea
                   ref={(el) => (sportFieldRefs.current.description = el)}
-                  name="description" 
-                  value={sportFormData.description} 
+                  name="description"
+                  value={sportFormData.description}
                   onChange={handleSportFormChange}
                   onBlur={handleSportFormBlur}
-                  placeholder="Description" 
+                  placeholder="Description"
                   className={shouldShowSportError("description") ? "sportsForm__input--error" : ""}
-                  required 
+                  required
                 />
                 {shouldShowSportError("description") && (
                   <span className="sportsForm__error">{sportFormErrors.description}</span>
@@ -1363,17 +1363,17 @@ function Sports() {
               <div className="sportsForm__row">
                 <div className="sportsForm__field">
                   <label className="sportsForm__label">Registration Open Date *</label>
-                  <input 
+                  <input
                     ref={(el) => (sportFieldRefs.current.registrationOpen = el)}
-                    type="date" 
-                    name="registrationOpen" 
-                    value={sportFormData.registrationOpen} 
+                    type="date"
+                    name="registrationOpen"
+                    value={sportFormData.registrationOpen}
                     onChange={handleSportFormChange}
                     onBlur={handleSportFormBlur}
                     placeholder="mm/dd/yyyy"
                     min={getTodayDate()}
                     className={shouldShowSportError("registrationOpen") ? "sportsForm__input--error" : ""}
-                    required 
+                    required
                   />
                   {shouldShowSportError("registrationOpen") && (
                     <span className="sportsForm__error">{sportFormErrors.registrationOpen}</span>
@@ -1381,17 +1381,17 @@ function Sports() {
                 </div>
                 <div className="sportsForm__field">
                   <label className="sportsForm__label">Registration Close Date *</label>
-                  <input 
+                  <input
                     ref={(el) => (sportFieldRefs.current.registrationClose = el)}
-                    type="date" 
-                    name="registrationClose" 
-                    value={sportFormData.registrationClose} 
+                    type="date"
+                    name="registrationClose"
+                    value={sportFormData.registrationClose}
                     onChange={handleSportFormChange}
                     onBlur={handleSportFormBlur}
                     placeholder="mm/dd/yyyy"
                     min={sportFormData.registrationOpen || getTodayDate()}
                     className={shouldShowSportError("registrationClose") ? "sportsForm__input--error" : ""}
-                    required 
+                    required
                   />
                   {shouldShowSportError("registrationClose") && (
                     <span className="sportsForm__error">{sportFormErrors.registrationClose}</span>
@@ -1401,30 +1401,30 @@ function Sports() {
 
               <div className="sportsForm__row">
                 <div className="sportsForm__field">
-                  <input 
+                  <input
                     ref={(el) => (sportFieldRefs.current.venue = el)}
-                    name="venue" 
-                    value={sportFormData.venue} 
+                    name="venue"
+                    value={sportFormData.venue}
                     onChange={handleSportFormChange}
                     onBlur={handleSportFormBlur}
-                    placeholder="Venue" 
+                    placeholder="Venue"
                     className={shouldShowSportError("venue") ? "sportsForm__input--error" : ""}
-                    required 
+                    required
                   />
                   {shouldShowSportError("venue") && (
                     <span className="sportsForm__error">{sportFormErrors.venue}</span>
                   )}
                 </div>
                 <div className="sportsForm__field">
-                  <input 
+                  <input
                     ref={(el) => (sportFieldRefs.current.coach = el)}
-                    name="coach" 
-                    value={sportFormData.coach} 
+                    name="coach"
+                    value={sportFormData.coach}
                     onChange={handleSportFormChange}
                     onBlur={handleSportFormBlur}
-                    placeholder="Coach" 
+                    placeholder="Coach"
                     className={shouldShowSportError("coach") ? "sportsForm__input--error" : ""}
-                    required 
+                    required
                   />
                   {shouldShowSportError("coach") && (
                     <span className="sportsForm__error">{sportFormErrors.coach}</span>
@@ -1434,30 +1434,30 @@ function Sports() {
 
               <div className="sportsForm__row">
                 <div className="sportsForm__field">
-                  <input 
+                  <input
                     ref={(el) => (sportFieldRefs.current.maxCapacity = el)}
-                    type="number" 
-                    min="1" 
-                    name="maxCapacity" 
-                    value={sportFormData.maxCapacity} 
+                    type="number"
+                    min="1"
+                    name="maxCapacity"
+                    value={sportFormData.maxCapacity}
                     onChange={handleSportFormChange}
                     onBlur={handleSportFormBlur}
-                    placeholder="Max capacity" 
+                    placeholder="Max capacity"
                     className={shouldShowSportError("maxCapacity") ? "sportsForm__input--error" : ""}
-                    required 
+                    required
                   />
                   {shouldShowSportError("maxCapacity") && (
                     <span className="sportsForm__error">{sportFormErrors.maxCapacity}</span>
                   )}
                 </div>
                 <div className="sportsForm__field">
-                  <input 
+                  <input
                     ref={(el) => (sportFieldRefs.current.registrationLink = el)}
-                    name="registrationLink" 
-                    value={sportFormData.registrationLink} 
+                    name="registrationLink"
+                    value={sportFormData.registrationLink}
                     onChange={handleSportFormChange}
                     onBlur={handleSportFormBlur}
-                    placeholder="Registration link" 
+                    placeholder="Registration link"
                     className={shouldShowSportError("registrationLink") ? "sportsForm__input--error" : ""}
                   />
                   {shouldShowSportError("registrationLink") && (
@@ -1467,13 +1467,13 @@ function Sports() {
               </div>
 
               <div className="sportsForm__field">
-                <input 
+                <input
                   ref={(el) => (sportFieldRefs.current.eligibility = el)}
-                  name="eligibility" 
-                  value={sportFormData.eligibility} 
+                  name="eligibility"
+                  value={sportFormData.eligibility}
                   onChange={handleSportFormChange}
                   onBlur={handleSportFormBlur}
-                  placeholder="Eligibility" 
+                  placeholder="Eligibility"
                   className={shouldShowSportError("eligibility") ? "sportsForm__input--error" : ""}
                 />
                 {shouldShowSportError("eligibility") && (
@@ -1482,13 +1482,13 @@ function Sports() {
               </div>
 
               <div className="sportsForm__field">
-                <input 
+                <input
                   ref={(el) => (sportFieldRefs.current.selectionCriteria = el)}
-                  name="selectionCriteria" 
-                  value={sportFormData.selectionCriteria} 
+                  name="selectionCriteria"
+                  value={sportFormData.selectionCriteria}
                   onChange={handleSportFormChange}
                   onBlur={handleSportFormBlur}
-                  placeholder="Selection criteria" 
+                  placeholder="Selection criteria"
                   className={shouldShowSportError("selectionCriteria") ? "sportsForm__input--error" : ""}
                 />
                 {shouldShowSportError("selectionCriteria") && (
@@ -1497,13 +1497,13 @@ function Sports() {
               </div>
 
               <div className="sportsForm__field">
-                <input 
+                <input
                   ref={(el) => (sportFieldRefs.current.skillLevelsText = el)}
-                  name="skillLevelsText" 
-                  value={sportFormData.skillLevelsText} 
+                  name="skillLevelsText"
+                  value={sportFormData.skillLevelsText}
                   onChange={handleSportFormChange}
                   onBlur={handleSportFormBlur}
-                  placeholder="Skill levels (comma separated)" 
+                  placeholder="Skill levels (comma separated)"
                   className={shouldShowSportError("skillLevelsText") ? "sportsForm__input--error" : ""}
                 />
                 {shouldShowSportError("skillLevelsText") && (
@@ -1512,11 +1512,11 @@ function Sports() {
               </div>
 
               <label className="sportsForm__checkbox">
-                <input 
-                  type="checkbox" 
-                  name="requiresMedical" 
-                  checked={sportFormData.requiresMedical} 
-                  onChange={handleSportFormChange} 
+                <input
+                  type="checkbox"
+                  name="requiresMedical"
+                  checked={sportFormData.requiresMedical}
+                  onChange={handleSportFormChange}
                 />
                 Medical certificate required
               </label>
@@ -1610,9 +1610,9 @@ function Sports() {
               {selectedSport.requiresMedical && (
                 <div className="sportDetails__alert">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path d="M12 9V14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M12 21.41H5.94C2.47 21.41 1.02 18.93 2.7 15.9L5.82 10.28L8.76 5.00003C10.54 1.79003 13.46 1.79003 15.24 5.00003L18.18 10.29L21.3 15.91C22.98 18.94 21.52 21.42 18.06 21.42H12V21.41Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M11.995 17H12.004" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M12 9V14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M12 21.41H5.94C2.47 21.41 1.02 18.93 2.7 15.9L5.82 10.28L8.76 5.00003C10.54 1.79003 13.46 1.79003 15.24 5.00003L18.18 10.29L21.3 15.91C22.98 18.94 21.52 21.42 18.06 21.42H12V21.41Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M11.995 17H12.004" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                   <span>Medical certificate required for registration</span>
                 </div>
@@ -1623,31 +1623,30 @@ function Sports() {
                   <div className="sportDetails__dateItem">
                     <span className="sportDetails__dateLabel">Registration Opens</span>
                     <span className="sportDetails__dateValue">
-                      {new Date(selectedSport.registrationOpen).toLocaleDateString("en-US", { 
-                        weekday: "long", month: "long", day: "numeric", year: "numeric" 
+                      {new Date(selectedSport.registrationOpen).toLocaleDateString("en-US", {
+                        weekday: "long", month: "long", day: "numeric", year: "numeric"
                       })}
                     </span>
                   </div>
                   <div className="sportDetails__dateItem">
                     <span className="sportDetails__dateLabel">Registration Closes</span>
                     <span className="sportDetails__dateValue">
-                      {new Date(selectedSport.registrationClose).toLocaleDateString("en-US", { 
-                        weekday: "long", month: "long", day: "numeric", year: "numeric" 
+                      {new Date(selectedSport.registrationClose).toLocaleDateString("en-US", {
+                        weekday: "long", month: "long", day: "numeric", year: "numeric"
                       })}
                     </span>
                   </div>
                 </div>
 
                 <button
-                  className={`sports__btn sports__btn--primary sports__btn--large ${
-                    getRegistrationStatus(selectedSport).disabled ? 'sports__btn--disabled' : ''
-                  }`}
+                  className={`sports__btn sports__btn--primary sports__btn--large ${getRegistrationStatus(selectedSport).disabled ? 'sports__btn--disabled' : ''
+                    }`}
                   onClick={() => handleRegister(selectedSport)}
                   disabled={getRegistrationStatus(selectedSport).disabled}
                 >
-                  {getRegistrationStatus(selectedSport).status === "FULL" ? "Registration Full" : 
-                   getRegistrationStatus(selectedSport).status === "CLOSED" ? "Registration Closed" :
-                   getRegistrationStatus(selectedSport).status === "COMING SOON" ? "Coming Soon" : "Register Now →"}
+                  {getRegistrationStatus(selectedSport).status === "FULL" ? "Registration Full" :
+                    getRegistrationStatus(selectedSport).status === "CLOSED" ? "Registration Closed" :
+                      getRegistrationStatus(selectedSport).status === "COMING SOON" ? "Coming Soon" : "Register Now →"}
                 </button>
               </div>
             </div>
