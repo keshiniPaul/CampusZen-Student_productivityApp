@@ -7,13 +7,6 @@ import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
 
-const wellbeingImg =
-  "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80";
-const guidedHealthTipsImg =
-  "https://images.unsplash.com/photo-1493836512294-502baa1986e2?auto=format&fit=crop&w=1200&q=80";
-const healthyHabitsImg =
-  "https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80";
-
 function Health() {
   const navigate = useNavigate();
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -202,12 +195,8 @@ function Health() {
             }}>
               Career
             </a>
-            <a href="#study" onClick={(e) => {
-              e.preventDefault();
-              showToast("Study section coming soon");
-              setIsNavOpen(false);
-            }}>
-              Study
+            <a href="/study-help" onClick={(e) => { e.preventDefault(); navigate('/study-help'); setIsNavOpen(false); }}>
+              Study Help
             </a>
 
             <div className="nav__cta">
@@ -267,9 +256,6 @@ function Health() {
       <section className="hero hero--health">
         <div className="container hero__container">
           <div className="hero__content">
-            <button className="back-to-dashboard" onClick={() => navigate(isLoggedIn ? "/dashboard" : "/")}>
-              <span>←</span> Back to Welcome Dashboard
-            </button>
             <h1 className="hero__title">Student Health & Wellbeing</h1>
             <p className="hero__subtitle">
               Your comprehensive wellness hub for physical and mental health support
@@ -311,7 +297,7 @@ function Health() {
             <article className="post post--featured">
               <div className="post__media">
                 <img
-                  src={wellbeingImg}
+                  src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                   alt="Wellbeing checkin"
                 />
                 <div className="post__category">Daily Wellness</div>
@@ -340,24 +326,24 @@ function Health() {
               </div>
             </article>
 
-            {/* Guided Health Tips */}
+            {/* Counselling */}
             <article className="post post--featured">
               <div className="post__media">
                 <img
-                  src={guidedHealthTipsImg}
-                  alt="Guided health tips"
+                  src="https://images.unsplash.com/photo-1491438590914-bc09fcaaf77a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+                  alt="Counselling support"
                 />
                 <div className="post__category">Mental Health</div>
               </div>
               <div className="post__body">
-                <h3 className="post__title">Guided Health Tips</h3>
+                <h3 className="post__title">Counselling & Support</h3>
                 <p className="post__text">
-                  Access expert-guided wellness tips, meditation guides, and mental health resources.
+                  Connect with professional counsellors and access confidential mental health support services.
                 </p>
                 <div className="post__features">
-                  <span className="post__feature">✓ Meditation guides</span>
-                  <span className="post__feature">✓ Wellness articles</span>
-                  <span className="post__feature">✓ Expert advice</span>
+                  <span className="post__feature">✓ One-on-one sessions</span>
+                  <span className="post__feature">✓ Group therapy</span>
+                  <span className="post__feature">✓ Crisis support</span>
                 </div>
                 <a
                   className="post__link"
@@ -368,7 +354,7 @@ function Health() {
                     setIsNavOpen(false);
                   }}
                 >
-                  Explore Tips <span className="post__link-arrow">→</span>
+                  Find Support <span className="post__link-arrow">→</span>
                 </a>
               </div>
             </article>
@@ -377,7 +363,7 @@ function Health() {
             <article className="post post--featured">
               <div className="post__media">
                 <img
-                  src={healthyHabitsImg}
+                  src="https://images.unsplash.com/photo-1511690743698-d9d85f2fbf38?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
                   alt="Healthy habits"
                 />
                 <div className="post__category">Lifestyle</div>
@@ -418,6 +404,12 @@ function Health() {
                 <a href="tel:+94117544801" className="health-emergency__phone">
                   📞 Crisis Hotline: +94 11 754 0000
                 </a>
+                <a href="#" className="health-emergency__chat" onClick={(e) => {
+                  e.preventDefault();
+                  showToast("Live chat support coming soon");
+                }}>
+                  💬 Live Chat Support
+                </a>
               </div>
             </div>
           </div>
@@ -430,13 +422,16 @@ function Health() {
           <div className="footer__support">
             <p className="footer__kicker">Need Support?</p>
             <h3 className="footer__heading">Health Help</h3>
-            <a className="footer__contact footer__contact--accent" href="https://support.sliit.lk">
+            <a className="footer__contact footer__contact--accent" href="#">
               🌐 support.campuszone.lk
             </a>
             <a className="footer__contact" href="tel:+94117544801">
               📞 +94 11 754 0000
             </a>
-            <a className="footer__feedback" href="https://support.sliit.lk">
+            <a className="footer__feedback" href="#" onClick={(e) => {
+              e.preventDefault();
+              showToast("Feedback form coming soon");
+            }}>
               Provide Feedback to CampusZone
             </a>
           </div>

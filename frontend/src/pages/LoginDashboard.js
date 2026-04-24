@@ -1,79 +1,32 @@
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "./Home.css"; // Import the same CSS as Home page
-import "./LoginDashboard.css";
 import campusLogo from "../images/campus_logo.png";
 import facebookIcon from "../images/facebook.png";
 import instagramIcon from "../images/instagram.png";
 import linkedinIcon from "../images/linkedin.png";
 import youtubeIcon from "../images/youtube.png";
 
-const dashboardCards = [
-  {
-    title: "Overview",
-    description: "Catch up on your priorities, reminders, and latest updates.",
-    image:
-      "https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=1200&q=80",
-    badge: "Today",
-    key: "overview",
-  },
-  {
-    title: "Health & Wellbeing",
-    description: "Log your wellbeing journey and discover support resources.",
-    image:
-      "https://images.unsplash.com/photo-1518611012118-696072aa579a?auto=format&fit=crop&w=1200&q=80",
-    badge: "Wellness",
-    key: "health",
-  },
-  {
-    title: "Events",
-    description: "Discover campus activities, workshops, and networking events.",
-    image:
-      "https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=1200&q=80",
-    badge: "New",
-    key: "events",
-  },
-  {
-    title: "Career",
-    description: "Build your profile and move ahead with practical career tools.",
-    image:
-      "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
-    badge: "Growth",
-    key: "career",
-  },
-  {
-    title: "Study",
-    description: "Organize tasks and keep your learning goals on schedule.",
-    image:
-      "https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=1200&q=80",
-    badge: "Planner",
-    key: "study",
-  },
-  {
-    title: "Resources",
-    description: "Access practical guides and curated student learning assets.",
-    image:
-      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?auto=format&fit=crop&w=1200&q=80",
-    badge: "Library",
-    key: "resources",
-  },
-];
+// Import dashboard images with .jpg extensions
+import overviewImg from "../images/overviewimg.jpg";
+import healthImg from "../images/healthimg.jpg";
+import eventImg from "../images/eventimg.jpg";
+import careerImg from "../images/career.jpg";
+import studyImg from "../images/study.jpg";
+import resourcesImg from "../images/resources.jpg"; // New Resources image
 
 function LoginDashboard() {
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isNavOpen, setIsNavOpen] = useState(false);
-  const [notifications, setNotifications] = useState([]);
-  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
-  const [isNotificationsLoading, setIsNotificationsLoading] = useState(false);
-  const [notificationsError, setNotificationsError] = useState("");
-  const [activeFilter, setActiveFilter] = useState("All");
-  const [dashboardEvents, setDashboardEvents] = useState([]);
+  const [toastText, setToastText] = useState("");
+  const [toastVisible, setToastVisible] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // Set to true since this is dashboard
   
   const navLinksRef = useRef(null);
   const navToggleRef = useRef(null);
   const profileDropdownRef = useRef(null);
-  const notificationDropdownRef = useRef(null);
+  const toastTimerRef = useRef(null);
 
   const user = JSON.parse(localStorage.getItem("user"));
 
@@ -108,67 +61,11 @@ function LoginDashboard() {
     }
   }, [navigate]);
 
-  const loadNotifications = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    setIsNotificationsLoading(true);
-    setNotificationsError("");
-
-    try {
-      const response = await fetch("http://localhost:5000/api/notifications", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Failed to load notifications");
-      }
-
-      setNotifications(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error(error);
-      setNotificationsError(error.message || "Failed to load notifications");
-    } finally {
-      setIsNotificationsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    loadNotifications();
-    try {
-      const stored = localStorage.getItem("campuszone_events");
-      if (stored) {
-        let eventsArr = JSON.parse(stored);
-        if (Array.isArray(eventsArr)) {
-          // Sort events by date ascending and filter out very old ones
-          const upcoming = eventsArr
-            .filter(e => new Date(e.date) >= new Date(new Date().setHours(0,0,0,0)))
-            .sort((a, b) => new Date(a.date) - new Date(b.date))
-            .slice(0, 5); // Just show top 5 upcoming
-          setDashboardEvents(upcoming);
-        }
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  }, []);
-
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target)) {
         setDropdownOpen(false);
-      }
-
-      if (
-        notificationDropdownRef.current &&
-        !notificationDropdownRef.current.contains(event.target)
-      ) {
-        setIsNotificationsOpen(false);
       }
     };
 
@@ -178,10 +75,7 @@ function LoginDashboard() {
 
   useEffect(() => {
     const onKeyDown = (event) => {
-      if (event.key === "Escape") {
-        setIsNavOpen(false);
-        setIsNotificationsOpen(false);
-      }
+      if (event.key === "Escape") setIsNavOpen(false);
     };
 
     const onDocumentClick = (event) => {
@@ -203,72 +97,25 @@ function LoginDashboard() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    };
+  }, []);
+
+  const showToast = (message) => {
+    setToastText(message || "Coming soon");
+    setToastVisible(true);
+
+    if (toastTimerRef.current) window.clearTimeout(toastTimerRef.current);
+    toastTimerRef.current = window.setTimeout(() => {
+      setToastVisible(false);
+    }, 2200);
+  };
+
   const handleLogout = () => {
     localStorage.clear();
     navigate("/");
-  };
-
-  const markNotificationAsRead = async (notificationId) => {
-    const token = localStorage.getItem("token");
-    if (!token) return;
-
-    try {
-      await fetch(`http://localhost:5000/api/notifications/${notificationId}/read`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const getRelativeTime = (dateValue) => {
-    if (!dateValue) return "";
-    const now = Date.now();
-    const date = new Date(dateValue).getTime();
-    const diffMs = Math.max(0, now - date);
-    const minutes = Math.floor(diffMs / 60000);
-
-    if (minutes < 1) return "Just now";
-    if (minutes < 60) return `${minutes}m ago`;
-
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `${hours}h ago`;
-
-    const days = Math.floor(hours / 24);
-    if (days < 7) return `${days}d ago`;
-
-    return new Date(dateValue).toLocaleDateString();
-  };
-
-  const unreadCount = notifications.filter((item) => !item.isRead).length;
-
-  const handleNotificationClick = async (notification) => {
-    if (!notification?.isRead) {
-      await markNotificationAsRead(notification._id);
-      setNotifications((prev) =>
-        prev.map((item) =>
-          item._id === notification._id ? { ...item, isRead: true } : item
-        )
-      );
-    }
-
-    if (notification?.link) {
-      navigate(notification.link);
-      setIsNotificationsOpen(false);
-      setIsNavOpen(false);
-    }
-  };
-
-  const openNotifications = async () => {
-    const nextOpen = !isNotificationsOpen;
-    setIsNotificationsOpen(nextOpen);
-
-    if (nextOpen) {
-      await loadNotifications();
-    }
   };
 
   const handleDeleteAccount = async () => {
@@ -351,7 +198,7 @@ function LoginDashboard() {
 
   const goToStudy = (e) => {
     e.preventDefault();
-    alert("Study section coming soon");
+    navigate("/study");
     setIsNavOpen(false);
   };
 
@@ -406,69 +253,22 @@ function LoginDashboard() {
             <a href="/events" onClick={goToEventsDashboard}>
               Events
             </a>
-            <a href="/career" onClick={goToCareer}>
+            <a href="#career" onClick={(e) => scrollToSection(e, "career")}>
               Career
             </a>
-
-            <a href="#study" onClick={(e) => scrollToSection(e, "study")}>
-              Study
+            <a href="/study-help" onClick={(e) => { e.preventDefault(); navigate('/study-help'); setIsNavOpen(false); }}>
+              Study Help
             </a>
 
             <div className="nav__cta">
-              <div className="notification-dropdown" ref={notificationDropdownRef}>
-                <button
-                  className="header__notificationBtn"
-                  aria-label="Notifications"
-                  onClick={openNotifications}
-                >
-                  <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
-                    <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
-                    <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
-                  </svg>
-                  <span className="header__notificationBadge">{unreadCount}</span>
-                </button>
-
-                {isNotificationsOpen && (
-                  <div className="notification-dropdown-menu">
-                    <div className="notification-dropdown-header">
-                      <strong>Notifications</strong>
-                      <button type="button" onClick={loadNotifications}>
-                        Refresh
-                      </button>
-                    </div>
-
-                    <div className="notification-dropdown-list">
-                      {isNotificationsLoading && <p className="notification-empty">Loading notifications...</p>}
-
-                      {!isNotificationsLoading && notificationsError && (
-                        <p className="notification-empty notification-empty--error">{notificationsError}</p>
-                      )}
-
-                      {!isNotificationsLoading && !notificationsError && notifications.length === 0 && (
-                        <p className="notification-empty">No notifications yet.</p>
-                      )}
-
-                      {!isNotificationsLoading &&
-                        !notificationsError &&
-                        notifications.map((notification) => (
-                          <button
-                            type="button"
-                            key={notification._id}
-                            className={`notification-item ${notification.isRead ? "" : "is-unread"}`.trim()}
-                            onClick={() => handleNotificationClick(notification)}
-                          >
-                            <div className="notification-item__top">
-                              <h4>{notification.title || "Notification"}</h4>
-                              <span>{getRelativeTime(notification.createdAt)}</span>
-                            </div>
-                            <p>{notification.message}</p>
-                          </button>
-                        ))}
-                    </div>
-                  </div>
-                )}
-              </div>
+              <button className="header__notificationBtn" aria-label="Notifications">
+                <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"/>
+                  <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10"/>
+                </svg>
+                <span className="header__notificationBadge">3</span>
+              </button>
               
               <div className="profile-dropdown" ref={profileDropdownRef}>
                 <button 
@@ -508,123 +308,170 @@ function LoginDashboard() {
 
       {/* Dashboard Content */}
       <main>
-        <section className="section dashboardWelcome">
+        <section className="section">
           <div className="container">
-            <div className="dashboardWelcome__panel">
-              <div className="dashboardWelcome__intro">
-                <p className="dashboardWelcome__eyebrow">Personal Workspace</p>
-                <h1 className="dashboardWelcome__title">
-                  Welcome back, {user?.fullName || "Student"}
-                </h1>
-                <p className="dashboardWelcome__subtitle">
-                  Stay focused with a dashboard designed around your daily campus flow.
-                </p>
-                <div className="dashboardWelcome__chips" aria-label="Quick status">
-                  <span>6 Modules</span>
-                  <span>{dashboardEvents.length} Upcoming Events</span>
-                  <span>{monthLabel}</span>
+            <div style={{ 
+              background: "var(--card-strong)",
+              border: "1px solid rgba(2,30,55,.07)",
+              borderRadius: "var(--radius-lg)",
+              padding: "40px",
+              boxShadow: "var(--shadow)",
+              marginTop: "20px"
+            }}>
+              <h1 style={{ fontSize: "32px", margin: "0 0 8px 0" }}>
+                Welcome back, {user?.fullName || "Student"}! 👋
+              </h1>
+              <p style={{ color: "var(--muted)", fontSize: "16px", marginBottom: "32px" }}>
+                This is your student productivity dashboard. Track your progress and manage your activities.
+              </p>
+
+              {/* Dashboard Cards with Images */}
+              <div className="dashboard-grid" style={{
+                display: "grid",
+                gridTemplateColumns: "repeat(3, 1fr)",
+                gap: "20px",
+                marginTop: "30px"
+              }}>
+                {/* Overview Card */}
+                <div className="dashboard-card" style={{
+                  background: "white",
+                  borderRadius: "var(--radius-lg)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow)",
+                  transition: "transform 0.3s ease",
+                  cursor: "pointer"
+                }} onClick={goToOverview}>
+                  <img src={overviewImg} alt="Overview" style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover"
+                  }} />
+                  <div style={{ padding: "20px" }}>
+                    <h3 style={{ margin: "0 0 10px 0", fontSize: "20px" }}>Overview</h3>
+                    <p style={{ color: "var(--muted)", margin: 0 }}>
+                      View your activity summary and recent updates
+                    </p>
+                  </div>
+                </div>
+
+                {/* Health Card */}
+                <div className="dashboard-card" style={{
+                  background: "white",
+                  borderRadius: "var(--radius-lg)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow)",
+                  transition: "transform 0.3s ease",
+                  cursor: "pointer"
+                }} onClick={goToHealth}>
+                  <img src={healthImg} alt="Health" style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover"
+                  }} />
+                  <div style={{ padding: "20px" }}>
+                    <h3 style={{ margin: "0 0 10px 0", fontSize: "20px" }}>Health & Wellbeing</h3>
+                    <p style={{ color: "var(--muted)", margin: 0 }}>
+                      Track your wellbeing and access support services
+                    </p>
+                  </div>
+                </div>
+
+                {/* Events Card */}
+                <div className="dashboard-card" style={{
+                  background: "white",
+                  borderRadius: "var(--radius-lg)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow)",
+                  transition: "transform 0.3s ease",
+                  cursor: "pointer"
+                }} onClick={goToEventsDashboard}>
+                  <img src={eventImg} alt="Events" style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover"
+                  }} />
+                  <div style={{ padding: "20px" }}>
+                    <h3 style={{ margin: "0 0 10px 0", fontSize: "20px" }}>Events</h3>
+                    <p style={{ color: "var(--muted)", margin: 0 }}>
+                      Check upcoming events and your registrations
+                    </p>
+                  </div>
+                </div>
+
+                {/* Career Card */}
+                <div className="dashboard-card" style={{
+                  background: "white",
+                  borderRadius: "var(--radius-lg)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow)",
+                  transition: "transform 0.3s ease",
+                  cursor: "pointer"
+                }} onClick={goToCareer}>
+                  <img src={careerImg} alt="Career" style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover"
+                  }} />
+                  <div style={{ padding: "20px" }}>
+                    <h3 style={{ margin: "0 0 10px 0", fontSize: "20px" }}>Career</h3>
+                    <p style={{ color: "var(--muted)", margin: 0 }}>
+                      Plan your future with internships and CV tools
+                    </p>
+                  </div>
+                </div>
+
+                {/* Study Card */}
+                <div className="dashboard-card" style={{
+                  background: "white",
+                  borderRadius: "var(--radius-lg)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow)",
+                  transition: "transform 0.3s ease",
+                  cursor: "pointer"
+                }} onClick={goToStudy}>
+                  <img src={studyImg} alt="Study" style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover"
+                  }} />
+                  <div style={{ padding: "20px" }}>
+                    <h3 style={{ margin: "0 0 10px 0", fontSize: "20px" }}>Study</h3>
+                    <p style={{ color: "var(--muted)", margin: 0 }}>
+                      Manage your courses and study materials
+                    </p>
+                  </div>
+                </div>
+
+                {/* Resources Card - New */}
+                <div className="dashboard-card" style={{
+                  background: "white",
+                  borderRadius: "var(--radius-lg)",
+                  overflow: "hidden",
+                  boxShadow: "var(--shadow)",
+                  transition: "transform 0.3s ease",
+                  cursor: "pointer"
+                }} onClick={goToResources}>
+                  <img src={resourcesImg} alt="Resources" style={{
+                    width: "100%",
+                    height: "180px",
+                    objectFit: "cover"
+                  }} />
+                  <div style={{ padding: "20px" }}>
+                    <h3 style={{ margin: "0 0 10px 0", fontSize: "20px" }}>Resources</h3>
+                    <p style={{ color: "var(--muted)", margin: 0 }}>
+                      Access study materials, guides, and helpful resources
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              <div className="dashboardWelcome__banner" role="img" aria-label="Student campus dashboard banner">
-                <img
-                  src="https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=1400&q=80"
-                  alt="University campus"
-                  loading="lazy"
-                />
-                <div className="dashboardWelcome__bannerOverlay">
-                  <strong>Build your best semester</strong>
-                  <p>Plan better, feel better, achieve more.</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Unified Timeline Section */}
-            {dashboardEvents.length > 0 && (
-              <div className="dashboardTimeline">
-                <div className="dashboardTimeline__header">
-                  <h2 className="dashboardTimeline__title">Upcoming in "My Campus Space"</h2>
-                  <Link to="/events" className="dashboardTimeline__viewAll">View Calendar &rarr;</Link>
-                </div>
-                <div className="dashboardTimeline__scroll">
-                  {dashboardEvents.map((ev, index) => {
-                    const d = new Date(ev.date);
-                    const isToday = d.toDateString() === new Date().toDateString();
-                    return (
-                      <div className="timelineEventCard" key={ev.id || index}>
-                        <div className="timelineEventCard__date">
-                          <strong>{d.getDate()}</strong>
-                          <span>{d.toLocaleString('en-US', { month: 'short' })}</span>
-                        </div>
-                        <div className="timelineEventCard__content">
-                          {isToday && <span className="timelineEventCard__badge">Today</span>}
-                          <h4>{ev.title}</h4>
-                          <p>{ev.venue}</p>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Advanced Animated Filters */}
-            <div className="dashboardFilters">
-              {['All', 'Essentials', 'Growth', 'Lifestyle'].map(filter => (
-                <button 
-                  key={filter}
-                  className={`dashboardFilterBtn ${activeFilter === filter ? 'is-active' : ''}`}
-                  onClick={() => setActiveFilter(filter)}
-                >
-                  {filter}
-                </button>
-              ))}
-            </div>
-
-            <div className="dashboardWelcome__grid">
-              {dashboardCards
-                .filter(card => {
-                  if (activeFilter === "All") return true;
-                  if (activeFilter === "Essentials" && ["overview", "study", "resources"].includes(card.key)) return true;
-                  if (activeFilter === "Growth" && ["events", "career"].includes(card.key)) return true;
-                  if (activeFilter === "Lifestyle" && ["health"].includes(card.key)) return true;
-                  return false;
-                })
-                .map((card, index) => {
-                const onOpen =
-                  card.key === "overview"
-                    ? goToOverview
-                    : card.key === "health"
-                    ? goToHealth
-                    : card.key === "events"
-                    ? goToEventsDashboard
-                    : card.key === "career"
-                    ? goToCareer
-                    : card.key === "study"
-                    ? goToStudy
-                    : goToResources;
-
-                return (
-                  <article 
-                    className="dashboardCard dashboardCard--animated" 
-                    key={card.key} 
-                    onClick={onOpen}
-                    style={{ animationDelay: `${index * 0.05}s` }}
-                  >
-                    <div className="dashboardCard__media">
-                      <img src={card.image} alt={card.title} loading="lazy" />
-                      <span className="dashboardCard__badge">{card.badge}</span>
-                    </div>
-                    <div className="dashboardCard__body">
-                      <h3>{card.title}</h3>
-                      <p>{card.description}</p>
-                      <button type="button" className="dashboardCard__action">
-                        Open section
-                      </button>
-                    </div>
-                  </article>
-                );
-              })}
+              {/* Add hover effect CSS */}
+              <style jsx>{`
+                .dashboard-card:hover {
+                  transform: translateY(-5px);
+                  box-shadow: 0 12px 30px rgba(0,0,0,0.15);
+                }
+              `}</style>
             </div>
           </div>
         </section>
@@ -709,6 +556,17 @@ function LoginDashboard() {
           </div>
         </div>
       </footer>
+
+      {/* Toast notification */}
+      <div
+        className={`toast ${toastVisible ? "is-visible" : ""}`.trim()}
+        id="toast"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        {toastText}
+      </div>
     </div>
   );
 }

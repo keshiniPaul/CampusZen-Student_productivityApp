@@ -1,36 +1,54 @@
 const mongoose = require("mongoose");
 
-const ResourceSchema = new mongoose.Schema(
+const resourceSchema = new mongoose.Schema(
   {
     title: {
       type: String,
       required: [true, "Title is required"],
       trim: true,
     },
-    description: {
+    type: {
       type: String,
-      required: [true, "Description is required"],
+      enum: ["pdf", "notes", "slides", "video", "link"],
+      required: [true, "Resource type is required"],
+    },
+    module: {
+      type: String,
+      required: [true, "Module is required"],
       trim: true,
     },
     fileUrl: {
       type: String,
+      required: [true, "File URL is required"],
+      trim: true,
     },
-    createdBy: {
+    description: {
+      type: String,
+      trim: true,
+    },
+    downloadCount: {
+      type: Number,
+      default: 0,
+    },
+    uploadedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
     },
-    // Adding non-required fields mentioned previously for backward compatibility with my plan
-    type: { type: String },
-    category: { type: String },
-    tags: [String],
-    link: String,
-    fileName: String,
-    fileType: String,
+    groupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "StudyGroup",
+      default: null,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Resource", ResourceSchema);
+resourceSchema.index({ module: 1 });
+resourceSchema.index({ type: 1 });
+resourceSchema.index({ title: "text", module: "text" });
+
+const Resource = mongoose.model("Resource", resourceSchema);
+
+module.exports = Resource;

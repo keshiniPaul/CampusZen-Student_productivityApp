@@ -10,11 +10,11 @@ export const sportsAPI = {
       const url = `${API_BASE_URL}/sports${queryString ? `?${queryString}` : ''}`;
       const response = await fetch(url);
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch sports');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error fetching sports:', error);
@@ -27,11 +27,11 @@ export const sportsAPI = {
     try {
       const response = await fetch(`${API_BASE_URL}/sports/${id}`);
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch sport');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error fetching sport:', error);
@@ -51,11 +51,11 @@ export const sportsAPI = {
         body: JSON.stringify(sportData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to create sport');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error creating sport:', error);
@@ -75,11 +75,11 @@ export const sportsAPI = {
         body: JSON.stringify(sportData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update sport');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error updating sport:', error);
@@ -97,11 +97,11 @@ export const sportsAPI = {
         },
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete sport');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error deleting sport:', error);
@@ -119,11 +119,11 @@ export const sportsAPI = {
         },
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to register for sport');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error registering for sport:', error);
@@ -143,11 +143,11 @@ export const sportsAPI = {
         body: JSON.stringify(notificationData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to send notification');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error sending notification:', error);
@@ -165,11 +165,11 @@ export const eventAPI = {
       const url = `${API_BASE_URL}/events${queryString ? `?${queryString}` : ''}`;
       const response = await fetch(url);
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch events');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -189,11 +189,11 @@ export const eventAPI = {
         body: JSON.stringify(eventData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to create event');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error creating event:', error);
@@ -213,11 +213,11 @@ export const eventAPI = {
         body: JSON.stringify(eventData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update event');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error updating event:', error);
@@ -235,11 +235,11 @@ export const eventAPI = {
         },
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete event');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error deleting event:', error);
@@ -257,11 +257,11 @@ export const clubsAPI = {
       const url = `${API_BASE_URL}/clubs${queryString ? `?${queryString}` : ''}`;
       const response = await fetch(url);
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch clubs');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error fetching clubs:', error);
@@ -274,11 +274,11 @@ export const clubsAPI = {
     try {
       const response = await fetch(`${API_BASE_URL}/clubs/${id}`);
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch club');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error fetching club:', error);
@@ -298,11 +298,11 @@ export const clubsAPI = {
         body: JSON.stringify(clubData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to create club');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error creating club:', error);
@@ -322,11 +322,11 @@ export const clubsAPI = {
         body: JSON.stringify(clubData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update club');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error updating club:', error);
@@ -344,11 +344,11 @@ export const clubsAPI = {
         },
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete club');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error deleting club:', error);
@@ -366,11 +366,11 @@ export const clubsAPI = {
         },
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to join club');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error joining club:', error);
@@ -390,11 +390,11 @@ export const clubsAPI = {
         body: JSON.stringify({ action }),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to manage member');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error managing member:', error);
@@ -414,11 +414,11 @@ export const clubsAPI = {
         body: JSON.stringify(announcementData),
       });
       const data = await response.json();
-
+      
       if (!response.ok) {
         throw new Error(data.message || 'Failed to post announcement');
       }
-
+      
       return data;
     } catch (error) {
       console.error('Error posting announcement:', error);
@@ -427,260 +427,101 @@ export const clubsAPI = {
   },
 };
 
-// Career API endpoints
-export const careerAPI = {
-  // Get all careers
-  getAllCareers: async () => {
+// Study Group API endpoints
+export const studyGroupsAPI = {
+  // Get all study groups
+  getAllGroups: async (params = {}) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/careers`);
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${API_BASE_URL}/study-groups${queryString ? `?${queryString}` : ''}`;
+      const response = await fetch(url);
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to fetch careers');
-      }
-
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch study groups');
       return data;
     } catch (error) {
-      console.error('Error fetching careers:', error);
+      console.error('Error fetching study groups:', error);
       throw error;
     }
   },
 
-  // Create new career (Admin only)
-  createCareer: async (formData, token) => {
+  // Get single group by ID
+  getGroupById: async (groupId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/careers`, {
+      const response = await fetch(`${API_BASE_URL}/study-groups/${groupId}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch study group');
+      return data;
+    } catch (error) {
+      console.error('Error fetching study group:', error);
+      throw error;
+    }
+  },
+
+  // Create a new study group
+  createGroup: async (groupData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/study-groups`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(groupData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to create study group');
+      return data;
+    } catch (error) {
+      console.error('Error creating study group:', error);
+      throw error;
+    }
+  },
+
+  // Join a study group
+  joinGroup: async (groupId, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/study-groups/${groupId}/members`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
-        body: formData, // FormData handles its own headers
       });
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to create career');
-      }
-
+      if (!response.ok) throw new Error(data.message || 'Failed to join study group');
       return data;
     } catch (error) {
-      console.error('Error creating career:', error);
+      console.error('Error joining study group:', error);
       throw error;
     }
   },
 
-  // Update career (Admin only)
-  updateCareer: async (id, formData, token) => {
+  // Leave a study group
+  leaveGroup: async (groupId, userId, token) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/careers/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData, // FormData handles its own headers
-      });
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to update career');
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error updating career:', error);
-      throw error;
-    }
-  },
-
-  // Delete career (Admin only)
-  deleteCareer: async (id, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/careers/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/study-groups/${groupId}/members/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
         },
       });
       const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || 'Failed to delete career');
-      }
-
+      if (!response.ok) throw new Error(data.message || 'Failed to leave study group');
       return data;
     } catch (error) {
-      console.error('Error deleting career:', error);
-      throw error;
-    }
-  },
-};
-
-// Internship Application API endpoints
-export const internshipAPI = {
-  // Get all applications for current user
-  getAllApplications: async (token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/internships`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to fetch applications');
-      return data;
-    } catch (error) {
-      console.error('Error fetching internship applications:', error);
+      console.error('Error leaving study group:', error);
       throw error;
     }
   },
 
-  // Get single application by ID
-  getApplicationById: async (id, token) => {
+  // Get group members
+  getGroupMembers: async (groupId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/internships/${id}`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(`${API_BASE_URL}/study-groups/${groupId}/members`);
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to fetch application');
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch members');
       return data;
     } catch (error) {
-      console.error('Error fetching internship application:', error);
-      throw error;
-    }
-  },
-
-  // Create new application
-  createApplication: async (applicationData, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/internships`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(applicationData),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to create application');
-      return data;
-    } catch (error) {
-      console.error('Error creating internship application:', error);
-      throw error;
-    }
-  },
-
-  // Update application
-  updateApplication: async (id, applicationData, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/internships/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(applicationData),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to update application');
-      return data;
-    } catch (error) {
-      console.error('Error updating internship application:', error);
-      throw error;
-    }
-  },
-
-  // Delete application
-  deleteApplication: async (id, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/internships/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to delete application');
-      return data;
-    } catch (error) {
-      console.error('Error deleting internship application:', error);
-      throw error;
-    }
-  },
-};
-
-// Notification API endpoints
-export const notificationAPI = {
-  // Create notification
-  createNotification: async (notificationData, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/notifications`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(notificationData),
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to create notification');
-      return data;
-    } catch (error) {
-      console.error('Error creating notification:', error);
-      throw error;
-    }
-  },
-
-  // Get all notifications for current user
-  getAllNotifications: async (token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/notifications`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to fetch notifications');
-      return data;
-    } catch (error) {
-      console.error('Error fetching notifications:', error);
-      throw error;
-    }
-  },
-
-  // Mark notification as read
-  markAsRead: async (id, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/notifications/${id}/read`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to mark notification as read');
-      return data;
-    } catch (error) {
-      console.error('Error marking notification as read:', error);
-      throw error;
-    }
-  },
-
-  // Delete notification
-  deleteNotification: async (id, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/notifications/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to delete notification');
-      return data;
-    } catch (error) {
-      console.error('Error deleting notification:', error);
+      console.error('Error fetching group members:', error);
       throw error;
     }
   },
@@ -688,8 +529,7 @@ export const notificationAPI = {
 
 // Resources API endpoints
 export const resourcesAPI = {
-  // Get all resources (supports search, type, category, recommend, userId)
-  getAllResources: async (params = {}) => {
+  getAll: async (params = {}) => {
     try {
       const queryString = new URLSearchParams(params).toString();
       const url = `${API_BASE_URL}/resources${queryString ? `?${queryString}` : ''}`;
@@ -703,9 +543,9 @@ export const resourcesAPI = {
     }
   },
 
-  getResourceById: async (id) => {
+  getById: async (resourceId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/resources/${id}`);
+      const response = await fetch(`${API_BASE_URL}/resources/${resourceId}`);
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to fetch resource');
       return data;
@@ -715,50 +555,27 @@ export const resourcesAPI = {
     }
   },
 
-  // formData is a FormData object (multipart) — do NOT set Content-Type header
-  createResource: async (formData, token) => {
+  upload: async (formData, token) => {
     try {
       const response = await fetch(`${API_BASE_URL}/resources`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
         body: formData,
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to create resource');
+      if (!response.ok) throw new Error(data.message || 'Failed to upload resource');
       return data;
     } catch (error) {
-      console.error('Error creating resource:', error);
+      console.error('Error uploading resource:', error);
       throw error;
     }
   },
 
-  updateResource: async (id, formData, token) => {
+  delete: async (resourceId, token) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/resources/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData,
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to update resource');
-      return data;
-    } catch (error) {
-      console.error('Error updating resource:', error);
-      throw error;
-    }
-  },
-
-  deleteResource: async (id, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/resources/${id}`, {
+      const response = await fetch(`${API_BASE_URL}/resources/${resourceId}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await response.json();
       if (!response.ok) throw new Error(data.message || 'Failed to delete resource');
@@ -769,58 +586,163 @@ export const resourcesAPI = {
     }
   },
 
-  saveResource: async (id, token) => {
+  incrementDownload: async (resourceId) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/resources/save/${id}`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      const response = await fetch(`${API_BASE_URL}/resources/${resourceId}/download`, { method: 'PATCH' });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to save resource');
+      if (!response.ok) throw new Error(data.message || 'Failed to update download count');
       return data;
     } catch (error) {
-      console.error('Error saving resource:', error);
-      throw error;
-    }
-  },
-
-  unsaveResource: async (id, token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/resources/save/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to unsave resource');
-      return data;
-    } catch (error) {
-      console.error('Error unsaving resource:', error);
-      throw error;
-    }
-  },
-
-  getSavedResources: async (token) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/resources/saved`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.message || 'Failed to fetch saved resources');
-      return data;
-    } catch (error) {
-      console.error('Error fetching saved resources:', error);
+      console.error('Error updating download count:', error);
       throw error;
     }
   },
 };
 
-const api = { sportsAPI, eventAPI, clubsAPI, careerAPI, internshipAPI, notificationAPI, resourcesAPI };
+// Assignments API endpoints
+export const assignmentsAPI = {
+  getAll: async (params = {}) => {
+    try {
+      const queryString = new URLSearchParams(params).toString();
+      const url = `${API_BASE_URL}/assignments${queryString ? `?${queryString}` : ''}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch assignments');
+      return data;
+    } catch (error) {
+      console.error('Error fetching assignments:', error);
+      throw error;
+    }
+  },
 
+  create: async (assignmentData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/assignments`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(assignmentData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to create assignment');
+      return data;
+    } catch (error) {
+      console.error('Error creating assignment:', error);
+      throw error;
+    }
+  },
+
+  updateStatus: async (assignmentId, status, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/assignments/${assignmentId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify({ status }),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to update status');
+      return data;
+    } catch (error) {
+      console.error('Error updating assignment status:', error);
+      throw error;
+    }
+  },
+
+  update: async (assignmentId, assignmentData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/assignments/${assignmentId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(assignmentData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to update assignment');
+      return data;
+    } catch (error) {
+      console.error('Error updating assignment:', error);
+      throw error;
+    }
+  },
+
+  delete: async (assignmentId, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/assignments/${assignmentId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to delete assignment');
+      return data;
+    } catch (error) {
+      console.error('Error deleting assignment:', error);
+      throw error;
+    }
+  },
+};
+
+// Timetable API endpoints
+export const timetableAPI = {
+  getAll: async (token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/timetable`, {
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to fetch timetable');
+      return data;
+    } catch (error) {
+      console.error('Error fetching timetable:', error);
+      throw error;
+    }
+  },
+
+  create: async (slotData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/timetable`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(slotData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to create slot');
+      return data;
+    } catch (error) {
+      console.error('Error creating timetable slot:', error);
+      throw error;
+    }
+  },
+
+  update: async (slotId, slotData, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/timetable/${slotId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+        body: JSON.stringify(slotData),
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to update slot');
+      return data;
+    } catch (error) {
+      console.error('Error updating timetable slot:', error);
+      throw error;
+    }
+  },
+
+  delete: async (slotId, token) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/timetable/${slotId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` },
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to delete slot');
+      return data;
+    } catch (error) {
+      console.error('Error deleting timetable slot:', error);
+      throw error;
+    }
+  },
+};
+
+const api = { sportsAPI, eventAPI, clubsAPI, studyGroupsAPI, resourcesAPI, assignmentsAPI, timetableAPI };
 
 export default api;

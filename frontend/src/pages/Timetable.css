@@ -1,0 +1,370 @@
+/* ===== Timetable Page ===== */
+.timetable {
+  min-height: 100vh;
+  background: #f8fafc;
+  padding-bottom: 4rem;
+}
+
+/* Header */
+.timetable__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 2.5rem 1rem 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.timetable__title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0 0 0.25rem;
+}
+
+.timetable__subtitle {
+  color: #64748b;
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.timetable__addBtn {
+  padding: 0.6rem 1.4rem;
+  background: #3b82f6;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+.timetable__addBtn:hover { background: #2563eb; }
+
+/* Login prompt */
+.timetable__loginPrompt {
+  text-align: center;
+  padding: 4rem 1rem;
+}
+.timetable__loginIcon { font-size: 3rem; margin-bottom: 1rem; }
+.timetable__loginPrompt h3 { font-size: 1.4rem; color: #1e293b; margin: 0 0 0.5rem; }
+.timetable__loginPrompt p { color: #64748b; margin: 0 0 1.5rem; }
+.timetable__loginBtn {
+  display: inline-block;
+  padding: 0.6rem 1.5rem;
+  background: #3b82f6;
+  color: #fff;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+}
+.timetable__loginBtn:hover { background: #2563eb; }
+
+/* Loading */
+.timetable__loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+}
+
+/* Grid wrapper */
+.timetable__gridWrapper {
+  padding: 0 1rem 2rem;
+  overflow-x: auto;
+}
+
+.timetable__grid {
+  display: flex;
+  min-width: 700px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  overflow: hidden;
+}
+
+/* Time column */
+.timetable__timeCol {
+  width: 64px;
+  flex-shrink: 0;
+  border-right: 1px solid #e2e8f0;
+}
+
+.timetable__timeLabel--head {
+  height: 44px;
+  border-bottom: 1px solid #e2e8f0;
+  background: #f8fafc;
+}
+
+/* Day columns */
+.timetable__dayCol {
+  flex: 1;
+  border-right: 1px solid #e2e8f0;
+  min-width: 90px;
+}
+.timetable__dayCol:last-child { border-right: none; }
+
+.timetable__dayHeader {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+.timetable__dayBody {
+  position: relative;
+}
+
+/* Hour cells in time column */
+.timetable__hourCell {
+  height: 64px;
+  display: flex;
+  align-items: flex-start;
+  padding-top: 4px;
+  padding-right: 6px;
+  justify-content: flex-end;
+  border-bottom: 1px solid #f1f5f9;
+}
+.timetable__hourLabel {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+/* Grid lines inside day body */
+.timetable__gridLine {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #f1f5f9;
+  pointer-events: none;
+}
+
+/* Slot card */
+.timetable__slot {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  border-radius: 6px;
+  padding: 4px 6px;
+  overflow: hidden;
+  cursor: default;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  transition: box-shadow 0.15s;
+}
+.timetable__slot:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.12); }
+.timetable__slot:hover .timetable__slotActions { opacity: 1; }
+
+.timetable__slotSubject {
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.timetable__slotTime {
+  font-size: 0.65rem;
+  color: #475569;
+  white-space: nowrap;
+}
+.timetable__slotType {
+  font-size: 0.6rem;
+  color: #64748b;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.timetable__slotActions {
+  display: flex;
+  gap: 3px;
+  margin-top: auto;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.timetable__slotEdit,
+.timetable__slotDelete {
+  background: rgba(255,255,255,0.85);
+  border: none;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  cursor: pointer;
+  padding: 1px 4px;
+  line-height: 1.4;
+}
+.timetable__slotEdit:hover { background: #dbeafe; }
+.timetable__slotDelete:hover { background: #fee2e2; }
+
+/* Empty state */
+.timetable__empty {
+  text-align: center;
+  padding: 3rem 1rem 1rem;
+}
+.timetable__emptyIcon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+.timetable__emptyTitle { font-size: 1.2rem; color: #1e293b; margin: 0 0 0.25rem; }
+.timetable__emptyText { color: #64748b; margin: 0; font-size: 0.9rem; }
+
+/* ===== Modal ===== */
+.timetable__modal {
+  max-width: 520px;
+  width: 95vw;
+}
+
+.timetable__modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.timetable__form { display: flex; flex-direction: column; gap: 1.1rem; }
+
+.timetable__formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+@media (max-width: 480px) { .timetable__formRow { grid-template-columns: 1fr; } }
+
+.timetable__formGroup { display: flex; flex-direction: column; gap: 0.4rem; }
+.timetable__formGroup--toggle { justify-content: flex-start; }
+
+.timetable__label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.timetable__input {
+  padding: 0.6rem 0.85rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #1e293b;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  box-sizing: border-box;
+}
+.timetable__input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
+.timetable__input--invalid { border-color: #dc2626; }
+.timetable__input--invalid:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.1); }
+.timetable__select { cursor: pointer; }
+
+.timetable__errorText { margin: 0; color: #dc2626; font-size: 0.8rem; }
+
+/* Color picker row */
+.timetable__colorRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.timetable__colorPicker {
+  width: 44px;
+  height: 36px;
+  border: 1.5px solid #d1d5db;
+  border-radius: 8px;
+  padding: 2px;
+  cursor: pointer;
+  background: #fff;
+}
+.timetable__colorPreview {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Toggle */
+.timetable__toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  margin-top: 0.25rem;
+}
+.timetable__toggle input { display: none; }
+.timetable__toggleSlider {
+  width: 42px;
+  height: 24px;
+  background: #cbd5e1;
+  border-radius: 12px;
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.timetable__toggleSlider::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: #fff;
+  border-radius: 50%;
+  top: 3px;
+  left: 3px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.timetable__toggle input:checked ~ .timetable__toggleSlider { background: #3b82f6; }
+.timetable__toggle input:checked ~ .timetable__toggleSlider::after { transform: translateX(18px); }
+.timetable__toggleText { font-size: 0.85rem; color: #475569; font-weight: 500; }
+
+/* Form actions */
+.timetable__formActions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+}
+.timetable__btn {
+  padding: 0.6rem 1.4rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background 0.2s, opacity 0.2s;
+}
+.timetable__btn--primary { background: #3b82f6; color: #fff; }
+.timetable__btn--primary:hover:not(:disabled) { background: #2563eb; }
+.timetable__btn--primary:disabled { opacity: 0.6; cursor: not-allowed; }
+.timetable__btn--secondary { background: #f1f5f9; color: #475569; }
+.timetable__btn--secondary:hover { background: #e2e8f0; }
+
+/* Toast */
+.timetable__toast {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e293b;
+  color: #fff;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  z-index: 9999;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: fadeInUp 0.3s ease;
+}
+.timetable__toast p { margin: 0; }
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translate(-50%, 10px); }
+  to   { opacity: 1; transform: translate(-50%, 0); }
+}
+
+@media (max-width: 640px) {
+  .timetable__title { font-size: 1.5rem; }
+  .timetable__gridWrapper { padding: 0 0.5rem 2rem; }
+}

@@ -9,19 +9,21 @@ const {
   registerForSport,
   sendSportNotification,
 } = require("../controllers/sportcontrollers");
-const { protect, adminOnly, studentOnly } = require("../middleware/authMiddleware");
+
+// Import auth middleware (when implemented)
+// const { protect, adminOnly, studentOnly } = require("../middleware/authMiddleware");
 
 // Public routes
 router.get("/", getSports);
 router.get("/:id", getSportById);
 
-// Student routes
-router.post("/:id/register", protect, studentOnly, registerForSport);
+// Student routes (add protect middleware when auth is ready)
+router.post("/:id/register", registerForSport); // Add: protect, studentOnly
 
-// Admin routes
-router.post("/", protect, adminOnly, createSport);
-router.put("/:id", protect, adminOnly, updateSport);
-router.delete("/:id", protect, adminOnly, deleteSport);
-router.post("/:id/notify", protect, adminOnly, sendSportNotification);
+// Admin routes (add protect and adminOnly middleware when auth is ready)
+router.post("/", createSport); // Add: protect, adminOnly
+router.put("/:id", updateSport); // Add: protect, adminOnly
+router.delete("/:id", deleteSport); // Add: protect, adminOnly
+router.post("/:id/notify", sendSportNotification); // Add: protect, adminOnly
 
 module.exports = router;

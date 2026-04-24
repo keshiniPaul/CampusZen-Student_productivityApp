@@ -16,18 +16,25 @@ import Event from "./pages/Event";
 import ActivityDetails from "./pages/ActivityDetails";
 import Sports from "./pages/Sports";
 import Clubs from "./pages/Clubs";
-import Career from "./pages/Career";
-import CareerInternships from "./pages/CareerInternships";
-import CareerGuidance from "./pages/CareerGuidance";
-import CareerResources from "./pages/CareerResources";
-import CareerManagement from "./pages/CareerManagement";
-import ResumeBuilder from "./pages/ResumeBuilder";
-import InternshipTracker from "./pages/InternshipTracker";
-import InternshipDetails from "./pages/InternshipDetails";
-
 
 // new pages for login
 import LoginDashboard from "./pages/LoginDashboard";
+
+// Study Groups
+import StudyGroups from "./pages/StudyGroups";
+import StudyGroupDetail from "./pages/StudyGroupDetail";
+
+// Resources
+import Resources from "./pages/Resources";
+
+// Assignments
+import Assignments from "./pages/Assignments";
+
+// Timetable
+import Timetable from "./pages/Timetable";
+
+// Study Help
+import StudyHelp from "./pages/StudyHelp";
 
 function App() {
   return (
@@ -45,10 +52,6 @@ function App() {
         {/* Authentication */}
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/admin/register" element={<Register />} />
-        <Route path="/admin/login" element={<Login />} />
-        <Route path="/student/register" element={<Register />} />
-        <Route path="/student/login" element={<Login />} />
 
         {/* Health Module */}
         <Route path="/daily-health" element={<DailyHealth />} />
@@ -57,16 +60,21 @@ function App() {
         <Route path="/health" element={<Health />} />
         <Route path="/dashboard" element={<LoginDashboard />} />
 
-        {/* Career Module */}
-        <Route path="/career" element={<Career />} />
-        <Route path="/career/internships" element={<CareerInternships />} />
-        <Route path="/career/guidance" element={<CareerGuidance />} />
-        <Route path="/career/resources" element={<CareerResources />} />
-        <Route path="/career/management" element={<CareerManagement />} />
-        <Route path="/career/resume-builder" element={<ResumeBuilder />} />
-        <Route path="/career/internship-tracker" element={<InternshipTracker />} />
-        <Route path="/career/internship-tracker/:id" element={<InternshipDetails />} />
+        {/* Study Groups */}
+        <Route path="/study-groups" element={<StudyGroups />} />
+        <Route path="/study-groups/:groupId" element={<StudyGroupDetail />} />
 
+        {/* Resources */}
+        <Route path="/resources" element={<Resources />} />
+
+        {/* Assignments */}
+        <Route path="/assignments" element={<Assignments />} />
+
+        {/* Timetable */}
+        <Route path="/timetable" element={<Timetable />} />
+
+        {/* Study Help */}
+        <Route path="/study-help" element={<StudyHelp />} />
 
         {/* Default */}
         <Route path="*" element={<Navigate to="/" replace />} />

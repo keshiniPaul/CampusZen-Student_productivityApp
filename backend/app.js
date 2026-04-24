@@ -2,41 +2,19 @@ const express = require("express");
 const cors = require("cors");
 const requestLogger = require("./middleware/requestLogger");
 const { notFound, errorHandler } = require("./middleware/errorHandler");
-const healthyHabitRoutes = require("./routes/HealthyHabitRoutes");
-const careerRoutes = require("./routes/careerRoutes");
-const resumeRoutes = require("./routes/resumeRoutes");
-const internshipRoutes = require("./routes/internshipRoutes");
-const notificationRoutes = require("./routes/notificationRoutes");
-const resourceRoutes = require("./routes/resourceRoutes");
+
 const app = express();
-const path = require("path");
 
 // Middleware
 app.use(cors());
-app.use(express.json({ limit: "25mb" }));
-app.use(express.urlencoded({ extended: true, limit: "25mb" }));
-
-// Serve static files
-app.use("/images", express.static(path.join(__dirname, "images")));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(requestLogger);
-app.use("/api/health/habits", healthyHabitRoutes);
-app.use("/api/careers", careerRoutes);
-app.use("/api/resumes", resumeRoutes);
-app.use("/api/internships", internshipRoutes);
-app.use("/api/notifications", notificationRoutes);
-app.use("/api/resources", resourceRoutes);
-
 
 // Home route
 app.get("/", (req, res) => {
   res.status(200).json({
-    message: "Backend connected successfully!",
-    endpoints: {
-      auth: "/api/auth",
-      events: "/api/events",
-      health: "/api/health"
-    }
+    message: "Backend connected successfully!"
   });
 });
 
@@ -48,23 +26,6 @@ app.use("/api/auth", userRoutes);
 const eventRoutes = require("./routes/eventroutes");
 app.use("/api/events", eventRoutes);
 
-// Health routes (Daily Health Check-in CRUD)
-const healthRoutes = require("./routes/healthRoutes");
-app.use("/api/health", healthRoutes);
-
-// Health check endpoint (separate from the main routes)
-app.get("/api/health-check", (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: "API is running",
-    timestamp: new Date().toISOString(),
-    services: {
-      database: "connected",
-      server: "operational"
-    }
-  });
-});
-
 // Sport routes
 const sportRoutes = require("./routes/sportroutes");
 app.use("/api/sports", sportRoutes);
@@ -72,6 +33,23 @@ app.use("/api/sports", sportRoutes);
 // Club routes
 const clubRoutes = require("./routes/clubroutes");
 app.use("/api/clubs", clubRoutes);
+
+// Study Group routes
+const studyGroupRoutes = require("./routes/studygrouproutes");
+app.use("/api/study-groups", studyGroupRoutes);
+
+// Assignment routes
+const assignmentRoutes = require("./routes/assignmentroutes");
+app.use("/api/assignments", assignmentRoutes);
+
+// Timetable routes
+const timetableRoutes = require("./routes/timetableroutes");
+app.use("/api/timetable", timetableRoutes);
+
+// Resource routes
+const resourceRoutes = require("./routes/resourceroutes");
+app.use("/api/resources", resourceRoutes);
+app.use("/uploads", require("express").static(require("path").join(__dirname, "uploads")));
 
 // Error handling middleware (must be last)
 app.use(notFound);
