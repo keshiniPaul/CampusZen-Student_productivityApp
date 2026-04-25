@@ -32,18 +32,6 @@ const UserSchema = new mongoose.Schema(
     profileImage: {
       type: String,
       default: "default-profile.png"
-    },
-
-    savedResources: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Resource",
-      },
-    ],
-
-    skills: {
-      type: [String],
-      default: [],
     }
   },
   {

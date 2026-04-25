@@ -69,29 +69,13 @@ const getEventById = async (req, res) => {
 // @access  Admin only
 const createEvent = async (req, res) => {
   try {
-    const {
-      title,
-      shortDescription,
-      category,
-      date,
-      venue,
-      image,
-      registrationRequired,
-      registrationLink,
-    } = req.body;
+    const { title, shortDescription, category, date, venue, image } = req.body;
     
     // Validate required fields
     if (!title || !shortDescription || !date || !venue) {
       return res.status(400).json({
         success: false,
         message: "Please provide all required fields",
-      });
-    }
-
-    if (registrationRequired && !registrationLink) {
-      return res.status(400).json({
-        success: false,
-        message: "Registration link is required when registration is enabled",
       });
     }
     
@@ -102,8 +86,6 @@ const createEvent = async (req, res) => {
       date,
       venue,
       image,
-      registrationRequired: Boolean(registrationRequired),
-      registrationLink: registrationRequired ? registrationLink || "" : "",
       createdBy: req.user?.id, // Assumes user auth middleware
     });
     
@@ -135,16 +117,7 @@ const updateEvent = async (req, res) => {
       });
     }
     
-    const {
-      title,
-      shortDescription,
-      category,
-      date,
-      venue,
-      image,
-      registrationRequired,
-      registrationLink,
-    } = req.body;
+    const { title, shortDescription, category, date, venue, image } = req.body;
     
     // Update fields
     if (title) event.title = title;
@@ -153,19 +126,6 @@ const updateEvent = async (req, res) => {
     if (date) event.date = date;
     if (venue) event.venue = venue;
     if (image) event.image = image;
-    if (typeof registrationRequired === "boolean") {
-      if (registrationRequired && !registrationLink && !event.registrationLink) {
-        return res.status(400).json({
-          success: false,
-          message: "Registration link is required when registration is enabled",
-        });
-      }
-      event.registrationRequired = registrationRequired;
-      event.registrationLink = registrationRequired ? registrationLink || event.registrationLink : "";
-    }
-    if (typeof registrationLink === "string" && event.registrationRequired) {
-      event.registrationLink = registrationLink;
-    }
     
     const updatedEvent = await event.save();
     

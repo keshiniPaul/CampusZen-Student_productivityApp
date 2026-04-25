@@ -1,0 +1,129 @@
+.studyHelp {
+  padding: 3rem 0 5rem;
+  min-height: calc(100vh - 70px);
+  background: #f8fafc;
+}
+
+.studyHelp__header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.studyHelp__title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-bottom: 0.75rem;
+}
+
+.studyHelp__subtitle {
+  font-size: 1.125rem;
+  color: #64748b;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.studyHelp__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+.studyHelp__card {
+  background: #fff;
+  border-radius: 1rem;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e2e8f0;
+}
+
+.studyHelp__card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.13);
+}
+
+.studyHelp__cardImgWrap {
+  position: relative;
+  width: 100%;
+  height: 180px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.studyHelp__cardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.35s ease;
+}
+
+.studyHelp__card:hover .studyHelp__cardImg {
+  transform: scale(1.05);
+}
+
+.studyHelp__cardBadge {
+  position: absolute;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  font-size: 1.6rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.4rem;
+  line-height: 1;
+  backdrop-filter: blur(4px);
+}
+
+.studyHelp__cardBody {
+  padding: 1.5rem 1.5rem 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+
+.studyHelp__cardTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin: 0;
+}
+
+.studyHelp__cardDesc {
+  font-size: 0.9rem;
+  color: #64748b;
+  line-height: 1.6;
+  flex: 1;
+}
+
+.studyHelp__cardBtn {
+  display: inline-block;
+  margin-top: 0.75rem;
+  color: #4f46e5;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: color 0.15s;
+}
+
+.studyHelp__cardBtn:hover {
+  color: #3730a3;
+}
+
+@media (max-width: 600px) {
+  .studyHelp__title {
+    font-size: 1.75rem;
+  }
+
+  .studyHelp__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .studyHelp__cardImgWrap {
+    height: 160px;
+  }
+}

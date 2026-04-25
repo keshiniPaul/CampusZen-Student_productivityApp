@@ -139,6 +139,7 @@ const clubSchema = new mongoose.Schema(
 clubSchema.index({ registrationOpen: 1, registrationClose: 1 });
 clubSchema.index({ category: 1 });
 clubSchema.index({ isActive: 1 });
+clubSchema.index({ name: 1 });
 
 // Virtual field for registration status
 clubSchema.virtual("status").get(function () {

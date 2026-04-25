@@ -221,17 +221,22 @@ function Home() {
             <a href="#top" onClick={scrollToTop}>
               Home
             </a>
-            <a href="#health" onClick={(e) => scrollToSection(e, "health")}>
+            <a href="#health" onClick={(e) => {
+                      e.preventDefault();
+                  navigate("/health");
+                   setIsNavOpen(false);
+              }}
+               >
               Health
             </a>
-            <a href="#events" onClick={(e) => scrollToSection(e, "events")}>
+            <a href="/events" onClick={goToEventsDashboard}>
               Events
             </a>
             <a href="#career" onClick={(e) => scrollToSection(e, "career")}>
               Career
             </a>
-            <a href="#study" onClick={(e) => scrollToSection(e, "study")}>
-              Study
+            <a href="/study-help" onClick={(e) => { e.preventDefault(); navigate('/study-help'); setIsNavOpen(false); }}>
+              Study Help
             </a>
 
             <div className="nav__cta">
@@ -449,7 +454,7 @@ function Home() {
         </section>
 
         {/* EVENT */}
-        <section className="section section--soft" id="events">
+        <section className="section section--soft" id="event">
           <div className="container">
             <div className="section__head">
               <h2 className="section__title">Extra Curricular Activities &amp; Events</h2>
