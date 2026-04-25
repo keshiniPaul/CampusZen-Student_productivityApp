@@ -11,7 +11,7 @@ test('01 - Event dashboard renders core categories', async ({ page }) => {
   await page.goto('/events');
 
   await expect(page.getByRole('heading', { name: 'Event Dashboard' })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Event' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Event', exact: true })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Sports' })).toBeVisible();
   await expect(page.getByRole('heading', { name: 'Club & Society' })).toBeVisible();
 });
