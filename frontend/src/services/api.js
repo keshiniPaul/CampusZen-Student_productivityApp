@@ -10,11 +10,11 @@ export const sportsAPI = {
       const url = `${API_BASE_URL}/sports${queryString ? `?${queryString}` : ''}`;
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch sports');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error fetching sports:', error);
@@ -27,11 +27,11 @@ export const sportsAPI = {
     try {
       const response = await fetch(`${API_BASE_URL}/sports/${id}`);
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch sport');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error fetching sport:', error);
@@ -51,11 +51,11 @@ export const sportsAPI = {
         body: JSON.stringify(sportData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to create sport');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error creating sport:', error);
@@ -75,11 +75,11 @@ export const sportsAPI = {
         body: JSON.stringify(sportData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update sport');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error updating sport:', error);
@@ -97,11 +97,11 @@ export const sportsAPI = {
         },
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete sport');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error deleting sport:', error);
@@ -119,11 +119,11 @@ export const sportsAPI = {
         },
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to register for sport');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error registering for sport:', error);
@@ -143,11 +143,11 @@ export const sportsAPI = {
         body: JSON.stringify(notificationData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to send notification');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error sending notification:', error);
@@ -165,11 +165,11 @@ export const eventAPI = {
       const url = `${API_BASE_URL}/events${queryString ? `?${queryString}` : ''}`;
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch events');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error fetching events:', error);
@@ -189,11 +189,11 @@ export const eventAPI = {
         body: JSON.stringify(eventData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to create event');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error creating event:', error);
@@ -213,11 +213,11 @@ export const eventAPI = {
         body: JSON.stringify(eventData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update event');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error updating event:', error);
@@ -235,11 +235,11 @@ export const eventAPI = {
         },
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete event');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error deleting event:', error);
@@ -257,11 +257,11 @@ export const clubsAPI = {
       const url = `${API_BASE_URL}/clubs${queryString ? `?${queryString}` : ''}`;
       const response = await fetch(url);
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch clubs');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error fetching clubs:', error);
@@ -274,11 +274,11 @@ export const clubsAPI = {
     try {
       const response = await fetch(`${API_BASE_URL}/clubs/${id}`);
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch club');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error fetching club:', error);
@@ -298,11 +298,11 @@ export const clubsAPI = {
         body: JSON.stringify(clubData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to create club');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error creating club:', error);
@@ -322,11 +322,11 @@ export const clubsAPI = {
         body: JSON.stringify(clubData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update club');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error updating club:', error);
@@ -344,11 +344,11 @@ export const clubsAPI = {
         },
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete club');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error deleting club:', error);
@@ -366,11 +366,11 @@ export const clubsAPI = {
         },
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to join club');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error joining club:', error);
@@ -390,11 +390,11 @@ export const clubsAPI = {
         body: JSON.stringify({ action }),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to manage member');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error managing member:', error);
@@ -414,11 +414,11 @@ export const clubsAPI = {
         body: JSON.stringify(announcementData),
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to post announcement');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error posting announcement:', error);
@@ -434,11 +434,11 @@ export const careerAPI = {
     try {
       const response = await fetch(`${API_BASE_URL}/careers`);
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to fetch careers');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error fetching careers:', error);
@@ -457,11 +457,11 @@ export const careerAPI = {
         body: formData, // FormData handles its own headers
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to create career');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error creating career:', error);
@@ -480,11 +480,11 @@ export const careerAPI = {
         body: formData, // FormData handles its own headers
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to update career');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error updating career:', error);
@@ -502,11 +502,11 @@ export const careerAPI = {
         },
       });
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.message || 'Failed to delete career');
       }
-      
+
       return data;
     } catch (error) {
       console.error('Error deleting career:', error);

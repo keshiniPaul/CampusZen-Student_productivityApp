@@ -211,7 +211,6 @@ const addActivityNotification = ({ title, message, category }) => {
 function Clubs() {
   const navigate = useNavigate();
   const currentUser = JSON.parse(localStorage.getItem("user") || "null");
-  const displayName = currentUser?.fullName || currentUser?.email || "User";
   const authToken = localStorage.getItem("token");
   const isAdmin = currentUser?.role === "admin";
   const [isNavOpen, setIsNavOpen] = useState(false);
@@ -363,7 +362,7 @@ function Clubs() {
       try {
         console.log('Fetching clubs from API...');
         const response = await clubsAPI.getAllClubs();
-        
+
         if (response.success && response.data && response.data.length > 0) {
           const mappedClubs = response.data.map((club) => {
             // Find matching initial data for image fallback
@@ -632,12 +631,12 @@ function Clubs() {
       }
     }
 
-      const updatedClubs = clubs.filter((item) => item.id !== clubId);
-      setClubs(updatedClubs);
-      localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
-      setToastText("✅ Club deleted successfully!");
-      setToastVisible(true);
-      setTimeout(() => setToastVisible(false), 3000);
+    const updatedClubs = clubs.filter((item) => item.id !== clubId);
+    setClubs(updatedClubs);
+    localStorage.setItem("campuszone_clubs", JSON.stringify(updatedClubs));
+    setToastText("✅ Club deleted successfully!");
+    setToastVisible(true);
+    setTimeout(() => setToastVisible(false), 3000);
   };
 
   const handleClubFormChange = (e) => {
@@ -843,6 +842,22 @@ function Clubs() {
     setIsNavOpen(false);
   };
 
+  const handleLogout = () => {
+    localStorage.clear();
+    setIsProfileOpen(false);
+    navigate("/");
+  };
+
+  const goToDashboard = () => {
+    setIsProfileOpen(false);
+    navigate("/dashboard");
+  };
+
+  const goToProfile = () => {
+    setIsProfileOpen(false);
+    navigate("/profile");
+  };
+
   const weekdayLabels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -893,9 +908,9 @@ function Clubs() {
       <header className="topbar" id="top">
         <nav className="nav container">
           <Link className="brand" to="/" aria-label="CampusZone Home" onClick={scrollToTop}>
-            <img 
-              className="brand__logo--img" 
-              src={campusLogo} 
+            <img
+              className="brand__logo--img"
+              src={campusLogo}
               alt="CampusZone Logo"
             />
           </Link>
@@ -933,57 +948,76 @@ function Clubs() {
             </a>
           </div>
 
-          <button
-            className="header__notificationBtn"
-            onClick={() => setShowNotifications((prev) => !prev)}
-            aria-label="Notifications"
-          >
-            🔔
-            {notifications.length > 0 && (
-              <span className="header__notificationBadge">{notifications.length}</span>
-            )}
-          </button>
-
-          {showNotifications && (
-            <div className="notifications__dropdown">
-              <div className="notifications__header">
-                <h3 className="notifications__title">Notifications</h3>
-                <span className="notifications__count">{notifications.length} new</span>
-              </div>
-              <div className="notifications__list">
-                {notifications.map((notif) => (
-                  <div key={notif.id} className={`notification__item notification__item--${notif.type}`}>
-                    <div className="notification__icon">
-                      {notif.type === "success" && "🔔"}
-                      {notif.type === "warning" && "⚠️"}
-                      {notif.type === "urgent" && "🚨"}
-                    </div>
-                    <div className="notification__content">
-                      <p className="notification__message">{notif.message}</p>
-                      <span className="notification__club">{notif.club}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          <div className="header__profileDropdown" ref={profileRef}>
+          <div className="nav__cta">
             <button
-              className="header__profileBtn"
-              onClick={() => setIsProfileOpen((prev) => !prev)}
-              aria-expanded={isProfileOpen}
+              className="header__notificationBtn"
+              onClick={() => setShowNotifications((prev) => !prev)}
+              aria-label="Notifications"
             >
-              <span className="header__profileText">{displayName}</span>
+              <svg className="header__notificationIcon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.02 2.90991C8.70997 2.90991 6.01997 5.59991 6.01997 8.90991V11.7999C6.01997 12.4099 5.75997 13.3399 5.44997 13.8599L4.29997 15.7699C3.58997 16.9499 4.07997 18.2599 5.37997 18.6999C9.68997 20.1399 14.34 20.1399 18.65 18.6999C19.86 18.2999 20.39 16.8699 19.73 15.7699L18.58 13.8599C18.28 13.3399 18.02 12.4099 18.02 11.7999V8.90991C18.02 5.60991 15.32 2.90991 12.02 2.90991Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" />
+                <path d="M13.87 3.19994C13.56 3.10994 13.24 3.03994 12.91 2.99994C11.95 2.87994 11.03 2.94994 10.17 3.19994C10.46 2.45994 11.18 1.93994 12.02 1.93994C12.86 1.93994 13.58 2.45994 13.87 3.19994Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M15.02 19.0601C15.02 20.7101 13.67 22.0601 12.02 22.0601C11.2 22.0601 10.44 21.7201 9.90002 21.1801C9.36002 20.6401 9.02002 19.8801 9.02002 19.0601" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" />
+              </svg>
+              {notifications.length > 0 && (
+                <span className="header__notificationBadge">{notifications.length}</span>
+              )}
             </button>
-            {isProfileOpen && (
-              <div className="header__profileMenu">
-                <a href="#profile" className="header__profileMenuItem">Profile</a>
-                <a href="#myclubs" className="header__profileMenuItem">My Clubs</a>
-                <a href="#password-change" className="header__profileMenuItem">Password Change</a>
-                <a href="#logout" className="header__profileMenuItem header__profileMenuItem--danger">Logout</a>
+
+            {showNotifications && (
+              <div className="notifications__dropdown">
+                <div className="notifications__header">
+                  <h3 className="notifications__title">Notifications</h3>
+                  <span className="notifications__count">{notifications.length} new</span>
+                </div>
+                <div className="notifications__list">
+                  {notifications.map((notif) => (
+                    <div key={notif.id} className={`notification__item notification__item--${notif.type}`}>
+                      <div className="notification__icon">
+                        {notif.type === "success" && "🔔"}
+                        {notif.type === "warning" && "⚠️"}
+                        {notif.type === "urgent" && "🚨"}
+                      </div>
+                      <div className="notification__content">
+                        <p className="notification__message">{notif.message}</p>
+                        <span className="notification__club">{notif.club}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </div>
             )}
+
+            <div className="profile-dropdown" ref={profileRef}>
+              <button
+                className="profile-icon-btn"
+                onClick={() => setIsProfileOpen((prev) => !prev)}
+                aria-label="Profile menu"
+              >
+                👤
+              </button>
+              {isProfileOpen && (
+                <div className="profile-dropdown-menu">
+                  <button onClick={goToProfile} className="dropdown-item" type="button">
+                    <span className="dropdown-icon">👤</span>
+                    My Profile
+                  </button>
+                  <button onClick={goToDashboard} className="dropdown-item" type="button">
+                    <span className="dropdown-icon">📊</span>
+                    Dashboard
+                  </button>
+                  <button className="dropdown-item" type="button" onClick={() => setIsProfileOpen(false)}>
+                    <span className="dropdown-icon">🏛️</span>
+                    My Clubs
+                  </button>
+                  <div className="dropdown-divider"></div>
+                  <button onClick={handleLogout} className="dropdown-item logout" type="button">
+                    <span className="dropdown-icon">🚪</span>
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </nav>
       </header>
@@ -1075,8 +1109,8 @@ function Clubs() {
                           title="Update Club"
                         >
                           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M11 2H9C4 2 2 4 2 9V15C2 20 4 22 9 22H15C20 22 22 20 22 15V13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M16.04 3.02001L8.16 10.9C7.86 11.2 7.56 11.79 7.5 12.22L7.07 15.23C6.91 16.32 7.68 17.08 8.77 16.93L11.78 16.5C12.2 16.44 12.79 16.14 13.1 15.84L20.98 7.96001C22.34 6.60001 22.98 5.02001 20.98 3.02001C18.98 1.02001 17.4 1.66001 16.04 3.02001Z" stroke="currentColor" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </button>
                         <button
@@ -1085,9 +1119,9 @@ function Clubs() {
                           title="Delete Club"
                         >
                           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M21 5.98001C17.67 5.65001 14.32 5.48001 10.98 5.48001C9 5.48001 7.02 5.58001 5.04 5.78001L3 5.98001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                            <path d="M18.85 9.14001L18.2 19.21C18.09 20.78 18 22 15.21 22H8.79002C6.00002 22 5.91002 20.78 5.80002 19.21L5.15002 9.14001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                            <path d="M21 5.98001C17.67 5.65001 14.32 5.48001 10.98 5.48001C9 5.48001 7.02 5.58001 5.04 5.78001L3 5.98001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M8.5 4.97L8.72 3.66C8.88 2.71 9 2 10.69 2H13.31C15 2 15.13 2.75 15.28 3.67L15.5 4.97" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                            <path d="M18.85 9.14001L18.2 19.21C18.09 20.78 18 22 15.21 22H8.79002C6.00002 22 5.91002 20.78 5.80002 19.21L5.15002 9.14001" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                           </svg>
                         </button>
                       </div>
@@ -1108,7 +1142,7 @@ function Clubs() {
                     <div className="clubs__meta">
                       <div className="clubs__metaItem">
                         <svg className="clubs__metaIcon" viewBox="0 0 24 24" fill="none">
-                          <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <div className="clubs__metaText">
                           <span className="clubs__metaLabel">Opens:</span>
@@ -1120,7 +1154,7 @@ function Clubs() {
 
                       <div className="clubs__metaItem">
                         <svg className="clubs__metaIcon" viewBox="0 0 24 24" fill="none">
-                          <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M8 2V5M16 2V5M3.5 9.09H20.5M21 8.5V17C21 20 19.5 22 16 22H8C4.5 22 3 20 3 17V8.5C3 5.5 4.5 3.5 8 3.5H16C19.5 3.5 21 5.5 21 8.5Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <div className="clubs__metaText">
                           <span className="clubs__metaLabel">Closes:</span>
@@ -1132,10 +1166,10 @@ function Clubs() {
 
                       <div className="clubs__metaItem clubs__metaItem--full">
                         <svg className="clubs__metaIcon" viewBox="0 0 24 24" fill="none">
-                          <path d="M9 2C6.38 2 4.25 4.13 4.25 6.75C4.25 9.32 6.26 11.4 8.88 11.49C8.96 11.48 9.04 11.48 9.1 11.49C9.12 11.49 9.13 11.49 9.15 11.49C9.16 11.49 9.16 11.49 9.17 11.49C11.73 11.4 13.74 9.32 13.75 6.75C13.75 4.13 11.62 2 9 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M14.08 14.15C11.29 12.29 6.73996 12.29 3.92996 14.15C2.65996 15 1.95996 16.15 1.95996 17.38C1.95996 18.61 2.65996 19.75 3.91996 20.59C5.31996 21.53 7.15996 22 8.99996 22C10.84 22 12.68 21.53 14.08 20.59C15.34 19.74 16.04 18.6 16.04 17.36C16.03 16.13 15.34 14.99 14.08 14.15Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M19.9901 7.34C20.1501 9.28 18.7701 10.98 16.8601 11.21C16.8501 11.21 16.8501 11.21 16.8401 11.21H16.8101C16.7501 11.21 16.6901 11.21 16.6401 11.23C15.6701 11.28 14.7801 10.97 14.1101 10.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                          <path d="M20.01 16.59C19.99 16.97 19.9 17.35 19.74 17.71C19.33 18.58 18.58 19.29 17.61 19.76C16.68 20.21 15.63 20.42 14.59 20.37C15.14 19.81 15.46 19.11 15.51 18.38C15.57 17.41 15.16 16.46 14.38 15.67C13.76 15.04 12.99 14.57 12.15 14.23C15.07 12.93 18.77 13.57 20.01 16.59Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                          <path d="M9 2C6.38 2 4.25 4.13 4.25 6.75C4.25 9.32 6.26 11.4 8.88 11.49C8.96 11.48 9.04 11.48 9.1 11.49C9.12 11.49 9.13 11.49 9.15 11.49C9.16 11.49 9.16 11.49 9.17 11.49C11.73 11.4 13.74 9.32 13.75 6.75C13.75 4.13 11.62 2 9 2Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M14.08 14.15C11.29 12.29 6.73996 12.29 3.92996 14.15C2.65996 15 1.95996 16.15 1.95996 17.38C1.95996 18.61 2.65996 19.75 3.91996 20.59C5.31996 21.53 7.15996 22 8.99996 22C10.84 22 12.68 21.53 14.08 20.59C15.34 19.74 16.04 18.6 16.04 17.36C16.03 16.13 15.34 14.99 14.08 14.15Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M19.9901 7.34C20.1501 9.28 18.7701 10.98 16.8601 11.21C16.8501 11.21 16.8501 11.21 16.8401 11.21H16.8101C16.7501 11.21 16.6901 11.21 16.6401 11.23C15.6701 11.28 14.7801 10.97 14.1101 10.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          <path d="M20.01 16.59C19.99 16.97 19.9 17.35 19.74 17.71C19.33 18.58 18.58 19.29 17.61 19.76C16.68 20.21 15.63 20.42 14.59 20.37C15.14 19.81 15.46 19.11 15.51 18.38C15.57 17.41 15.16 16.46 14.38 15.67C13.76 15.04 12.99 14.57 12.15 14.23C15.07 12.93 18.77 13.57 20.01 16.59Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                         </svg>
                         <div className="clubs__metaText">
                           <span className="clubs__metaLabel">Members:</span>
@@ -1152,9 +1186,9 @@ function Clubs() {
                         </span>
                       </div>
                       <div className="clubs__progressBar">
-                        <div 
+                        <div
                           className="clubs__progress"
-                          style={{ 
+                          style={{
                             width: `${filledPercentage}%`,
                             backgroundColor: filledPercentage >= 90 ? '#e74c3c' : filledPercentage >= 70 ? '#f39c12' : '#3b82f6'
                           }}
@@ -1174,9 +1208,9 @@ function Clubs() {
                         onClick={() => handleJoinClub(club)}
                         disabled={statusInfo.disabled}
                       >
-                        {statusInfo.status === "FULL" ? "Membership Full" : 
-                         statusInfo.status === "CLOSED" ? "Registration Closed" :
-                         statusInfo.status === "COMING SOON" ? "Coming Soon" : "Join Club"}
+                        {statusInfo.status === "FULL" ? "Membership Full" :
+                          statusInfo.status === "CLOSED" ? "Registration Closed" :
+                            statusInfo.status === "COMING SOON" ? "Coming Soon" : "Join Club"}
                       </button>
                     </div>
                   </div>
@@ -1501,27 +1535,27 @@ function Clubs() {
               <div className="clubDetails__section">
                 <h3 className="clubDetails__heading">Connect With Us</h3>
                 <div className="clubDetails__social">
-                  <a 
-                    href={selectedClub.socialMedia.facebook} 
-                    target="_blank" 
+                  <a
+                    href={selectedClub.socialMedia.facebook}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="clubDetails__socialLink"
                   >
                     <img src={facebookIcon} alt="Facebook" className="clubDetails__socialIcon" />
                     Facebook
                   </a>
-                  <a 
-                    href={selectedClub.socialMedia.instagram} 
-                    target="_blank" 
+                  <a
+                    href={selectedClub.socialMedia.instagram}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="clubDetails__socialLink"
                   >
                     <img src={instagramIcon} alt="Instagram" className="clubDetails__socialIcon" />
                     Instagram
                   </a>
-                  <a 
-                    href={selectedClub.socialMedia.linkedin} 
-                    target="_blank" 
+                  <a
+                    href={selectedClub.socialMedia.linkedin}
+                    target="_blank"
                     rel="noopener noreferrer"
                     className="clubDetails__socialLink"
                   >
@@ -1536,16 +1570,16 @@ function Clubs() {
                   <div className="clubDetails__dateItem">
                     <span className="clubDetails__dateLabel">Registration Opens</span>
                     <span className="clubDetails__dateValue">
-                      {new Date(selectedClub.registrationOpen).toLocaleDateString("en-US", { 
-                        weekday: "long", month: "long", day: "numeric", year: "numeric" 
+                      {new Date(selectedClub.registrationOpen).toLocaleDateString("en-US", {
+                        weekday: "long", month: "long", day: "numeric", year: "numeric"
                       })}
                     </span>
                   </div>
                   <div className="clubDetails__dateItem">
                     <span className="clubDetails__dateLabel">Registration Closes</span>
                     <span className="clubDetails__dateValue">
-                      {new Date(selectedClub.registrationClose).toLocaleDateString("en-US", { 
-                        weekday: "long", month: "long", day: "numeric", year: "numeric" 
+                      {new Date(selectedClub.registrationClose).toLocaleDateString("en-US", {
+                        weekday: "long", month: "long", day: "numeric", year: "numeric"
                       })}
                     </span>
                   </div>
@@ -1555,9 +1589,9 @@ function Clubs() {
                   onClick={() => handleJoinClub(selectedClub)}
                   disabled={getRegistrationStatus(selectedClub).disabled}
                 >
-                  {getRegistrationStatus(selectedClub).status === "FULL" ? "Membership Full" : 
-                   getRegistrationStatus(selectedClub).status === "CLOSED" ? "Registration Closed" :
-                   getRegistrationStatus(selectedClub).status === "COMING SOON" ? "Coming Soon" : "Join Club Now"}
+                  {getRegistrationStatus(selectedClub).status === "FULL" ? "Membership Full" :
+                    getRegistrationStatus(selectedClub).status === "CLOSED" ? "Registration Closed" :
+                      getRegistrationStatus(selectedClub).status === "COMING SOON" ? "Coming Soon" : "Join Club Now"}
                 </button>
               </div>
             </div>
@@ -1610,24 +1644,24 @@ function Clubs() {
           </div>
         </div>
 
-            <div className="footer__socials" aria-label="Social links">
-              <a href="#top" onClick={scrollToTop} aria-label="Facebook">
-                <img className="footer__socialIcon" src={facebookIcon} alt="Facebook" />
-              </a>
-              <a href="#top" onClick={scrollToTop} aria-label="Instagram">
-                <img className="footer__socialIcon" src={instagramIcon} alt="Instagram" />
-              </a>
-              <a href="#top" onClick={scrollToTop} aria-label="LinkedIn">
-                <img className="footer__socialIcon" src={linkedinIcon} alt="LinkedIn" />
-              </a>
-              <a href="#top" onClick={scrollToTop} aria-label="YouTube">
-                <img className="footer__socialIcon" src={youtubeIcon} alt="YouTube" />
-              </a>
-            </div>
+        <div className="footer__socials" aria-label="Social links">
+          <a href="#top" onClick={scrollToTop} aria-label="Facebook">
+            <img className="footer__socialIcon" src={facebookIcon} alt="Facebook" />
+          </a>
+          <a href="#top" onClick={scrollToTop} aria-label="Instagram">
+            <img className="footer__socialIcon" src={instagramIcon} alt="Instagram" />
+          </a>
+          <a href="#top" onClick={scrollToTop} aria-label="LinkedIn">
+            <img className="footer__socialIcon" src={linkedinIcon} alt="LinkedIn" />
+          </a>
+          <a href="#top" onClick={scrollToTop} aria-label="YouTube">
+            <img className="footer__socialIcon" src={youtubeIcon} alt="YouTube" />
+          </a>
+        </div>
 
-            <a className="toTop" href="#top" onClick={scrollToTop} aria-label="Back to top">
-              ↑
-            </a>
+        <a className="toTop" href="#top" onClick={scrollToTop} aria-label="Back to top">
+          ↑
+        </a>
       </footer>
 
       <div

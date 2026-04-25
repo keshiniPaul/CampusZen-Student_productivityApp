@@ -1209,3 +1209,118 @@
     text-align: center;
   }
 }
+
+/* Modern refresh */
+.habits-hero {
+  background:
+    linear-gradient(120deg, rgba(8, 34, 56, 0.74), rgba(58, 123, 200, 0.54)),
+    url("https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1800&q=80") center/cover;
+  padding: 5.4rem 0 7.2rem;
+}
+
+.habits-hero__badge {
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  box-shadow: 0 12px 30px rgba(2, 30, 55, 0.16);
+}
+
+.habits-section {
+  background:
+    radial-gradient(700px 300px at 10% 0%, rgba(74, 158, 255, 0.14), transparent 55%),
+    #f6fbff;
+}
+
+.habits-card {
+  border: 1px solid rgba(2, 30, 55, 0.08);
+  box-shadow: 0 15px 34px rgba(2, 30, 55, 0.1);
+}
+
+.habits-tabs {
+  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.habits-tabs__btn.active {
+  background: linear-gradient(145deg, #e2f4ff, #f7fbff);
+  border: 1px solid rgba(74, 158, 255, 0.25);
+}
+
+.goal-slider::-webkit-slider-thumb {
+  background: linear-gradient(145deg, #2db9ea, #3a7bc8);
+}
+
+.goals-submit {
+  background: linear-gradient(135deg, #1fbfd7, #3a7bc8);
+  box-shadow: 0 15px 30px rgba(58, 123, 200, 0.25);
+}
+
+/* Compact spacing tune-up */
+.habits-hero {
+  padding: 4.4rem 0 5.4rem;
+}
+
+.habits-hero__subtitle {
+  margin-bottom: 1.6rem;
+}
+
+.habits-hero__stats {
+  gap: 1.8rem;
+  margin-top: 1.2rem;
+}
+
+.habits-tabs__nav {
+  gap: 0.65rem;
+  padding: 0.7rem 0;
+}
+
+.habits-tabs__btn {
+  padding: 0.62rem 1.2rem;
+}
+
+.habits-section {
+  padding: 2rem 0 3rem;
+}
+
+.habits-card {
+  border-radius: 18px;
+  padding: 1.5rem;
+}
+
+.habits-card__header {
+  margin-bottom: 1.4rem;
+}
+
+.goals-form {
+  gap: 1.25rem;
+}
+
+.goals-grid {
+  gap: 1.25rem;
+}
+
+.goals-summary {
+  margin-top: 1.2rem;
+}
+
+.goals-summary__grid {
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.goals-form__actions {
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 768px) {
+  .habits-hero {
+    padding: 3.4rem 0 4.1rem;
+  }
+
+  .habits-section {
+    padding: 1.3rem 0 2rem;
+  }
+
+  .habits-card {
+    padding: 1rem;
+  }
+}
+

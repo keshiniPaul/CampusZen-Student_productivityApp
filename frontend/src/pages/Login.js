@@ -129,6 +129,9 @@ function Login() {
       {/* Login Section */}
       <main className="login">
         <div className="container login__container">
+          <div className="login__image-wrapper">
+             <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?q=80&w=1200" alt="CampusZone Showcase" className="login__image" />
+          </div>
           <div className="login__card">
             <h2>Welcome Back</h2>
             <p className="login__subtitle">
@@ -185,18 +188,6 @@ function Login() {
           </div>
         </div>
       </main>
-
-      {/* Footer */}
-      <footer className="footer">
-        <div className="container footer__inner">
-          <div>
-            <div className="footer__name">CampusZone</div>
-            <div className="footer__small">
-              Student Productivity Platform
-            </div>
-          </div>
-        </div>
-      </footer>
 
       {/* Toast Notification */}
       <div className={`toast ${toast.visible ? "is-visible" : ""}`}>

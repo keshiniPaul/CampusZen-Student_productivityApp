@@ -143,7 +143,6 @@ function Home() {
 
   const goToEventsDashboard = (event) => {
     event.preventDefault();
-    showToast("Opening events dashboard");
     navigate("/events");
     setIsNavOpen(false);
   };
@@ -222,22 +221,13 @@ function Home() {
             <a href="#top" onClick={scrollToTop}>
               Home
             </a>
-            <a href="#health" onClick={(e) => {
-                      e.preventDefault();
-                  navigate("/health");
-                   setIsNavOpen(false);
-              }}
-               >
+            <a href="#health" onClick={(e) => scrollToSection(e, "health")}>
               Health
             </a>
-            <a href="/events" onClick={goToEventsDashboard}>
+            <a href="#events" onClick={(e) => scrollToSection(e, "events")}>
               Events
             </a>
-            <a href="/career" onClick={(e) => {
-                e.preventDefault();
-                navigate("/career");
-                setIsNavOpen(false);
-            }}>
+            <a href="#career" onClick={(e) => scrollToSection(e, "career")}>
               Career
             </a>
             <a href="#study" onClick={(e) => scrollToSection(e, "study")}>
@@ -368,20 +358,18 @@ function Home() {
                   alt="Campus students"
                   loading="lazy"
                 />
-                <div className="heroCard__badges">
-                  <div className="heroCard__float">
-                    <div className="floatIcon" aria-hidden="true">🎓</div>
-                    <div>
-                      <div className="floatTitle">Student Hub</div>
-                      <div className="floatText">All-in-one services</div>
-                    </div>
+                <div className="heroCard__float heroCard__float--left">
+                  <div className="floatIcon" aria-hidden="true">🎓</div>
+                  <div>
+                    <div className="floatTitle">Student Hub</div>
+                    <div className="floatText">All-in-one services</div>
                   </div>
-                  <div className="heroCard__float">
-                    <div className="floatIcon" aria-hidden="true">✅</div>
-                    <div>
-                      <div className="floatTitle">Easy Access</div>
-                      <div className="floatText">Modern &amp; secure</div>
-                    </div>
+                </div>
+                <div className="heroCard__float heroCard__float--right">
+                  <div className="floatIcon" aria-hidden="true">✅</div>
+                  <div>
+                    <div className="floatTitle">Easy Access</div>
+                    <div className="floatText">Modern &amp; secure</div>
                   </div>
                 </div>
               </div>
@@ -461,7 +449,7 @@ function Home() {
         </section>
 
         {/* EVENT */}
-        <section className="section section--soft" id="event">
+        <section className="section section--soft" id="events">
           <div className="container">
             <div className="section__head">
               <h2 className="section__title">Extra Curricular Activities &amp; Events</h2>
@@ -561,10 +549,10 @@ function Home() {
                 <p className="card__text">Save internship posts and track application status.</p>
                 <a
                   className="card__link"
-                  href="/career/internships"
+                  href="/"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate("/career/internships");
+                    showToast("Internships module coming soon");
                   }}
                 >
                   Learn more →
@@ -577,10 +565,10 @@ function Home() {
                 <p className="card__text">Build a clean CV and organize your achievements.</p>
                 <a
                   className="card__link"
-                  href="/career/resume-builder"
+                  href="/"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate("/career/resume-builder");
+                    showToast("CV builder coming soon");
                   }}
                 >
                   Learn more →
@@ -593,10 +581,10 @@ function Home() {
                 <p className="card__text">Set goals and track skills for your dream career.</p>
                 <a
                   className="card__link"
-                  href="/career/guidance"
+                  href="/"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate("/career/guidance");
+                    showToast("Goals tracker coming soon");
                   }}
                 >
                   Learn more →
@@ -609,10 +597,10 @@ function Home() {
                 <p className="card__text">Practice questions and prepare confidently.</p>
                 <a
                   className="card__link"
-                  href="/career/resources"
+                  href="/"
                   onClick={(e) => {
                     e.preventDefault();
-                    navigate("/career/resources");
+                    showToast("Interview prep coming soon");
                   }}
                 >
                   Learn more →
