@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 
 const groupMemberSchema = new mongoose.Schema({
   userId: {
@@ -49,6 +50,11 @@ const studyGroupSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    inviteCode: {
+      type: String,
+      unique: true,
+      default: () => crypto.randomBytes(6).toString("hex"),
+    },
     isActive: {
       type: Boolean,
       default: true,
@@ -64,7 +70,7 @@ studyGroupSchema.index({ type: 1 });
 studyGroupSchema.index({ name: "text", module: "text" });
 
 studyGroupSchema.virtual("memberCount").get(function () {
-  return this.members.length;
+  return this.members ? this.members.length : 0;
 });
 
 studyGroupSchema.set("toJSON", { virtuals: true });
